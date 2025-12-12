@@ -1,4 +1,4 @@
-rootProject.name = "Overscrolled"
+rootProject.name = "Songbook"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -28,8 +28,4 @@ dependencyResolutionManagement {
     }
 }
 
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
-
-include(":composeApp")
+include(":androidApp", ":shared")
