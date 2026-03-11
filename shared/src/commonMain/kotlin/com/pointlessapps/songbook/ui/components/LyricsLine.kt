@@ -4,10 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -32,7 +29,7 @@ fun LyricsLine(
     chords: List<ChordMarker>,
     modifier: Modifier = Modifier,
     cursorIndex: Int? = null,
-    onCursorFinalized: (Int) -> Unit = {},
+    onCursorFinalized: (Int, Offset) -> Unit = { _, _ -> },
 ) {
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
     var internalCursorIndex by remember { mutableStateOf<Int?>(null) }
@@ -84,7 +81,9 @@ fun LyricsLine(
                         change.consume()
                     }
 
-                    internalCursorIndex?.let { onCursorFinalized(it) }
+                    internalCursorIndex?.let {
+                        onCursorFinalized(it, Offset(targetX, textPosition.y))
+                    }
                     internalCursorIndex = null
                 }
             },

@@ -5,13 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.model.Chord
 import com.pointlessapps.songbook.ui.components.*
@@ -43,6 +41,19 @@ fun App() {
                 bottomBar = { SongStatusBar(tempo = 120) },
                 containerColor = MaterialTheme.colorScheme.surface,
             ) { paddingValues ->
+                var line1Chords by remember {
+                    mutableStateOf(
+                        listOf(
+                            ChordMarker(Chord.Am7, 0),
+                            ChordMarker(Chord.Dm7, 15),
+                            ChordMarker(Chord.G7, 30),
+                            ChordMarker(Chord.CMaj7, 45),
+                        )
+                    )
+                }
+
+                var popupState by remember { mutableStateOf<PopupState?>(null) }
+
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     LazyColumn(
                         modifier = Modifier
@@ -63,15 +74,27 @@ fun App() {
                         item {
                             LyricsSection(label = "Verse 1") {
                                 Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-                                    LyricsLine(
-                                        text = "Fly me to the moon, and let me play among the stars",
-                                        chords = listOf(
-                                            ChordMarker(Chord.Am7, 0),
-                                            ChordMarker(Chord.Dm7, 15),
-                                            ChordMarker(Chord.G7, 30),
-                                            ChordMarker(Chord.CMaj7, 45),
-                                        ),
-                                    )
+                                    Box {
+                                        LyricsLine(
+                                            text = "Fly me to the moon, and let me play among the stars",
+                                            chords = line1Chords,
+                                            onCursorFinalized = { index, offset ->
+                                                popupState = PopupState(index, offset)
+                                            }
+                                        )
+
+                                        popupState?.let { state ->
+                                            ChordSelectionPopup(
+                                                offset = IntOffset(state.offset.x.toInt(), state.offset.y.toInt()),
+                                                onChordSelected = { chord ->
+                                                    line1Chords = (line1Chords + ChordMarker(chord, state.index)).sortedBy { it.offset }
+                                                    popupState = null
+                                                },
+                                                onDismissRequest = { popupState = null }
+                                            )
+                                        }
+                                    }
+
                                     LyricsLine(
                                         text = "Let me see what spring is like on Jupiter and Mars",
                                         chords = listOf(
@@ -113,3 +136,5 @@ fun App() {
         }
     }
 }
+
+private data class PopupState(val index: Int, val offset: Offset)

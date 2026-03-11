@@ -15,4 +15,8 @@
     <string name="song_status_bar_capo">CAPO: %1$d</string>
     <string name="song_status_bar_live_mode">LIVE MODE ACTIVE</string>
     <string name="song_status_bar_fullscreen">Fullscreen</string>
+    <string name="chord_selection_popup_title">Chord Directory</string>
+    <string name="chord_selection_popup_subtitle">Select a chord to insert into your lyrics</string>
+    <string name="chord_selection_popup_search_placeholder">Search for a specific chord...</string>
+    <string name="chord_selection_popup_all_chords">ALL CHORDS</string>
 </resources>
