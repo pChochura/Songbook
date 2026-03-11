@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,12 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.shared.generated.resources.Res
-import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_auto_scroll
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_key
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_side_by_side
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_standard
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_text_only
-import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_reset
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_text_size_label
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
@@ -47,7 +42,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun SongControlBar(
     modifier: Modifier = Modifier,
-    onAutoScrollClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -60,7 +54,6 @@ fun SongControlBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        // Key and Font Size Controls
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
@@ -125,7 +118,6 @@ fun SongControlBar(
             }
         }
 
-        // View Mode Toggle (Segmented-like)
         Row(
             modifier = Modifier
                 .background(
@@ -161,53 +153,6 @@ fun SongControlBar(
                     Text(
                         text = stringResource(mode),
                         style = MaterialTheme.typography.labelSmall,
-                    )
-                }
-            }
-        }
-
-        // Action Buttons
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-        ) {
-            TextButton(
-                onClick = { },
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = null,
-                        modifier = Modifier.size(MaterialTheme.spacing.large),
-                    )
-                    Text(
-                        text = stringResource(Res.string.song_control_bar_reset),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-            }
-
-            Button(
-                onClick = onAutoScrollClick,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                shape = RoundedCornerShape(MaterialTheme.spacing.small),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        modifier = Modifier.size(MaterialTheme.spacing.large),
-                    )
-                    Text(
-                        text = stringResource(Res.string.song_control_bar_auto_scroll),
-                        style = MaterialTheme.typography.labelMedium,
                     )
                 }
             }

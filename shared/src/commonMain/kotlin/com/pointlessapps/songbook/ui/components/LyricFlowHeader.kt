@@ -1,22 +1,19 @@
 package com.pointlessapps.songbook.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import com.pointlessapps.songbook.shared.generated.resources.Res
 import com.pointlessapps.songbook.shared.generated.resources.common_app_name
 import com.pointlessapps.songbook.ui.theme.spacing
@@ -26,39 +23,27 @@ import org.jetbrains.compose.resources.stringResource
 fun LyricFlowHeader(
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Row(
         modifier = modifier
+            .statusBarsPadding()
             .fillMaxWidth()
             .padding(
                 horizontal = MaterialTheme.spacing.large,
                 vertical = MaterialTheme.spacing.medium,
             ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-            modifier = Modifier.align(Alignment.CenterStart),
-        ) {
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(MaterialTheme.spacing.large),
-            )
-            Text(
-                text = stringResource(Res.string.common_app_name),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-
-        // Mock User Profile
-        Box(
-            modifier = Modifier
-                .size(MaterialTheme.spacing.huge)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.outline)
-                .align(Alignment.CenterEnd),
+        Icon(
+            imageVector = Icons.Default.MusicNote,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(MaterialTheme.spacing.large),
+        )
+        Text(
+            text = stringResource(Res.string.common_app_name),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

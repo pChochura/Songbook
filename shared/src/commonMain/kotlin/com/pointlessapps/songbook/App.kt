@@ -10,11 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,8 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.shared.generated.resources.Res
-import com.pointlessapps.songbook.shared.generated.resources.common_play
 import com.pointlessapps.songbook.ui.components.ChordMarker
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.components.LyricFlowNavigationRail
@@ -38,7 +31,6 @@ import com.pointlessapps.songbook.ui.components.SongHeader
 import com.pointlessapps.songbook.ui.components.SongStatusBar
 import com.pointlessapps.songbook.ui.theme.LyricFlowTheme
 import com.pointlessapps.songbook.ui.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun App() {
@@ -62,22 +54,7 @@ fun App() {
                         SongControlBar()
                     }
                 },
-                bottomBar = {
-                    SongStatusBar(tempo = 120, capo = 0, isLiveMode = true)
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { },
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = MaterialTheme.colorScheme.onTertiary,
-                        shape = CircleShape,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = stringResource(Res.string.common_play),
-                        )
-                    }
-                },
+                bottomBar = { SongStatusBar(tempo = 120) },
                 containerColor = MaterialTheme.colorScheme.surface,
             ) { paddingValues ->
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -94,7 +71,6 @@ fun App() {
                             SongHeader(
                                 title = "Fly Me to the Moon",
                                 artist = "Frank Sinatra",
-                                tags = listOf("JAZZ STANDARD", "# Am"),
                             )
                         }
 

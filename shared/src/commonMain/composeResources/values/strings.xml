@@ -1,5 +1,5 @@
 <resources>
-    <string name="common_app_name">LyricFlow</string>
+    <string name="common_app_name">Songbook</string>
     <string name="common_play">Play</string>
     <string name="lyric_flow_navigation_rail_library">Library</string>
     <string name="lyric_flow_navigation_rail_now_playing">Now Playing</string>
