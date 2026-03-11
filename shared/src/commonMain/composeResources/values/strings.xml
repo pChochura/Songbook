@@ -1,0 +1,18 @@
+<resources>
+    <string name="common_app_name">LyricFlow</string>
+    <string name="common_play">Play</string>
+    <string name="lyric_flow_navigation_rail_library">Library</string>
+    <string name="lyric_flow_navigation_rail_now_playing">Now Playing</string>
+    <string name="lyric_flow_navigation_rail_controls">Controls</string>
+    <string name="song_control_bar_key">KEY: %1$s</string>
+    <string name="song_control_bar_reset">Reset</string>
+    <string name="song_control_bar_auto_scroll">Auto-scroll</string>
+    <string name="song_control_bar_mode_standard">Standard</string>
+    <string name="song_control_bar_mode_side_by_side">Side-by-Side</string>
+    <string name="song_control_bar_mode_text_only">Text Only</string>
+    <string name="song_control_bar_text_size_label">T</string>
+    <string name="song_status_bar_tempo">TEMPO: %1$d BPM</string>
+    <string name="song_status_bar_capo">CAPO: %1$d</string>
+    <string name="song_status_bar_live_mode">LIVE MODE ACTIVE</string>
+    <string name="song_status_bar_fullscreen">Fullscreen</string>
+</resources>

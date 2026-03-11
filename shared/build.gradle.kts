@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.compose.mp.runtime)
             implementation(libs.compose.mp.foundation)
             implementation(libs.compose.mp.material3)
+            implementation(libs.compose.mp.material.icons.extended)
             implementation(libs.compose.mp.ui)
             implementation(libs.compose.mp.components.resources)
         }
