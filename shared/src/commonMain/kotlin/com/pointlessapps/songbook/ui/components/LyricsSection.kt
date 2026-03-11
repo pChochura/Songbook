@@ -13,16 +13,16 @@ import com.pointlessapps.songbook.ui.theme.spacing
 fun LyricsSection(
     label: String,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column(
         modifier = modifier.padding(vertical = MaterialTheme.spacing.large),
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
     ) {
         Text(
             text = label.uppercase(),
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline,
         )
         content()
     }

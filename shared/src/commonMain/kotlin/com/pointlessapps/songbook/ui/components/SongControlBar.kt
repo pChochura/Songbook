@@ -1,27 +1,53 @@
 package com.pointlessapps.songbook.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.shared.generated.resources.Res
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_auto_scroll
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_key
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_side_by_side
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_standard
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_text_only
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_reset
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_text_size_label
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
-import com.pointlessapps.songbook.shared.generated.resources.*
 
 @Composable
 fun SongControlBar(
     modifier: Modifier = Modifier,
-    onAutoScrollClick: () -> Unit = {}
+    onAutoScrollClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -29,54 +55,63 @@ fun SongControlBar(
             .background(MaterialTheme.colorScheme.surface)
             .padding(
                 horizontal = MaterialTheme.spacing.large,
-                vertical = MaterialTheme.spacing.medium
+                vertical = MaterialTheme.spacing.medium,
             ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         // Key and Font Size Controls
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large)
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
             Text(
                 text = stringResource(Res.string.song_control_bar_key, "+0"),
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            
+
             Row(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), RoundedCornerShape(MaterialTheme.spacing.small))
+                    .background(
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(MaterialTheme.spacing.small),
+                    )
                     .padding(MaterialTheme.spacing.extraSmall),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = { }, modifier = Modifier.size(MaterialTheme.spacing.extraLarge)) {
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
+                ) {
                     Icon(
-                        Icons.Default.Remove,
+                        imageVector = Icons.Default.Remove,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(MaterialTheme.spacing.large)
+                        modifier = Modifier.size(MaterialTheme.spacing.large),
                     )
                 }
-                IconButton(onClick = { }, modifier = Modifier.size(MaterialTheme.spacing.extraLarge)) {
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
+                ) {
                     Icon(
-                        Icons.Default.Add,
+                        imageVector = Icons.Default.Add,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(MaterialTheme.spacing.large)
+                        modifier = Modifier.size(MaterialTheme.spacing.large),
                     )
                 }
             }
-            
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
             ) {
                 Text(
                     text = stringResource(Res.string.song_control_bar_text_size_label),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Slider(
                     value = 0.5f,
@@ -84,8 +119,8 @@ fun SongControlBar(
                     modifier = Modifier.width(150.dp),
                     colors = SliderDefaults.colors(
                         thumbColor = MaterialTheme.colorScheme.onSurface,
-                        activeTrackColor = MaterialTheme.colorScheme.primary
-                    )
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                    ),
                 )
             }
         }
@@ -93,30 +128,40 @@ fun SongControlBar(
         // View Mode Toggle (Segmented-like)
         Row(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.1f), RoundedCornerShape(MaterialTheme.spacing.large))
-                .padding(MaterialTheme.spacing.extraSmall)
+                .background(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(MaterialTheme.spacing.large),
+                )
+                .padding(MaterialTheme.spacing.extraSmall),
         ) {
             val modes = listOf(
                 Res.string.song_control_bar_mode_standard,
                 Res.string.song_control_bar_mode_side_by_side,
-                Res.string.song_control_bar_mode_text_only
+                Res.string.song_control_bar_mode_text_only,
             )
             var selectedMode by remember { mutableStateOf(modes[0]) }
             modes.forEach { mode ->
                 TextButton(
                     onClick = { selectedMode = mode },
                     colors = ButtonDefaults.textButtonColors(
-                        containerColor = if (selectedMode == mode) MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) else Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                        containerColor = if (selectedMode == mode) {
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                        } else {
+                            Color.Transparent
+                        },
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                     shape = RoundedCornerShape(14.dp),
                     contentPadding = PaddingValues(
                         horizontal = MaterialTheme.spacing.large,
-                        vertical = MaterialTheme.spacing.small
+                        vertical = MaterialTheme.spacing.small,
                     ),
-                    modifier = Modifier.height(MaterialTheme.spacing.huge)
+                    modifier = Modifier.height(MaterialTheme.spacing.huge),
                 ) {
-                    Text(stringResource(mode), style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        text = stringResource(mode),
+                        style = MaterialTheme.typography.labelSmall,
+                    )
                 }
             }
         }
@@ -124,40 +169,46 @@ fun SongControlBar(
         // Action Buttons
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
         ) {
             TextButton(
                 onClick = { },
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                 ) {
                     Icon(
-                        Icons.Default.Refresh,
+                        imageVector = Icons.Default.Refresh,
                         contentDescription = null,
-                        modifier = Modifier.size(MaterialTheme.spacing.large)
+                        modifier = Modifier.size(MaterialTheme.spacing.large),
                     )
-                    Text(stringResource(Res.string.song_control_bar_reset), style = MaterialTheme.typography.labelMedium)
+                    Text(
+                        text = stringResource(Res.string.song_control_bar_reset),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
             }
-            
+
             Button(
                 onClick = onAutoScrollClick,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                shape = RoundedCornerShape(MaterialTheme.spacing.small)
+                shape = RoundedCornerShape(MaterialTheme.spacing.small),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                 ) {
                     Icon(
-                        Icons.Default.PlayArrow,
+                        imageVector = Icons.Default.PlayArrow,
                         contentDescription = null,
-                        modifier = Modifier.size(MaterialTheme.spacing.large)
+                        modifier = Modifier.size(MaterialTheme.spacing.large),
                     )
-                    Text(stringResource(Res.string.song_control_bar_auto_scroll), style = MaterialTheme.typography.labelMedium)
+                    Text(
+                        text = stringResource(Res.string.song_control_bar_auto_scroll),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
             }
         }

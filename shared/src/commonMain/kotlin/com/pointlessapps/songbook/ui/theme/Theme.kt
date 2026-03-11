@@ -20,22 +20,22 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = Color.White,
     surfaceVariant = ChipBackground,
     onSurfaceVariant = CyanSecondary,
-    outline = TextGray
+    outline = TextGray,
 )
 
 @Composable
 fun LyricFlowTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = DarkColorScheme
 
     CompositionLocalProvider(
-        LocalSpacing provides Spacing()
+        LocalSpacing provides Spacing(),
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            content = content
+            content = content,
         )
     }
 }

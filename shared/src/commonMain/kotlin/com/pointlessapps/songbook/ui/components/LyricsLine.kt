@@ -16,11 +16,11 @@ data class ChordMarker(val chord: String, val offset: Int)
 fun LyricsLine(
     text: String,
     chords: List<ChordMarker>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.padding(vertical = MaterialTheme.spacing.small),
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large)) {
             chords.forEach { marker ->
@@ -30,7 +30,7 @@ fun LyricsLine(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
