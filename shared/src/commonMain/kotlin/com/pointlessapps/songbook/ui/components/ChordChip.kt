@@ -10,11 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.pointlessapps.songbook.model.Chord
 import com.pointlessapps.songbook.ui.theme.spacing
 
 @Composable
 fun ChordChip(
-    chord: String,
+    chord: Chord,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -29,7 +30,7 @@ fun ChordChip(
             ),
     ) {
         Text(
-            text = chord,
+            text = chord.value,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelMedium.copy(
                 fontSize = 14.sp,

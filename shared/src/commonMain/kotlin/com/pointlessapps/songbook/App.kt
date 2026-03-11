@@ -1,14 +1,7 @@
 package com.pointlessapps.songbook
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,15 +13,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.ui.components.ChordMarker
-import com.pointlessapps.songbook.ui.components.LyricFlowHeader
-import com.pointlessapps.songbook.ui.components.LyricFlowNavigationRail
-import com.pointlessapps.songbook.ui.components.LyricsLine
-import com.pointlessapps.songbook.ui.components.LyricsSection
-import com.pointlessapps.songbook.ui.components.NavigationDestination
-import com.pointlessapps.songbook.ui.components.SongControlBar
-import com.pointlessapps.songbook.ui.components.SongHeader
-import com.pointlessapps.songbook.ui.components.SongStatusBar
+import com.pointlessapps.songbook.model.Chord
+import com.pointlessapps.songbook.ui.components.*
 import com.pointlessapps.songbook.ui.theme.LyricFlowTheme
 import com.pointlessapps.songbook.ui.theme.spacing
 
@@ -80,19 +66,19 @@ fun App() {
                                     LyricsLine(
                                         text = "Fly me to the moon, and let me play among the stars",
                                         chords = listOf(
-                                            ChordMarker("Am7", 0),
-                                            ChordMarker("Dm7", 15),
-                                            ChordMarker("G7", 30),
-                                            ChordMarker("Cmaj7", 45),
+                                            ChordMarker(Chord.Am7, 0),
+                                            ChordMarker(Chord.Dm7, 15),
+                                            ChordMarker(Chord.G7, 30),
+                                            ChordMarker(Chord.CMaj7, 45),
                                         ),
                                     )
                                     LyricsLine(
                                         text = "Let me see what spring is like on Jupiter and Mars",
                                         chords = listOf(
-                                            ChordMarker("Fmaj7", 0),
-                                            ChordMarker("Bm7b5", 15),
-                                            ChordMarker("E7", 30),
-                                            ChordMarker("Am7", 45),
+                                            ChordMarker(Chord.FMaj7, 0),
+                                            ChordMarker(Chord.Bm7b5, 15),
+                                            ChordMarker(Chord.E7, 30),
+                                            ChordMarker(Chord.Am7, 45),
                                         ),
                                     )
                                 }
@@ -105,17 +91,17 @@ fun App() {
                                     LyricsLine(
                                         text = "In other words, hold my hand",
                                         chords = listOf(
-                                            ChordMarker("Dm7", 0),
-                                            ChordMarker("G7", 10),
-                                            ChordMarker("Cmaj7", 20),
+                                            ChordMarker(Chord.Dm7, 0),
+                                            ChordMarker(Chord.G7, 10),
+                                            ChordMarker(Chord.CMaj7, 20),
                                         ),
                                     )
                                     LyricsLine(
                                         text = "In other words, baby, kiss me",
                                         chords = listOf(
-                                            ChordMarker("Dm7", 0),
-                                            ChordMarker("G7", 10),
-                                            ChordMarker("Cmaj7", 20),
+                                            ChordMarker(Chord.Dm7, 0),
+                                            ChordMarker(Chord.G7, 10),
+                                            ChordMarker(Chord.CMaj7, 20),
                                         ),
                                     )
                                 }
