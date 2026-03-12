@@ -1,7 +1,16 @@
 package com.pointlessapps.songbook.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -9,8 +18,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,7 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.pointlessapps.songbook.model.Chord
-import com.pointlessapps.songbook.shared.generated.resources.*
+import com.pointlessapps.songbook.shared.generated.resources.Res
+import com.pointlessapps.songbook.shared.generated.resources.chord_selection_popup_search_placeholder
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
@@ -30,6 +49,7 @@ fun ChordSelectionPopup(
     offset: IntOffset,
     onChordSelected: (Chord) -> Unit,
     onDismissRequest: () -> Unit,
+    selectedChord: Chord? = null,
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val filteredChords = remember(searchQuery) {
@@ -57,22 +77,10 @@ fun ChordSelectionPopup(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(spacing.huge)
+                    .padding(spacing.large)
                     .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(spacing.large)
             ) {
-                Text(
-                    text = stringResource(Res.string.chord_selection_popup_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = colorScheme.onBackground
-                )
-                Text(
-                    text = stringResource(Res.string.chord_selection_popup_subtitle),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colorScheme.outline
-                )
-
-                Spacer(modifier = Modifier.height(spacing.huge))
-
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 64.dp),
                     horizontalArrangement = Arrangement.spacedBy(spacing.medium),
@@ -82,25 +90,36 @@ fun ChordSelectionPopup(
                         .fillMaxWidth(),
                 ) {
                     items(filteredChords) { chord ->
+                        val isSelected = chord.value == selectedChord?.value
                         Surface(
                             onClick = { onChordSelected(chord) },
-                            modifier = Modifier.aspectRatio(1f),
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .then(
+                                    if (isSelected) {
+                                        Modifier.border(
+                                            width = 2.dp,
+                                            color = colorScheme.primary,
+                                            shape = RoundedCornerShape(12.dp)
+                                        )
+                                    } else {
+                                        Modifier
+                                    }
+                                ),
                             shape = RoundedCornerShape(12.dp),
-                            color = colorScheme.surface,
+                            color = if (isSelected) colorScheme.primaryContainer else colorScheme.surface,
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
                                     text = chord.value,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = colorScheme.onSurface,
+                                    color = if (isSelected) colorScheme.onPrimaryContainer else colorScheme.onSurface,
                                     textAlign = TextAlign.Center,
                                 )
                             }
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(spacing.huge))
 
                 // Search Bar
                 TextField(
@@ -137,28 +156,6 @@ fun ChordSelectionPopup(
                     ),
                     singleLine = true,
                 )
-
-                Spacer(modifier = Modifier.height(spacing.large))
-
-                // Bottom badge style indicator
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = colorScheme.surface,
-                        modifier = Modifier.height(24.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = spacing.large)) {
-                            Text(
-                                text = stringResource(Res.string.chord_selection_popup_all_chords),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = colorScheme.secondary
-                            )
-                        }
-                    }
-                }
             }
         }
     }
