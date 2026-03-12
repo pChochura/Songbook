@@ -19,6 +19,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 @Composable
 fun App() {
     var selectedDestination by remember { mutableStateOf(NavigationDestination.NowPlaying) }
+    var transposition by remember { mutableStateOf(0) }
 
     LyricFlowTheme {
         Row(
@@ -35,7 +36,12 @@ fun App() {
                 topBar = {
                     Column {
                         LyricFlowHeader()
-                        SongControlBar()
+                        SongControlBar(
+                            transposition = transposition,
+                            onTransposeUp = { transposition++ },
+                            onTransposeDown = { transposition-- },
+                            onReset = { transposition = 0 }
+                        )
                     }
                 },
                 bottomBar = { SongStatusBar(tempo = 120) },
@@ -77,7 +83,7 @@ fun App() {
                                     Box {
                                         LyricsLine(
                                             text = "Fly me to the moon, and let me play among the stars",
-                                            chords = line1Chords,
+                                            chords = line1Chords.map { it.copy(chord = it.chord.transpose(transposition)) },
                                             onCursorFinalized = { index, offset ->
                                                 popupState = PopupState(index, offset)
                                             }
@@ -87,7 +93,9 @@ fun App() {
                                             ChordSelectionPopup(
                                                 offset = IntOffset(state.offset.x.toInt(), state.offset.y.toInt()),
                                                 onChordSelected = { chord ->
-                                                    line1Chords = (line1Chords + ChordMarker(chord, state.index)).sortedBy { it.offset }
+                                                    // Store the chord in its "original" key by reverse transposing it
+                                                    val originalChord = chord.transpose(-transposition)
+                                                    line1Chords = (line1Chords + ChordMarker(originalChord, state.index)).sortedBy { it.offset }
                                                     popupState = null
                                                 },
                                                 onDismissRequest = { popupState = null }
@@ -102,7 +110,7 @@ fun App() {
                                             ChordMarker(Chord.Bm7b5, 15),
                                             ChordMarker(Chord.E7, 30),
                                             ChordMarker(Chord.Am7, 45),
-                                        ),
+                                        ).map { it.copy(chord = it.chord.transpose(transposition)) },
                                     )
                                 }
                             }
@@ -117,7 +125,7 @@ fun App() {
                                             ChordMarker(Chord.Dm7, 0),
                                             ChordMarker(Chord.G7, 10),
                                             ChordMarker(Chord.CMaj7, 20),
-                                        ),
+                                        ).map { it.copy(chord = it.chord.transpose(transposition)) },
                                     )
                                     LyricsLine(
                                         text = "In other words, baby, kiss me",
@@ -125,7 +133,7 @@ fun App() {
                                             ChordMarker(Chord.Dm7, 0),
                                             ChordMarker(Chord.G7, 10),
                                             ChordMarker(Chord.CMaj7, 20),
-                                        ),
+                                        ).map { it.copy(chord = it.chord.transpose(transposition)) },
                                     )
                                 }
                             }
