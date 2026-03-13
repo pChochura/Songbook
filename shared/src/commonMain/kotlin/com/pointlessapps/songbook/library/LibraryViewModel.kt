@@ -9,7 +9,6 @@ import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.data.SongDao
 import com.pointlessapps.songbook.data.SongEntity
-import com.pointlessapps.songbook.ui.components.NavigationDestination
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -20,7 +19,6 @@ internal sealed interface LibraryEvent {
 }
 
 internal data class LibraryState(
-    val selectedDestination: NavigationDestination = NavigationDestination.Library,
     val songs: List<SongEntity> = emptyList(),
     val isLoading: Boolean = false,
     val totalSongs: Int = 0,
@@ -52,10 +50,6 @@ internal class LibraryViewModel(
                 )
             }
         }
-    }
-
-    fun onDestinationSelected(destination: NavigationDestination) {
-        state = state.copy(selectedDestination = destination)
     }
 
     fun showImportDialog() {

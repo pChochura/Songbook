@@ -11,7 +11,6 @@ import com.pointlessapps.songbook.core.domain.models.ChordMarker
 import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.data.SongDao
 import com.pointlessapps.songbook.data.SongEntity
-import com.pointlessapps.songbook.ui.components.NavigationDestination
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -24,7 +23,6 @@ internal data class LyricsState(
     val songId: Long? = null,
     val title: String = "Untitled Song",
     val artist: String = "Unknown Artist",
-    val selectedDestination: NavigationDestination = NavigationDestination.NowPlaying,
     val transposition: Int = 0,
     val isOcrActive: Boolean = false,
     val parsedSections: List<List<ParsedLine>>? = null,
@@ -63,10 +61,6 @@ internal class LyricsViewModel(
                 }
             }
         }
-    }
-
-    fun onDestinationSelected(destination: NavigationDestination) {
-        state = state.copy(selectedDestination = destination)
     }
 
     fun transposeUp() {

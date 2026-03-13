@@ -56,8 +56,6 @@ import com.pointlessapps.songbook.data.SongEntity
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
-import com.pointlessapps.songbook.ui.components.LyricFlowNavigationRail
-import com.pointlessapps.songbook.ui.components.NavigationDestination
 import com.pointlessapps.songbook.ui.theme.spacing
 import io.github.ismoy.imagepickerkmp.features.ocr.annotations.ExperimentalOCRApi
 import io.github.ismoy.imagepickerkmp.features.ocr.data.providers.CloudOCRProvider
@@ -89,16 +87,6 @@ internal fun LibraryScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        LyricFlowNavigationRail(
-            selectedDestination = state.selectedDestination,
-            onDestinationSelected = { destination ->
-                viewModel.onDestinationSelected(destination)
-                if (destination == NavigationDestination.NowPlaying) {
-                    navigator.navigateToLyrics()
-                }
-            },
-        )
-
         Scaffold(
             topBar = { LyricFlowHeader() },
             containerColor = MaterialTheme.colorScheme.background,
@@ -132,7 +120,15 @@ internal fun LibraryScreen(
 
                 FilterSection(
                     label = "Key:",
-                    filters = listOf("C Major", "G Major", "D Major", "A Major", "E Major", "F Major", "Bb Major"),
+                    filters = listOf(
+                        "C Major",
+                        "G Major",
+                        "D Major",
+                        "A Major",
+                        "E Major",
+                        "F Major",
+                        "Bb Major",
+                    ),
                     selectedFilter = null,
                 )
 
@@ -217,10 +213,11 @@ internal fun LibraryScreen(
                     ),
                     onOCRCompleted = { result ->
                         @Suppress("UNCHECKED_CAST")
-                        val rawText = ((result.metadata?.get("gemini_structured_data") as? Map<String, Any>)
-                            ?.get("text_content") as? JsonArray)?.mapNotNull { element ->
-                            element.jsonObject["text"]?.jsonPrimitive?.content
-                        }?.joinToString("\n") ?: ""
+                        val rawText =
+                            ((result.metadata?.get("gemini_structured_data") as? Map<String, Any>)
+                                ?.get("text_content") as? JsonArray)?.mapNotNull { element ->
+                                element.jsonObject["text"]?.jsonPrimitive?.content
+                            }?.joinToString("\n") ?: ""
                         viewModel.onOcrScanned(rawText)
                     },
                     onError = { viewModel.setOcrActive(false) },
@@ -312,6 +309,7 @@ private fun ImportSongDialog(
                             }
                         }
                     }
+
                     1 -> {
                         Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
                             OutlinedTextField(

@@ -24,7 +24,6 @@ import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
 import com.pointlessapps.songbook.ui.components.ChordSelectionPopup
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
-import com.pointlessapps.songbook.ui.components.LyricFlowNavigationRail
 import com.pointlessapps.songbook.ui.components.LyricsLine
 import com.pointlessapps.songbook.ui.components.LyricsSection
 import com.pointlessapps.songbook.ui.components.SongControlBar
@@ -52,11 +51,6 @@ internal fun LyricsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
     ) {
-        LyricFlowNavigationRail(
-            selectedDestination = state.selectedDestination,
-            onDestinationSelected = viewModel::onDestinationSelected,
-        )
-
         Scaffold(
             topBar = {
                 Column {
@@ -119,7 +113,7 @@ internal fun LyricsScreen(
                                                             sectionIndex,
                                                             lineIndex,
                                                             index,
-                                                            offset
+                                                            offset,
                                                         )
                                                     },
                                                     onChordClicked = { marker, offset ->
@@ -127,7 +121,7 @@ internal fun LyricsScreen(
                                                             sectionIndex,
                                                             lineIndex,
                                                             marker,
-                                                            offset
+                                                            offset,
                                                         )
                                                     },
                                                 )
