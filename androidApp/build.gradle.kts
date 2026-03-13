@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":shared"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.koin.android)
 
     implementation(this.platform(libs.compose.bom))
     implementation(libs.compose.ui.tooling.preview)

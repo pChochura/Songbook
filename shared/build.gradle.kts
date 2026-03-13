@@ -6,10 +6,16 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 group = "com.pointlessapps.Songbook"
 version = "1.0.0"
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
 
 kotlin {
     compilerOptions {
@@ -51,6 +57,17 @@ kotlin {
 
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.image.picker)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
         }
     }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.room.compiler)
 }
