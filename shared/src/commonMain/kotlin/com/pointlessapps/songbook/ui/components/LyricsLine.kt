@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.model.Chord
@@ -48,22 +50,36 @@ fun LyricsLine(
 
     // Animation logic
     var lastTargetX by remember { mutableFloatStateOf(0f) }
-    val targetX = remember(displayCursorIndex, textLayoutResult) {
+    var lastTargetY by remember { mutableFloatStateOf(0f) }
+    var lastCursorHeight by remember { mutableFloatStateOf(0f) }
+
+    val (targetX, targetY, cursorHeight) = remember(displayCursorIndex, textLayoutResult) {
         if (displayCursorIndex != null && textLayoutResult != null && displayCursorIndex <= text.length) {
-            textLayoutResult!!.getHorizontalPosition(displayCursorIndex, true).also {
-                lastTargetX = it
-            }
+            val lineIndex = textLayoutResult!!.getLineForOffset(displayCursorIndex)
+            val x = textLayoutResult!!.getHorizontalPosition(displayCursorIndex, true)
+            val y = textLayoutResult!!.getLineTop(lineIndex)
+            val height = textLayoutResult!!.getLineBottom(lineIndex) - y
+
+            lastTargetX = x
+            lastTargetY = y
+            lastCursorHeight = height
+
+            Triple(x, y, height)
         } else {
-            lastTargetX
+            Triple(lastTargetX, lastTargetY, lastCursorHeight)
         }
     }
 
     val animatedX by animateFloatAsState(targetValue = targetX, label = "cursorX")
+    val animatedY by animateFloatAsState(targetValue = targetY, label = "cursorY")
+    val animatedHeight by animateFloatAsState(targetValue = cursorHeight, label = "cursorHeight")
+
     val cursorAlpha by animateFloatAsState(
         targetValue = if (displayCursorIndex != null) 1f else 0f,
         label = "cursorAlpha",
     )
 
+    val density = LocalDensity.current
     val spacingExtraSmall = MaterialTheme.spacing.extraSmall
     val spacingSmall = MaterialTheme.spacing.small
 
@@ -120,10 +136,12 @@ fun LyricsLine(
                     .graphicsLayer {
                         alpha = cursorAlpha
                         translationX = animatedX - size.width / 2
+                        translationY = animatedY
                     }
                     .clip(MaterialTheme.shapes.small)
                     .background(MaterialTheme.colorScheme.primary)
-                    .width(2.dp),
+                    .width(2.dp)
+                    .height(with(density) { animatedHeight.toDp() }),
             )
         },
     ) { measurables, constraints ->
@@ -134,8 +152,7 @@ fun LyricsLine(
         val cursorPlaceable = measurables.last().measure(
             constraints.copy(
                 minWidth = 0,
-                minHeight = textPlaceable.height,
-                maxHeight = textPlaceable.height,
+                minHeight = 0,
             ),
         )
 
@@ -157,7 +174,7 @@ fun LyricsLine(
                     }
                 }
 
-                // Place the cursor measurable; its actual X and Alpha are handled by graphicsLayer
+                // Place the cursor measurable; its actual X, Y and Alpha are handled by graphicsLayer
                 cursorPlaceable.placeRelative(0, chordsHeight + spacingPx)
             }
         }
