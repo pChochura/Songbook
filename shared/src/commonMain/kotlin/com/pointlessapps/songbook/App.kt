@@ -6,6 +6,6 @@ import com.pointlessapps.songbook.ui.theme.LyricFlowTheme
 @Composable
 fun App() {
     LyricFlowTheme {
-        Navigator(startingRoute = Route.Lyrics())
+        Navigator(startingRoute = Route.Library)
     }
 }

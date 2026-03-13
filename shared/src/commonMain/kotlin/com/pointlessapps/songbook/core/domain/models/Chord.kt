@@ -1,8 +1,11 @@
 package com.pointlessapps.songbook.core.domain.models
 
+import kotlinx.serialization.Serializable
+
 /**
  * Represents the 12 semitones in Western music.
  */
+@Serializable
 enum class Note(val sharp: String, val flat: String) {
     C("C", "C"), Cs("C#", "Db"), D("D", "D"), Ds("D#", "Eb"),
     E("E", "E"), F("F", "F"), Fs("F#", "Gb"), G("G", "G"),
@@ -23,6 +26,7 @@ enum class Note(val sharp: String, val flat: String) {
     }
 }
 
+@Serializable
 data class Chord(
     val root: Note,
     val suffix: String = "",

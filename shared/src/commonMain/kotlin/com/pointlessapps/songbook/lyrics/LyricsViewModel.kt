@@ -5,28 +5,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.domain.models.ChordMarker
+import com.pointlessapps.songbook.core.domain.models.ParsedLine
+import com.pointlessapps.songbook.data.SongDao
+import com.pointlessapps.songbook.data.SongEntity
 import com.pointlessapps.songbook.ui.components.NavigationDestination
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 internal sealed interface LyricsEvent {
     data class NavigateTo(val route: Route) : LyricsEvent
 }
 
 internal data class LyricsState(
+    val songId: Long? = null,
+    val title: String = "Untitled Song",
+    val artist: String = "Unknown Artist",
     val selectedDestination: NavigationDestination = NavigationDestination.NowPlaying,
     val transposition: Int = 0,
     val isOcrActive: Boolean = false,
     val parsedSections: List<List<ParsedLine>>? = null,
     val popupState: PopupState? = null,
     val isLoading: Boolean = false,
-)
-
-internal data class ParsedLine(
-    val text: String,
-    val chords: List<ChordMarker> = emptyList(),
 )
 
 internal data class PopupState(
@@ -37,13 +40,30 @@ internal data class PopupState(
     val editingMarker: ChordMarker? = null,
 )
 
-internal class LyricsViewModel() : ViewModel() {
+internal class LyricsViewModel(
+    private val songId: Long? = null,
+    private val songDao: SongDao,
+) : ViewModel() {
 
-    var state by mutableStateOf(LyricsState())
+    var state by mutableStateOf(LyricsState(songId = songId))
         private set
 
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
+
+    init {
+        songId?.let { id ->
+            viewModelScope.launch {
+                songDao.getSongById(id)?.let { song ->
+                    state = state.copy(
+                        title = song.title,
+                        artist = song.artist,
+                        parsedSections = song.sections,
+                    )
+                }
+            }
+        }
+    }
 
     fun onDestinationSelected(destination: NavigationDestination) {
         state = state.copy(selectedDestination = destination)
@@ -131,5 +151,30 @@ internal class LyricsViewModel() : ViewModel() {
             parsedSections = newSections,
             popupState = null,
         )
+
+        saveSong()
+    }
+
+    private fun saveSong() {
+        viewModelScope.launch {
+            val sections = state.parsedSections ?: return@launch
+            val entity = SongEntity(
+                id = state.songId ?: 0,
+                title = state.title,
+                artist = state.artist,
+                lyrics = sections.flatten().joinToString("\n") { it.text },
+                key = "C Major", // Default for now
+                duration = "4:00",
+                bpm = 120,
+                sections = sections,
+            )
+            val newId = if (state.songId == null || state.songId == 0L) {
+                songDao.insertSong(entity)
+            } else {
+                songDao.updateSong(entity)
+                state.songId
+            }
+            state = state.copy(songId = newId)
+        }
     }
 }

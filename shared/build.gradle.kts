@@ -19,7 +19,7 @@ room {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-Xwhen-guards")
+        freeCompilerArgs.addAll("-Xwhen-guards", "-XXLanguage:+ExpectRefinement")
     }
 
     android {
@@ -65,10 +65,14 @@ kotlin {
 
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
+            implementation(libs.androidx.navigation3.ui)
         }
     }
 }
 
 dependencies {
-    add("kspCommonMainMetadata", libs.room.compiler)
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
 }

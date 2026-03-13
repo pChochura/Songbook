@@ -20,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
-import com.pointlessapps.songbook.lyrics.ParsedLine
 import com.pointlessapps.songbook.ui.components.ChordSelectionPopup
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.components.LyricFlowNavigationRail
@@ -90,8 +90,8 @@ internal fun LyricsScreen(
                     if (state.parsedSections != null) {
                         item {
                             SongHeader(
-                                title = "Parsed Song",
-                                artist = "Unknown Artist",
+                                title = state.title,
+                                artist = state.artist,
                             )
                         }
 
