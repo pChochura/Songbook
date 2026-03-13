@@ -28,10 +28,8 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.model.Chord
+import com.pointlessapps.songbook.core.domain.models.ChordMarker
 import com.pointlessapps.songbook.ui.theme.spacing
-
-data class ChordMarker(val chord: Chord, val offset: Int)
 
 @Composable
 fun LyricsLine(
@@ -119,7 +117,7 @@ fun LyricsLine(
                     onClick = {
                         val x = textLayoutResult?.getHorizontalPosition(marker.offset, true) ?: 0f
                         onChordClicked(marker, Offset(x, 0f))
-                    }
+                    },
                 )
             }
             Text(

@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.model
+package com.pointlessapps.songbook.core.domain.models
 
 /**
  * Represents the 12 semitones in Western music.

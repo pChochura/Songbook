@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.pointlessapps.songbook.model.Chord
+import com.pointlessapps.songbook.core.domain.models.Chord
 import com.pointlessapps.songbook.ui.theme.spacing
 
 @Composable

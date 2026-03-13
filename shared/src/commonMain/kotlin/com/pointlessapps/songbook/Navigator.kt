@@ -21,13 +21,13 @@ import org.koin.core.annotation.KoinExperimentalAPI
 
 internal sealed interface Route : NavKey {
     @Serializable
-    data object Lyrics : Route
+    data class Lyrics(val songId: Long? = null) : Route
 }
 
 private val navigationConfig = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
-            subclass(Route.Lyrics::class, Route.Start.serializer())
+            subclass(Route.Lyrics::class, Route.Lyrics.serializer())
         }
     }
 }
@@ -71,8 +71,8 @@ internal fun Navigator(
 }
 
 internal class Navigator(private val backStack: NavBackStack<NavKey>) {
-    fun navigateToLyrics() {
-        backStack.add(Route.Lyrics)
+    fun navigateToLyrics(songId: Long? = null) {
+        backStack.add(Route.Lyrics(songId))
     }
 }
 

@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.pointlessapps.songbook.model.Chord
+import com.pointlessapps.songbook.core.domain.models.Chord
 import com.pointlessapps.songbook.shared.generated.resources.Res
 import com.pointlessapps.songbook.shared.generated.resources.chord_selection_popup_search_placeholder
 import com.pointlessapps.songbook.ui.theme.spacing
