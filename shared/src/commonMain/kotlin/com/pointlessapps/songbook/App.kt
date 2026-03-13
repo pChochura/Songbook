@@ -18,11 +18,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.ui.components.ChordMarker
+import com.pointlessapps.songbook.ui.components.ChordSelectionPopup
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.components.LyricFlowNavigationRail
 import com.pointlessapps.songbook.ui.components.LyricsLine
@@ -48,7 +53,8 @@ fun App() {
     var selectedDestination by rememberSaveable { mutableStateOf(NavigationDestination.NowPlaying) }
     var transposition by rememberSaveable { mutableStateOf(0) }
     var isOcrActive by rememberSaveable { mutableStateOf(false) }
-    var parsedSections by rememberSaveable { mutableStateOf<List<List<String>>?>(null) }
+    var parsedSections by remember { mutableStateOf<List<List<ParsedLine>>?>(null) }
+    var popupState by remember { mutableStateOf<PopupState?>(null) }
 
     LyricFlowTheme {
         Row(
@@ -99,15 +105,89 @@ fun App() {
                                 )
                             }
 
-                            parsedSections?.forEach { section ->
+                            parsedSections?.forEachIndexed { sectionIndex, section ->
                                 item {
                                     LyricsSection(label = "Lyrics") {
-                                        Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-                                            section.forEach { line ->
-                                                LyricsLine(
-                                                    text = line,
-                                                    chords = emptyList(),
-                                                )
+                                        Column(
+                                            verticalArrangement = Arrangement.spacedBy(
+                                                MaterialTheme.spacing.medium,
+                                            ),
+                                        ) {
+                                            section.forEachIndexed { lineIndex, line ->
+                                                Box {
+                                                    LyricsLine(
+                                                        text = line.text,
+                                                        chords = line.chords.map {
+                                                            it.copy(
+                                                                chord = it.chord.transpose(
+                                                                    transposition,
+                                                                ),
+                                                            )
+                                                        },
+                                                        onCursorFinalized = { index, offset ->
+                                                            popupState = PopupState(
+                                                                sectionIndex = sectionIndex,
+                                                                lineIndex = lineIndex,
+                                                                charIndex = index,
+                                                                offset = offset,
+                                                            )
+                                                        },
+                                                        onChordClicked = { marker, offset ->
+                                                            popupState = PopupState(
+                                                                sectionIndex = sectionIndex,
+                                                                lineIndex = lineIndex,
+                                                                charIndex = marker.offset,
+                                                                offset = offset,
+                                                                editingMarker = marker,
+                                                            )
+                                                        },
+                                                    )
+
+                                                    popupState?.let { state ->
+                                                        if (state.sectionIndex == sectionIndex && state.lineIndex == lineIndex) {
+                                                            ChordSelectionPopup(
+                                                                offset = IntOffset(
+                                                                    state.offset.x.toInt(),
+                                                                    state.offset.y.toInt(),
+                                                                ),
+                                                                selectedChord = state.editingMarker?.chord,
+                                                                onChordSelected = { chord ->
+                                                                    parsedSections =
+                                                                        parsedSections?.mapIndexed { sIndex, sLines ->
+                                                                            if (sIndex == sectionIndex) {
+                                                                                sLines.mapIndexed { lIndex, lData ->
+                                                                                    if (lIndex == lineIndex) {
+                                                                                        if (state.editingMarker != null) {
+                                                                                            // Update existing chord
+                                                                                            lData.copy(
+                                                                                                chords = lData.chords.map {
+                                                                                                    if (it == state.editingMarker) it.copy(
+                                                                                                        chord = chord,
+                                                                                                    ) else it
+                                                                                                },
+                                                                                            )
+                                                                                        } else {
+                                                                                            // Add new chord
+                                                                                            lData.copy(
+                                                                                                chords = (lData.chords + ChordMarker(
+                                                                                                    chord,
+                                                                                                    state.charIndex,
+                                                                                                )).sortedBy { it.offset },
+                                                                                            )
+                                                                                        }
+                                                                                    } else lData
+                                                                                }
+                                                                            } else sLines
+                                                                        }
+                                                                    popupState = null
+                                                                },
+                                                                onDismissRequest = {
+                                                                    popupState = null
+                                                                },
+                                                            )
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -159,6 +239,7 @@ fun App() {
                             ((result.metadata?.get("gemini_structured_data") as? Map<String, Any>)
                                 ?.get("text_content") as? JsonArray)?.mapNotNull { element ->
                                 element.jsonObject["text"]?.jsonPrimitive?.content?.split("\n")
+                                    ?.map { ParsedLine(it) }
                             }
                         parsedSections = sections
                         println("LOG!, $sections")
@@ -175,3 +256,16 @@ fun App() {
         }
     }
 }
+
+private data class ParsedLine(
+    val text: String,
+    val chords: List<ChordMarker> = emptyList(),
+)
+
+private data class PopupState(
+    val sectionIndex: Int,
+    val lineIndex: Int,
+    val charIndex: Int,
+    val offset: Offset,
+    val editingMarker: ChordMarker? = null,
+)
