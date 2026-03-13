@@ -2,8 +2,7 @@ package com.pointlessapps.songbook.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -87,28 +86,23 @@ fun LyricsLine(
             .padding(vertical = spacingSmall)
             .pointerInput(textLayoutResult) {
                 val layoutResult = textLayoutResult ?: return@pointerInput
-                awaitEachGesture {
-                    val down = awaitFirstDown()
-
-                    internalCursorIndex = layoutResult.getOffsetForPosition(
-                        down.position - textPosition,
-                    )
-
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val change = event.changes.firstOrNull { it.pressed } ?: break
-
-                        internalCursorIndex = layoutResult.getOffsetForPosition(
-                            change.position - textPosition,
-                        )
-                        change.consume()
-                    }
-
-                    internalCursorIndex?.let {
-                        onCursorFinalized(it, Offset(targetX, 0f))
-                    }
-                    internalCursorIndex = null
-                }
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { startOffset ->
+                        internalCursorIndex = layoutResult.getOffsetForPosition(startOffset - textPosition)
+                    },
+                    onDrag = { change, _ ->
+                        internalCursorIndex = layoutResult.getOffsetForPosition(change.position - textPosition)
+                    },
+                    onDragEnd = {
+                        internalCursorIndex?.let {
+                            onCursorFinalized(it, Offset(layoutResult.getHorizontalPosition(it, true), 0f))
+                        }
+                        internalCursorIndex = null
+                    },
+                    onDragCancel = {
+                        internalCursorIndex = null
+                    },
+                )
             },
         content = {
             chords.forEach { marker ->
