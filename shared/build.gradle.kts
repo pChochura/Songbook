@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 group = "com.pointlessapps.Songbook"
@@ -17,7 +18,7 @@ kotlin {
 
     android {
         namespace = "com.pointlessapps.Songbook.shared"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        compileSdk = libs.versions.androidCompileSdk.get().toInt()
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -47,6 +48,9 @@ kotlin {
             implementation(libs.compose.mp.material.icons.extended)
             implementation(libs.compose.mp.ui)
             implementation(libs.compose.mp.components.resources)
+
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.image.picker)
         }
     }
 }

@@ -1,21 +1,23 @@
 [versions]
 agp = "9.1.0"
-android-compileSdk = "36"
-android-minSdk = "24"
-android-targetSdk = "36"
-androidx-activity = "1.12.4"
-compose-bom = "2026.03.00"
+androidCompileSdk = "36"
+androidMinSdk = "24"
+androidTargetSdk = "36"
+androidxActivity = "1.13.0"
+composeBom = "2026.03.00"
 composeMultiplatform = "1.10.2"
 composeMultiplatformMaterial3 = "1.9.0"
 composeMultiplatformIcons = "1.7.3"
 kotlin = "2.3.10"
+kotlinSerialization = "1.10.0"
+imagePicker = "1.0.33"
 
 [libraries]
 # AndroidX
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 
 # Compose BOM
-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 
 # Compose Multiplatform
@@ -25,6 +27,10 @@ compose-mp-material3 = { module = "org.jetbrains.compose.material3:material3", v
 compose-mp-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "composeMultiplatformIcons" }
 compose-mp-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
 compose-mp-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
+
+# Misc
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
+image-picker = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagePicker" }
 
 [plugins]
 # Android
@@ -39,3 +45,4 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMul
 # Kotlin
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

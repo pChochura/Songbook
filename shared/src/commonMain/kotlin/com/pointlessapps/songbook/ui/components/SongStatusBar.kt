@@ -25,6 +25,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun SongStatusBar(
     tempo: Int,
+    onFullscreenClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -55,7 +56,7 @@ fun SongStatusBar(
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
             IconButton(
-                onClick = { },
+                onClick = onFullscreenClicked,
                 modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
             ) {
                 Icon(
