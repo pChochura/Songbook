@@ -2,6 +2,16 @@
 
 ## Code Style & Patterns
 
+### Composables
+
+Always prefer using the horizontalArrangement, or verticalArrangement in Row and Column composables
+instead of Spacer. When the Row or Column might not fit on the screen, prefer using
+FlowRow or FlowColumn instead. Make sure the design is responsive and prepared for multitude of
+screen resolutions.
+
+Whenever there is a string used in the composition, prefer referencing it via stringResource
+instead of hardcoding it.
+
 ### Screen Conventions
 
 Every functionality is split by screens (Lyrics, Library, Settings and so on).

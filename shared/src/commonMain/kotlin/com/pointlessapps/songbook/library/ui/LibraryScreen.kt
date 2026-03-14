@@ -100,50 +100,19 @@ internal fun LibraryScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = MaterialTheme.spacing.huge),
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.huge),
             ) {
                 LibraryHeader(state.totalSongs, state.totalArtists)
-
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.huge))
-
-                Text(
-                    text = "QUICK FILTERS",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-
-                FilterSection(
-                    label = "Genre:",
-                    filters = listOf("All", "Rock", "Worship", "Jazz", "Blues", "Pop", "Country"),
-                    selectedFilter = "All",
-                )
-
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
-                FilterSection(
-                    label = "Key:",
-                    filters = listOf(
-                        "C Major",
-                        "G Major",
-                        "D Major",
-                        "A Major",
-                        "E Major",
-                        "F Major",
-                        "Bb Major",
-                    ),
-                    selectedFilter = null,
-                )
-
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.huge))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                    ) {
                         Text(
                             text = "All Songs",
                             style = MaterialTheme.typography.headlineSmall,
@@ -169,8 +138,6 @@ internal fun LibraryScreen(
                         color = MaterialTheme.colorScheme.outline,
                     )
                 }
-
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
