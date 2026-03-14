@@ -124,6 +124,14 @@ internal fun LyricsScreen(
                                                             offset,
                                                         )
                                                     },
+                                                    onChordMoved = { marker, newCharIndex ->
+                                                        viewModel.onChordMoved(
+                                                            sectionIndex,
+                                                            lineIndex,
+                                                            marker,
+                                                            newCharIndex,
+                                                        )
+                                                    },
                                                 )
 
                                                 state.popupState?.let { popupState ->

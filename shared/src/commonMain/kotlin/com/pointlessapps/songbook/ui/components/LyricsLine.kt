@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.ui.components
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
@@ -29,6 +32,8 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.core.domain.models.ChordMarker
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun LyricsLine(
@@ -38,45 +43,38 @@ fun LyricsLine(
     cursorIndex: Int? = null,
     onCursorFinalized: (Int, Offset) -> Unit = { _, _ -> },
     onChordClicked: (ChordMarker, Offset) -> Unit = { _, _ -> },
+    onChordMoved: (ChordMarker, Int) -> Unit = { _, _ -> },
 ) {
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-    var internalCursorIndex by remember { mutableStateOf<Int?>(null) }
     var textPosition by remember { mutableStateOf(Offset.Zero) }
 
-    val displayCursorIndex = internalCursorIndex ?: cursorIndex
+    // Chord drag — read only in measurePolicy (layout phase), no recomposition triggered
+    var draggingChordIdx by remember { mutableStateOf<Int?>(null) }
+    var draggingChordX by remember { mutableFloatStateOf(0f) }
 
-    // Animation logic
-    var lastTargetX by remember { mutableFloatStateOf(0f) }
-    var lastTargetY by remember { mutableFloatStateOf(0f) }
-    var lastCursorHeight by remember { mutableFloatStateOf(0f) }
+    // Cursor — Animatable values are read only in graphicsLayer (draw phase), no recomposition
+    val cursorXAnim = remember { Animatable(0f) }
+    val cursorYAnim = remember { Animatable(0f) }
+    val cursorHeightAnim = remember { Animatable(0f) }
+    val cursorAlphaAnim = remember { Animatable(0f) }
 
-    val (targetX, targetY, cursorHeight) = remember(displayCursorIndex, textLayoutResult) {
-        if (displayCursorIndex != null && textLayoutResult != null && displayCursorIndex <= text.length) {
-            val lineIndex = textLayoutResult!!.getLineForOffset(displayCursorIndex)
-            val x = textLayoutResult!!.getHorizontalPosition(displayCursorIndex, true)
-            val y = textLayoutResult!!.getLineTop(lineIndex)
-            val height = textLayoutResult!!.getLineBottom(lineIndex) - y
-
-            lastTargetX = x
-            lastTargetY = y
-            lastCursorHeight = height
-
-            Triple(x, y, height)
+    // Apply externally-supplied cursorIndex (e.g. restored from state)
+    LaunchedEffect(cursorIndex, textLayoutResult) {
+        val lr = textLayoutResult ?: return@LaunchedEffect
+        if (cursorIndex != null && cursorIndex <= text.length) {
+            val lineIdx = lr.getLineForOffset(cursorIndex)
+            launch { cursorXAnim.animateTo(lr.getHorizontalPosition(cursorIndex, true), spring()) }
+            launch { cursorYAnim.animateTo(lr.getLineTop(lineIdx), spring()) }
+            launch { cursorHeightAnim.animateTo(lr.getLineBottom(lineIdx) - lr.getLineTop(lineIdx), spring()) }
+            cursorAlphaAnim.animateTo(1f)
         } else {
-            Triple(lastTargetX, lastTargetY, lastCursorHeight)
+            cursorAlphaAnim.animateTo(0f)
         }
     }
 
-    val animatedX by animateFloatAsState(targetValue = targetX, label = "cursorX")
-    val animatedY by animateFloatAsState(targetValue = targetY, label = "cursorY")
-    val animatedHeight by animateFloatAsState(targetValue = cursorHeight, label = "cursorHeight")
-
-    val cursorAlpha by animateFloatAsState(
-        targetValue = if (displayCursorIndex != null) 1f else 0f,
-        label = "cursorAlpha",
-    )
-
     val density = LocalDensity.current
+    // Fixed base height for the cursor box; scaleY in graphicsLayer handles the actual height
+    val cursorBaseHeightPx = with(density) { 24.dp.toPx() }
     val spacingExtraSmall = MaterialTheme.spacing.extraSmall
     val spacingSmall = MaterialTheme.spacing.small
 
@@ -86,28 +84,71 @@ fun LyricsLine(
             .padding(vertical = spacingSmall)
             .pointerInput(textLayoutResult) {
                 val layoutResult = textLayoutResult ?: return@pointerInput
-                detectDragGesturesAfterLongPress(
-                    onDragStart = { startOffset ->
-                        internalCursorIndex = layoutResult.getOffsetForPosition(startOffset - textPosition)
-                    },
-                    onDrag = { change, _ ->
-                        internalCursorIndex = layoutResult.getOffsetForPosition(change.position - textPosition)
-                    },
-                    onDragEnd = {
-                        internalCursorIndex?.let {
-                            onCursorFinalized(it, Offset(layoutResult.getHorizontalPosition(it, true), 0f))
-                        }
-                        internalCursorIndex = null
-                    },
-                    onDragCancel = {
-                        internalCursorIndex = null
-                    },
-                )
+                var currentIndex = 0
+                coroutineScope {
+                    val scope = this
+                    detectDragGesturesAfterLongPress(
+                        onDragStart = { startOffset ->
+                            currentIndex = layoutResult.getOffsetForPosition(startOffset - textPosition)
+                            val x = layoutResult.getHorizontalPosition(currentIndex, true)
+                            val lineIdx = layoutResult.getLineForOffset(currentIndex)
+                            val y = layoutResult.getLineTop(lineIdx)
+                            val h = layoutResult.getLineBottom(lineIdx) - y
+                            scope.launch { cursorAlphaAnim.snapTo(1f) }
+                            scope.launch { cursorXAnim.snapTo(x) }
+                            scope.launch { cursorYAnim.snapTo(y) }
+                            scope.launch { cursorHeightAnim.snapTo(h) }
+                        },
+                        onDrag = { change, _ ->
+                            currentIndex = layoutResult.getOffsetForPosition(change.position - textPosition)
+                            val x = layoutResult.getHorizontalPosition(currentIndex, true)
+                            val lineIdx = layoutResult.getLineForOffset(currentIndex)
+                            val y = layoutResult.getLineTop(lineIdx)
+                            val h = layoutResult.getLineBottom(lineIdx) - y
+                            scope.launch { cursorXAnim.animateTo(x, spring(stiffness = 1200f)) }
+                            scope.launch { cursorYAnim.snapTo(y) }
+                            scope.launch { cursorHeightAnim.snapTo(h) }
+                        },
+                        onDragEnd = {
+                            onCursorFinalized(
+                                currentIndex,
+                                Offset(layoutResult.getHorizontalPosition(currentIndex, true), 0f),
+                            )
+                            scope.launch { cursorAlphaAnim.animateTo(0f) }
+                        },
+                        onDragCancel = {
+                            scope.launch { cursorAlphaAnim.animateTo(0f) }
+                        },
+                    )
+                }
             },
         content = {
-            chords.forEach { marker ->
+            chords.forEachIndexed { chordIndex, marker ->
                 ChordChip(
                     chord = marker.chord,
+                    modifier = Modifier.pointerInput(marker, textLayoutResult) {
+                        val layoutResult = textLayoutResult ?: return@pointerInput
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { _ ->
+                                draggingChordIdx = chordIndex
+                                draggingChordX = layoutResult.getHorizontalPosition(marker.offset, true)
+                            },
+                            onDrag = { _, dragAmount ->
+                                draggingChordX = (draggingChordX + dragAmount.x)
+                                    .coerceIn(0f, layoutResult.size.width.toFloat())
+                            },
+                            onDragEnd = {
+                                val result = textLayoutResult ?: return@detectDragGesturesAfterLongPress
+                                val midLineY = (result.getLineTop(0) + result.getLineBottom(0)) / 2f
+                                val newCharIndex = result.getOffsetForPosition(Offset(draggingChordX, midLineY))
+                                onChordMoved(marker, newCharIndex)
+                                draggingChordIdx = null
+                            },
+                            onDragCancel = {
+                                draggingChordIdx = null
+                            },
+                        )
+                    },
                     onClick = {
                         val x = textLayoutResult?.getHorizontalPosition(marker.offset, true) ?: 0f
                         onChordClicked(marker, Offset(x, 0f))
@@ -123,17 +164,20 @@ fun LyricsLine(
                     textPosition = it.positionInParent()
                 },
             )
+            // Cursor — position/size/alpha controlled entirely in graphicsLayer (draw phase)
             Box(
                 modifier = Modifier
                     .graphicsLayer {
-                        alpha = cursorAlpha
-                        translationX = animatedX - size.width / 2
-                        translationY = animatedY
+                        alpha = cursorAlphaAnim.value
+                        translationX = cursorXAnim.value - size.width / 2
+                        translationY = cursorYAnim.value
+                        scaleY = cursorHeightAnim.value / cursorBaseHeightPx
+                        transformOrigin = TransformOrigin(0.5f, 0f)
                     }
                     .clip(MaterialTheme.shapes.small)
                     .background(MaterialTheme.colorScheme.primary)
                     .width(2.dp)
-                    .height(with(density) { animatedHeight.toDp() }),
+                    .height(with(density) { cursorBaseHeightPx.toDp() }),
             )
         },
     ) { measurables, constraints ->
@@ -142,10 +186,7 @@ fun LyricsLine(
         }
         val textPlaceable = measurables[chords.size].measure(constraints)
         val cursorPlaceable = measurables.last().measure(
-            constraints.copy(
-                minWidth = 0,
-                minHeight = 0,
-            ),
+            constraints.copy(minWidth = 0, minHeight = 0),
         )
 
         val chordsHeight = if (chordPlaceables.isEmpty()) 0 else chordPlaceables.maxOf { it.height }
@@ -160,13 +201,14 @@ fun LyricsLine(
             textLayoutResult?.let { result ->
                 chords.forEachIndexed { index, marker ->
                     if (marker.offset <= text.length) {
-                        val x = result.getHorizontalPosition(marker.offset, true).toInt()
-                        val chipPlaceable = chordPlaceables[index]
-                        chipPlaceable.placeRelative(x, 0)
+                        val x = if (index == draggingChordIdx) {
+                            draggingChordX.toInt()
+                        } else {
+                            result.getHorizontalPosition(marker.offset, true).toInt()
+                        }
+                        chordPlaceables[index].placeRelative(x, 0)
                     }
                 }
-
-                // Place the cursor measurable; its actual X, Y and Alpha are handled by graphicsLayer
                 cursorPlaceable.placeRelative(0, chordsHeight + spacingPx)
             }
         }

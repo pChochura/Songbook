@@ -109,6 +109,24 @@ internal class LyricsViewModel(
         )
     }
 
+    fun onChordMoved(sectionIndex: Int, lineIndex: Int, marker: ChordMarker, newCharIndex: Int) {
+        val newSections = state.parsedSections?.mapIndexed { sIdx, sLines ->
+            if (sIdx == sectionIndex) {
+                sLines.mapIndexed { lIdx, lData ->
+                    if (lIdx == lineIndex) {
+                        lData.copy(
+                            chords = lData.chords.map {
+                                if (it == marker) it.copy(offset = newCharIndex) else it
+                            }.sortedBy { it.offset },
+                        )
+                    } else lData
+                }
+            } else sLines
+        }
+        state = state.copy(parsedSections = newSections)
+        saveSong()
+    }
+
     fun dismissPopup() {
         state = state.copy(popupState = null)
     }
