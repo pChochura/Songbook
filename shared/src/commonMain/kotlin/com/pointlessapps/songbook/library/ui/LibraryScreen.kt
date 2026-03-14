@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -95,66 +96,68 @@ internal fun LibraryScreen(
             topBar = { LyricFlowHeader() },
             containerColor = MaterialTheme.colorScheme.background,
         ) { paddingValues ->
-            Column(
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = MaterialTheme.spacing.huge),
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.huge),
+                contentPadding = PaddingValues(
+                    top = MaterialTheme.spacing.huge,
+                    bottom = MaterialTheme.spacing.huge,
+                ),
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             ) {
-                LibraryHeader(state.totalSongs, state.totalArtists)
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    LibraryHeader(state.totalSongs, state.totalArtists)
+                }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
                     ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                        ) {
+                            Text(
+                                text = "All Songs",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Text(
+                                text = "${state.songs.size} Found",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .background(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                        RoundedCornerShape(4.dp),
+                                    )
+                                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                            )
+                        }
+
                         Text(
-                            text = "All Songs",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
-                        Text(
-                            text = "${state.songs.size} Found",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .background(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                    RoundedCornerShape(4.dp),
-                                )
-                                .padding(horizontal = 4.dp, vertical = 2.dp),
+                            text = "Sort by: Date Added",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.outline,
                         )
                     }
+                }
 
-                    Text(
-                        text = "Sort by: Date Added",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline,
+                items(state.songs) { song ->
+                    SongCard(
+                        song = song,
+                        onClick = { navigator.navigateToLyrics(song.id) },
                     )
                 }
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    contentPadding = PaddingValues(bottom = MaterialTheme.spacing.huge),
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
-                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
-                ) {
-                    items(state.songs) { song ->
-                        SongCard(
-                            song = song,
-                            onClick = { navigator.navigateToLyrics(song.id) },
-                        )
-                    }
-
-                    item {
-                        AddSongCard(onClick = { viewModel.showImportDialog() })
-                    }
+                item {
+                    AddSongCard(onClick = { viewModel.showImportDialog() })
                 }
             }
         }
