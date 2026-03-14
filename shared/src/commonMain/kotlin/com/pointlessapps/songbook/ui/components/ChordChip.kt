@@ -4,14 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.pointlessapps.songbook.core.domain.models.Chord
 import com.pointlessapps.songbook.ui.theme.spacing
 
@@ -21,7 +19,7 @@ fun ChordChip(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
 ) {
-    val shape = RoundedCornerShape(MaterialTheme.spacing.small)
+    val shape = MaterialTheme.shapes.extraSmall
     Box(
         modifier = modifier
             .clip(shape)
@@ -30,7 +28,7 @@ fun ChordChip(
                     Modifier.clickable(onClick = onClick)
                 } else {
                     Modifier
-                }
+                },
             )
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
@@ -44,8 +42,7 @@ fun ChordChip(
         Text(
             text = chord.value,
             color = MaterialTheme.colorScheme.onPrimary,
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontSize = 36.sp,
+            style = MaterialTheme.typography.displaySmall.copy(
                 fontWeight = FontWeight.Bold,
             ),
         )

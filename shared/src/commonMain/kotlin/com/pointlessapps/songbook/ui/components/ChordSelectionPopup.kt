@@ -11,11 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -68,12 +67,12 @@ fun ChordSelectionPopup(
     ) {
         Surface(
             modifier = Modifier
-                .width(500.dp)
+                .widthIn(500.dp)
                 .heightIn(max = 600.dp)
                 .padding(spacing.medium),
-            shape = RoundedCornerShape(24.dp),
+            shape = MaterialTheme.shapes.extraLarge,
             color = colorScheme.background,
-            shadowElevation = 16.dp,
+            shadowElevation = spacing.large,
             tonalElevation = 0.dp,
         ) {
             Column(
@@ -99,15 +98,15 @@ fun ChordSelectionPopup(
                                 .then(
                                     if (isSelected) {
                                         Modifier.border(
-                                            width = 2.dp,
+                                            width = spacing.extraSmall,
                                             color = colorScheme.primary,
-                                            shape = RoundedCornerShape(12.dp),
+                                            shape = MaterialTheme.shapes.medium,
                                         )
                                     } else {
                                         Modifier
                                     },
                                 ),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = MaterialTheme.shapes.medium,
                             color = if (isSelected) colorScheme.primaryContainer else colorScheme.surface,
                         ) {
                             Box(contentAlignment = Alignment.Center) {

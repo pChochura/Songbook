@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.shared.generated.resources.Res
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_key
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_both
@@ -77,7 +75,7 @@ fun SongControlBar(
                     .background(
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                             .compositeOver(MaterialTheme.colorScheme.background),
-                        shape = RoundedCornerShape(spacing.small),
+                        shape = MaterialTheme.shapes.extraSmall,
                     )
                     .padding(spacing.extraSmall),
                 verticalAlignment = Alignment.CenterVertically,
@@ -112,7 +110,7 @@ fun SongControlBar(
                 .background(
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
                         .compositeOver(MaterialTheme.colorScheme.background),
-                    shape = RoundedCornerShape(spacing.large),
+                    shape = MaterialTheme.shapes.large,
                 )
                 .padding(spacing.extraSmall),
         ) {
@@ -133,7 +131,7 @@ fun SongControlBar(
                         },
                         contentColor = MaterialTheme.colorScheme.onSurface,
                     ),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = MaterialTheme.shapes.medium,
                     contentPadding = PaddingValues(
                         horizontal = spacing.large,
                         vertical = spacing.small,

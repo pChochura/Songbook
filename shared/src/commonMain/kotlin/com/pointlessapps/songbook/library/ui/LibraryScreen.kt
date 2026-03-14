@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +26,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -170,7 +168,7 @@ internal fun LibraryScreen(
                                 modifier = Modifier
                                     .background(
                                         MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                        RoundedCornerShape(4.dp),
+                                        shape = MaterialTheme.shapes.extraSmall,
                                     )
                                     .padding(horizontal = 4.dp, vertical = 2.dp),
                             )
@@ -290,7 +288,7 @@ private fun SearchBar(
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
                 )
             },
             trailingIcon = if (query.isNotEmpty()) {
@@ -299,7 +297,7 @@ private fun SearchBar(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(Res.string.library_search_clear_filter),
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(MaterialTheme.spacing.large),
                         )
                     }
                 }
@@ -317,7 +315,7 @@ private fun SearchBar(
 
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(MaterialTheme.shapes.medium)
                     .height(OutlinedTextFieldDefaults.MinHeight)
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable(onClick = onClearFilter)
@@ -329,7 +327,7 @@ private fun SearchBar(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                 ) {
                     Text(
                         text = stringResource(
@@ -344,7 +342,7 @@ private fun SearchBar(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(Res.string.library_search_clear_filter),
                         tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(12.dp),
+                        modifier = Modifier.size(MaterialTheme.spacing.large),
                     )
                 }
             }
@@ -359,7 +357,10 @@ private fun LazyGridItemScope.SongCard(song: SongEntity, onClick: () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         onClick = onClick,
     ) {
-        Column(modifier = Modifier.padding(MaterialTheme.spacing.large)) {
+        Column(
+            modifier = Modifier.padding(MaterialTheme.spacing.large),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -368,28 +369,28 @@ private fun LazyGridItemScope.SongCard(song: SongEntity, onClick: () -> Unit) {
                     imageVector = Icons.Default.MusicNote,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
                 )
                 Icon(
                     imageVector = Icons.Default.StarBorder,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
                 )
             }
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-
-            Text(
-                text = song.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = song.artist,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-            )
+            Column {
+                Text(
+                    text = song.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = song.artist,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline,
+                )
+            }
         }
     }
 }
@@ -400,11 +401,11 @@ private fun LazyGridItemScope.AddSongCard(onClick: () -> Unit) {
         modifier = Modifier
             .animateItem()
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(MaterialTheme.shapes.small)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                shape = RoundedCornerShape(8.dp),
+                shape = MaterialTheme.shapes.small,
             )
             .clickable(onClick = onClick)
             .padding(

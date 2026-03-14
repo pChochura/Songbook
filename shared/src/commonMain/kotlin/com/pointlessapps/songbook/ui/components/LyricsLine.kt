@@ -29,8 +29,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.pointlessapps.songbook.core.domain.models.ChordMarker
 import com.pointlessapps.songbook.ui.theme.spacing
 import kotlinx.coroutines.coroutineScope
@@ -80,7 +78,7 @@ fun LyricsLine(
 
     val density = LocalDensity.current
     // Fixed base height for the cursor box; scaleY in graphicsLayer handles the actual height
-    val cursorBaseHeightPx = with(density) { 24.dp.toPx() }
+    val cursorBaseHeightPx = with(density) { MaterialTheme.spacing.extraLarge.toPx() }
     val spacingExtraSmall = MaterialTheme.spacing.extraSmall
     val spacingSmall = MaterialTheme.spacing.small
 
@@ -168,8 +166,7 @@ fun LyricsLine(
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyLarge,
-                fontSize = 32.sp,
+                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 onTextLayout = { textLayoutResult = it },
                 modifier = Modifier.onGloballyPositioned {
@@ -188,7 +185,7 @@ fun LyricsLine(
                     }
                     .clip(MaterialTheme.shapes.small)
                     .background(MaterialTheme.colorScheme.primary)
-                    .width(2.dp)
+                    .width(MaterialTheme.spacing.extraSmall)
                     .height(with(density) { cursorBaseHeightPx.toDp() }),
             )
         },
