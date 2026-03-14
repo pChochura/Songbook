@@ -47,8 +47,10 @@ import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.data.SongEntity
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
+import com.pointlessapps.songbook.shared.generated.resources.*
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.theme.spacing
+import org.jetbrains.compose.resources.stringResource
 import io.github.ismoy.imagepickerkmp.features.ocr.annotations.ExperimentalOCRApi
 import io.github.ismoy.imagepickerkmp.features.ocr.data.providers.CloudOCRProvider
 import io.github.ismoy.imagepickerkmp.features.ocr.model.ImagePickerOCRConfig
@@ -124,12 +126,12 @@ internal fun LibraryScreen(
                             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
                         ) {
                             Text(
-                                text = "All Songs",
+                                text = stringResource(Res.string.library_songs_section_title),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                             )
                             Text(
-                                text = "${state.songs.size} Found",
+                                text = stringResource(Res.string.library_songs_found, state.songs.size),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier
@@ -142,7 +144,7 @@ internal fun LibraryScreen(
                         }
 
                         Text(
-                            text = "Sort by: Date Added",
+                            text = stringResource(Res.string.library_sort_by_date),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.outline,
                         )
@@ -212,26 +214,26 @@ private fun LibraryHeader(totalSongs: Int, totalArtists: Int) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "YOUR PERSONAL SONGBOOK",
+                text = stringResource(Res.string.library_header_tagline),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "Song Library",
+                text = stringResource(Res.string.library_header_title),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "Access $totalSongs carefully transcribed songs with dynamic chord display options.",
+                text = stringResource(Res.string.library_header_description, totalSongs),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.outline,
             )
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-            StatCard(value = totalSongs.toString(), label = "SONGS")
-            StatCard(value = totalArtists.toString(), label = "ARTISTS")
+            StatCard(value = totalSongs.toString(), label = stringResource(Res.string.library_stat_songs))
+            StatCard(value = totalArtists.toString(), label = stringResource(Res.string.library_stat_artists))
         }
     }
 }
@@ -352,16 +354,16 @@ private fun SongCard(song: SongEntity, onClick: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = song.key ?: "C Major",
+                        text = song.key ?: stringResource(Res.string.library_song_key_default),
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }
                 Text(
-                    text = song.duration ?: "0:00",
+                    text = song.duration ?: stringResource(Res.string.library_song_duration_default),
                     style = MaterialTheme.typography.labelSmall,
                 )
                 Text(
-                    text = "${song.bpm ?: 0} BPM",
+                    text = stringResource(Res.string.library_song_bpm, song.bpm ?: 0),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier
                         .background(
@@ -399,12 +401,12 @@ private fun AddSongCard(onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             Text(
-                text = "Add New Song",
+                text = stringResource(Res.string.library_add_song_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "Import text, PDF, or ChordPro",
+                text = stringResource(Res.string.library_add_song_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
             )

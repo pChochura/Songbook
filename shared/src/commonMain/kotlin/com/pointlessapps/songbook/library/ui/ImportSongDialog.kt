@@ -38,7 +38,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.pointlessapps.songbook.shared.generated.resources.*
 import com.pointlessapps.songbook.ui.theme.spacing
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ImportSongDialog(
@@ -85,19 +87,19 @@ internal fun ImportSongDialog(
                     }
                     Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)) {
                         Text(
-                            text = "Add New Song",
+                            text = stringResource(Res.string.import_dialog_header_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = "Import lyrics to your library",
+                            text = stringResource(Res.string.import_dialog_header_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline,
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = onDismiss) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(Res.string.import_dialog_close))
                     }
                 }
 
@@ -109,26 +111,26 @@ internal fun ImportSongDialog(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                     ) {
-                        Text("Song Title", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(Res.string.import_dialog_song_title_label), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         OutlinedTextField(
                             value = title,
                             onValueChange = { title = it },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
-                            placeholder = { Text("Title") },
+                            placeholder = { Text(stringResource(Res.string.import_dialog_song_title_placeholder)) },
                         )
                     }
                     Column(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                     ) {
-                        Text("Artist", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(Res.string.import_dialog_artist_label), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         OutlinedTextField(
                             value = artist,
                             onValueChange = { artist = it },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
-                            placeholder = { Text("Artist") },
+                            placeholder = { Text(stringResource(Res.string.import_dialog_artist_placeholder)) },
                         )
                     }
                 }
@@ -140,12 +142,12 @@ internal fun ImportSongDialog(
                         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                     ) {
                         Icon(imageVector = Icons.Default.Title, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Text("Song Lyrics", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(Res.string.import_dialog_lyrics_label), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
                         OutlinedButton(onClick = onOcrRequested) {
                             Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                                 Icon(imageVector = Icons.Default.CropFree, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Text("OCR Import")
+                                Text(stringResource(Res.string.import_dialog_ocr_button))
                             }
                         }
                     }
@@ -154,7 +156,7 @@ internal fun ImportSongDialog(
                         onValueChange = { lyrics = it },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
                         minLines = 10,
-                        placeholder = { Text("Enter lyrics here…") },
+                        placeholder = { Text(stringResource(Res.string.import_dialog_lyrics_placeholder)) },
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -167,7 +169,7 @@ internal fun ImportSongDialog(
                             modifier = Modifier.size(14.dp),
                         )
                         Text(
-                            text = "Tip: Use [Chord] for inline chords or line breaks to separate verses.",
+                            text = stringResource(Res.string.import_dialog_lyrics_tip),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.outline,
                             fontStyle = FontStyle.Italic,
@@ -182,12 +184,12 @@ internal fun ImportSongDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium, Alignment.End),
                 ) {
-                    TextButton(onClick = onDismiss) { Text("Cancel") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(Res.string.import_dialog_cancel)) }
                     Button(
                         onClick = { onManualConfirmed(title, artist, lyrics) },
                         enabled = title.isNotBlank(),
                     ) {
-                        Text("Import Song")
+                        Text(stringResource(Res.string.import_dialog_confirm))
                     }
                 }
             }

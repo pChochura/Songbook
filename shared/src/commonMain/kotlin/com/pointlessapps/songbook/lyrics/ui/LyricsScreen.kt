@@ -26,10 +26,12 @@ import com.pointlessapps.songbook.ui.components.ChordSelectionPopup
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.components.LyricsLine
 import com.pointlessapps.songbook.ui.components.LyricsSection
+import com.pointlessapps.songbook.shared.generated.resources.*
 import com.pointlessapps.songbook.ui.components.SongControlBar
 import com.pointlessapps.songbook.ui.components.SongHeader
 import com.pointlessapps.songbook.ui.components.SongStatusBar
 import com.pointlessapps.songbook.ui.theme.spacing
+import org.jetbrains.compose.resources.stringResource
 import io.github.ismoy.imagepickerkmp.features.ocr.annotations.ExperimentalOCRApi
 import io.github.ismoy.imagepickerkmp.features.ocr.data.providers.CloudOCRProvider
 import io.github.ismoy.imagepickerkmp.features.ocr.model.ImagePickerOCRConfig
@@ -91,7 +93,7 @@ internal fun LyricsScreen(
 
                         state.parsedSections.forEachIndexed { sectionIndex, section ->
                             item {
-                                LyricsSection(label = "Lyrics") {
+                                LyricsSection(label = stringResource(Res.string.lyrics_section_label)) {
                                     Column(
                                         verticalArrangement = Arrangement.spacedBy(
                                             MaterialTheme.spacing.medium,
@@ -166,12 +168,12 @@ internal fun LyricsScreen(
                                     verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
                                 ) {
                                     Text(
-                                        text = "No song captured yet",
+                                        text = stringResource(Res.string.lyrics_no_song_message),
                                         style = MaterialTheme.typography.headlineSmall,
                                         color = MaterialTheme.colorScheme.outline,
                                     )
                                     Button(onClick = { viewModel.setOcrActive(true) }) {
-                                        Text("Capture Song via OCR")
+                                        Text(stringResource(Res.string.lyrics_capture_ocr_button))
                                     }
                                 }
                             }
