@@ -27,7 +27,7 @@ fun LyricFlowHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
             .statusBarsPadding()
             .padding(
                 horizontal = MaterialTheme.spacing.large,

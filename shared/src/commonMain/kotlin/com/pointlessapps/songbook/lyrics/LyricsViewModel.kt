@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pointlessapps.songbook.Route
+import com.pointlessapps.songbook.core.domain.models.Chord
 import com.pointlessapps.songbook.core.domain.models.ChordMarker
 import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.data.SongDao
@@ -15,9 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-internal sealed interface LyricsEvent {
-    data class NavigateTo(val route: Route) : LyricsEvent
-}
+internal sealed interface LyricsEvent
 
 internal data class LyricsState(
     val songId: Long? = null,
@@ -25,7 +23,7 @@ internal data class LyricsState(
     val artist: String = "Unknown Artist",
     val transposition: Int = 0,
     val isOcrActive: Boolean = false,
-    val parsedSections: List<List<ParsedLine>>? = null,
+    val parsedSections: List<List<ParsedLine>> = emptyList(),
     val popupState: PopupState? = null,
     val isLoading: Boolean = false,
 )
@@ -79,13 +77,6 @@ internal class LyricsViewModel(
         state = state.copy(isOcrActive = active)
     }
 
-    fun onOcrCompleted(sections: List<List<ParsedLine>>?) {
-        state = state.copy(
-            parsedSections = sections,
-            isOcrActive = false,
-        )
-    }
-
     fun onCursorFinalized(sectionIndex: Int, lineIndex: Int, charIndex: Int, offset: Offset) {
         state = state.copy(
             popupState = PopupState(
@@ -110,7 +101,7 @@ internal class LyricsViewModel(
     }
 
     fun onChordMoved(sectionIndex: Int, lineIndex: Int, marker: ChordMarker, newCharIndex: Int) {
-        val newSections = state.parsedSections?.mapIndexed { sIdx, sLines ->
+        val newSections = state.parsedSections.mapIndexed { sIdx, sLines ->
             if (sIdx == sectionIndex) {
                 sLines.mapIndexed { lIdx, lData ->
                     if (lIdx == lineIndex) {
@@ -131,28 +122,36 @@ internal class LyricsViewModel(
         state = state.copy(popupState = null)
     }
 
-    fun onChordSelected(chord: com.pointlessapps.songbook.core.domain.models.Chord) {
+    fun onChordSelected(chord: Chord?) {
         val popupState = state.popupState ?: return
         val sectionIndex = popupState.sectionIndex
         val lineIndex = popupState.lineIndex
 
-        val newSections = state.parsedSections?.mapIndexed { sIndex, sLines ->
+        val newSections = state.parsedSections.mapIndexed { sIndex, sLines ->
             if (sIndex == sectionIndex) {
                 sLines.mapIndexed { lIndex, lData ->
                     if (lIndex == lineIndex) {
-                        if (popupState.editingMarker != null) {
-                            lData.copy(
-                                chords = lData.chords.map {
-                                    if (it == popupState.editingMarker) it.copy(chord = chord) else it
+                        when {
+                            popupState.editingMarker != null -> lData.copy(
+                                chords = if (chord == null) {
+                                    lData.chords - popupState.editingMarker
+                                } else {
+                                    lData.chords.map {
+                                        if (it == popupState.editingMarker) {
+                                            it.copy(chord = chord)
+                                        } else it
+                                    }
                                 },
                             )
-                        } else {
-                            lData.copy(
+
+                            chord != null -> lData.copy(
                                 chords = (lData.chords + ChordMarker(
                                     chord,
                                     popupState.charIndex,
                                 )).sortedBy { it.offset },
                             )
+
+                            else -> lData
                         }
                     } else lData
                 }
@@ -169,15 +168,12 @@ internal class LyricsViewModel(
 
     private fun saveSong() {
         viewModelScope.launch {
-            val sections = state.parsedSections ?: return@launch
+            val sections = state.parsedSections
             val entity = SongEntity(
                 id = state.songId ?: 0,
                 title = state.title,
                 artist = state.artist,
                 lyrics = sections.flatten().joinToString("\n") { it.text },
-                key = "C Major", // Default for now
-                duration = "4:00",
-                bpm = 120,
                 sections = sections,
             )
             val newId = if (state.songId == null || state.songId == 0L) {

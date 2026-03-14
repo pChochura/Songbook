@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "a0a5a8d99bd8bca7e9473cf391bf6069",
+    "version": 1,
+    "identityHash": "864546742272e65d7d16e0f833aa2922",
     "entities": [
       {
         "tableName": "songs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `lyrics` TEXT NOT NULL, `key` TEXT, `duration` TEXT, `bpm` INTEGER, `sections` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `lyrics` TEXT NOT NULL, `sections` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -33,24 +33,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "key",
-            "columnName": "key",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "duration",
-            "columnName": "duration",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "bpm",
-            "columnName": "bpm",
-            "affinity": "INTEGER"
-          },
-          {
             "fieldPath": "sections",
             "columnName": "sections",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -63,7 +49,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a0a5a8d99bd8bca7e9473cf391bf6069')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '864546742272e65d7d16e0f833aa2922')"
     ]
   }
 }

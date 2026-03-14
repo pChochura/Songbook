@@ -10,8 +10,5 @@ data class SongEntity(
     val title: String,
     val artist: String,
     val lyrics: String,
-    val key: String? = null,
-    val duration: String? = null,
-    val bpm: Int? = null,
-    val sections: List<List<ParsedLine>>? = null,
+    val sections: List<List<ParsedLine>> = emptyList(),
 )

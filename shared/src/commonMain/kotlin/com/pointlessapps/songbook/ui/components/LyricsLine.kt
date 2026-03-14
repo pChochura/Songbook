@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pointlessapps.songbook.core.domain.models.ChordMarker
 import com.pointlessapps.songbook.ui.theme.spacing
 import kotlinx.coroutines.coroutineScope
@@ -65,7 +66,12 @@ fun LyricsLine(
             val lineIdx = lr.getLineForOffset(cursorIndex)
             launch { cursorXAnim.animateTo(lr.getHorizontalPosition(cursorIndex, true), spring()) }
             launch { cursorYAnim.animateTo(lr.getLineTop(lineIdx), spring()) }
-            launch { cursorHeightAnim.animateTo(lr.getLineBottom(lineIdx) - lr.getLineTop(lineIdx), spring()) }
+            launch {
+                cursorHeightAnim.animateTo(
+                    lr.getLineBottom(lineIdx) - lr.getLineTop(lineIdx),
+                    spring(),
+                )
+            }
             cursorAlphaAnim.animateTo(1f)
         } else {
             cursorAlphaAnim.animateTo(0f)
@@ -89,7 +95,8 @@ fun LyricsLine(
                     val scope = this
                     detectDragGesturesAfterLongPress(
                         onDragStart = { startOffset ->
-                            currentIndex = layoutResult.getOffsetForPosition(startOffset - textPosition)
+                            currentIndex =
+                                layoutResult.getOffsetForPosition(startOffset - textPosition)
                             val x = layoutResult.getHorizontalPosition(currentIndex, true)
                             val lineIdx = layoutResult.getLineForOffset(currentIndex)
                             val y = layoutResult.getLineTop(lineIdx)
@@ -100,7 +107,8 @@ fun LyricsLine(
                             scope.launch { cursorHeightAnim.snapTo(h) }
                         },
                         onDrag = { change, _ ->
-                            currentIndex = layoutResult.getOffsetForPosition(change.position - textPosition)
+                            currentIndex =
+                                layoutResult.getOffsetForPosition(change.position - textPosition)
                             val x = layoutResult.getHorizontalPosition(currentIndex, true)
                             val lineIdx = layoutResult.getLineForOffset(currentIndex)
                             val y = layoutResult.getLineTop(lineIdx)
@@ -131,16 +139,19 @@ fun LyricsLine(
                         detectDragGesturesAfterLongPress(
                             onDragStart = { _ ->
                                 draggingChordIdx = chordIndex
-                                draggingChordX = layoutResult.getHorizontalPosition(marker.offset, true)
+                                draggingChordX =
+                                    layoutResult.getHorizontalPosition(marker.offset, true)
                             },
                             onDrag = { _, dragAmount ->
                                 draggingChordX = (draggingChordX + dragAmount.x)
                                     .coerceIn(0f, layoutResult.size.width.toFloat())
                             },
                             onDragEnd = {
-                                val result = textLayoutResult ?: return@detectDragGesturesAfterLongPress
+                                val result =
+                                    textLayoutResult ?: return@detectDragGesturesAfterLongPress
                                 val midLineY = (result.getLineTop(0) + result.getLineBottom(0)) / 2f
-                                val newCharIndex = result.getOffsetForPosition(Offset(draggingChordX, midLineY))
+                                val newCharIndex =
+                                    result.getOffsetForPosition(Offset(draggingChordX, midLineY))
                                 onChordMoved(marker, newCharIndex)
                                 draggingChordIdx = null
                             },
@@ -158,6 +169,7 @@ fun LyricsLine(
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
+                fontSize = 32.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 onTextLayout = { textLayoutResult = it },
                 modifier = Modifier.onGloballyPositioned {

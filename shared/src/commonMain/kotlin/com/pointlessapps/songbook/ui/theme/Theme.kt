@@ -18,8 +18,8 @@ private val DarkColorScheme = darkColorScheme(
     onTertiary = Color.White,
     onBackground = Color.White,
     onSurface = Color.White,
-    surfaceVariant = ChipBackground,
-    onSurfaceVariant = CyanSecondary,
+    surfaceVariant = PurpleContainer,
+    onSurfaceVariant = PurplePrimary,
     outline = TextGray,
 )
 

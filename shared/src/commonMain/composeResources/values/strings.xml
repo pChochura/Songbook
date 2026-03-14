@@ -19,6 +19,7 @@
     <string name="chord_selection_popup_subtitle">Select a chord to insert into your lyrics</string>
     <string name="chord_selection_popup_search_placeholder">Search for a specific chord...</string>
     <string name="chord_selection_popup_all_chords">ALL CHORDS</string>
+    <string name="chord_selection_popup_remove">Remove</string>
 
     <!-- Library Screen -->
     <string name="library_header_tagline">YOUR PERSONAL SONGBOOK</string>

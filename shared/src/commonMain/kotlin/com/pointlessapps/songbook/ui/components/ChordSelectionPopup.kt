@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,16 +15,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -40,6 +40,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.pointlessapps.songbook.core.domain.models.Chord
 import com.pointlessapps.songbook.shared.generated.resources.Res
+import com.pointlessapps.songbook.shared.generated.resources.chord_selection_popup_remove
 import com.pointlessapps.songbook.shared.generated.resources.chord_selection_popup_search_placeholder
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
@@ -47,7 +48,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ChordSelectionPopup(
     offset: IntOffset,
-    onChordSelected: (Chord) -> Unit,
+    onChordSelected: (Chord?) -> Unit,
     onDismissRequest: () -> Unit,
     selectedChord: Chord? = null,
 ) {
@@ -73,13 +74,13 @@ fun ChordSelectionPopup(
             shape = RoundedCornerShape(24.dp),
             color = colorScheme.background,
             shadowElevation = 16.dp,
-            tonalElevation = 0.dp
+            tonalElevation = 0.dp,
         ) {
             Column(
                 modifier = Modifier
                     .padding(spacing.large)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(spacing.large)
+                verticalArrangement = Arrangement.spacedBy(spacing.large),
             ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 64.dp),
@@ -100,11 +101,11 @@ fun ChordSelectionPopup(
                                         Modifier.border(
                                             width = 2.dp,
                                             color = colorScheme.primary,
-                                            shape = RoundedCornerShape(12.dp)
+                                            shape = RoundedCornerShape(12.dp),
                                         )
                                     } else {
                                         Modifier
-                                    }
+                                    },
                                 ),
                             shape = RoundedCornerShape(12.dp),
                             color = if (isSelected) colorScheme.primaryContainer else colorScheme.surface,
@@ -121,41 +122,65 @@ fun ChordSelectionPopup(
                     }
                 }
 
-                // Search Bar
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    placeholder = {
-                        Text(
-                            text = stringResource(Res.string.chord_selection_popup_search_placeholder),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = colorScheme.outline,
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .clip(CircleShape)
-                        .background(colorScheme.surface),
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            tint = colorScheme.outline,
-                        )
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        cursorColor = colorScheme.onSurface,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = colorScheme.onSurface,
-                        unfocusedTextColor = colorScheme.onSurface,
-                    ),
-                    singleLine = true,
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(
+                                text = stringResource(Res.string.chord_selection_popup_search_placeholder),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colorScheme.outline,
+                            )
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .background(colorScheme.surface),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                tint = colorScheme.outline,
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.5f,
+                            ),
+                            cursorColor = MaterialTheme.colorScheme.primary,
+                            focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline,
+                            focusedTrailingIconColor = MaterialTheme.colorScheme.outline,
+                            unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
+                        ),
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
+                    )
+
+                    Button(
+                        modifier = Modifier.height(48.dp),
+                        onClick = { onChordSelected(null) },
+                        enabled = selectedChord != null,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f),
+                            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                        ),
+                    ) {
+                        Text(stringResource(Res.string.chord_selection_popup_remove))
+                    }
+                }
             }
         }
     }

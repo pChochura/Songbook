@@ -43,9 +43,9 @@ fun ChordChip(
     ) {
         Text(
             text = chord.value,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.labelMedium.copy(
-                fontSize = 14.sp,
+                fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )

@@ -304,8 +304,8 @@ private fun SearchBar(
                     }
                 }
             } else null,
-            shape = RoundedCornerShape(12.dp),
             colors = textFieldColors,
+            shape = MaterialTheme.shapes.medium,
         )
 
         AnimatedContent(

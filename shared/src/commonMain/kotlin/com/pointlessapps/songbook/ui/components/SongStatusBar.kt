@@ -28,7 +28,7 @@ fun SongStatusBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
             .navigationBarsPadding()
             .padding(
                 horizontal = MaterialTheme.spacing.large,

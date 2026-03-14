@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.shared.generated.resources.Res
 import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_key
@@ -74,7 +75,8 @@ fun SongControlBar(
             Row(
                 modifier = Modifier
                     .background(
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                            .compositeOver(MaterialTheme.colorScheme.background),
                         shape = RoundedCornerShape(spacing.small),
                     )
                     .padding(spacing.extraSmall),
@@ -108,7 +110,8 @@ fun SongControlBar(
         Row(
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
+                        .compositeOver(MaterialTheme.colorScheme.background),
                     shape = RoundedCornerShape(spacing.large),
                 )
                 .padding(spacing.extraSmall),

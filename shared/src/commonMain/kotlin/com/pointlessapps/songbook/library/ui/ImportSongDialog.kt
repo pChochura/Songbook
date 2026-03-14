@@ -162,6 +162,7 @@ internal fun ImportSongDialog(
                             singleLine = true,
                             placeholder = { Text(stringResource(Res.string.import_dialog_song_title_placeholder)) },
                             colors = textFieldColors,
+                            shape = MaterialTheme.shapes.medium,
                         )
                     }
                     Column(
@@ -180,6 +181,7 @@ internal fun ImportSongDialog(
                             singleLine = true,
                             placeholder = { Text(stringResource(Res.string.import_dialog_artist_placeholder)) },
                             colors = textFieldColors,
+                            shape = MaterialTheme.shapes.medium,
                         )
                     }
                 }
@@ -228,6 +230,7 @@ internal fun ImportSongDialog(
                         minLines = 10,
                         placeholder = { Text(stringResource(Res.string.import_dialog_lyrics_placeholder)) },
                         colors = textFieldColors,
+                        shape = MaterialTheme.shapes.medium,
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
