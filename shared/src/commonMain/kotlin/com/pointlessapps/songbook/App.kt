@@ -9,6 +9,9 @@ fun App(
     openSearch: Boolean = false,
 ) {
     LyricFlowTheme {
-        Navigator(startingRoute = Route.Library)
+        Navigator(startingRoute = Route.Library(
+            initialFilterLetter = initialFilterLetter,
+            openSearch = openSearch,
+        ))
     }
 }

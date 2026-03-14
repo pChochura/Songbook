@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 
 internal sealed interface LibraryEvent {
     data class NavigateTo(val route: Route) : LibraryEvent
+    data object FocusSearch : LibraryEvent
 }
 
 internal data class LibraryState(
@@ -26,9 +27,30 @@ internal data class LibraryState(
     val showImportDialog: Boolean = false,
     val isOcrActive: Boolean = false,
     val ocrScannedText: String? = null,
-)
+    val searchQuery: String = "",
+    val filterLetter: Char? = null,
+) {
+    val filteredSongs: List<SongEntity>
+        get() {
+            var result = songs
+            if (filterLetter != null) {
+                result = result.filter {
+                    it.title.firstOrNull()?.uppercaseChar() == filterLetter
+                }
+            }
+            if (searchQuery.isNotBlank()) {
+                val query = searchQuery.trim().lowercase()
+                result = result.filter {
+                    it.title.lowercase().contains(query) || it.artist.lowercase().contains(query)
+                }
+            }
+            return result
+        }
+}
 
 internal class LibraryViewModel(
+    private val initialFilterLetter: String? = null,
+    private val openSearch: Boolean = false,
     private val songDao: SongDao,
 ) : ViewModel() {
 
@@ -39,7 +61,13 @@ internal class LibraryViewModel(
     val events = eventChannel.receiveAsFlow()
 
     init {
+        if (initialFilterLetter != null) {
+            state = state.copy(filterLetter = initialFilterLetter.firstOrNull()?.uppercaseChar())
+        }
         viewModelScope.launch {
+            if (openSearch) {
+                eventChannel.send(LibraryEvent.FocusSearch)
+            }
             state = state.copy(isLoading = true)
             songDao.getAllSongs().collectLatest { songs ->
                 state = state.copy(
@@ -50,6 +78,14 @@ internal class LibraryViewModel(
                 )
             }
         }
+    }
+
+    fun setSearchQuery(query: String) {
+        state = state.copy(searchQuery = query, filterLetter = if (query.isNotBlank()) null else state.filterLetter)
+    }
+
+    fun setFilterLetter(letter: Char?) {
+        state = state.copy(filterLetter = letter, searchQuery = "")
     }
 
     fun showImportDialog() {

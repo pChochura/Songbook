@@ -21,7 +21,10 @@ import org.koin.core.annotation.KoinExperimentalAPI
 
 public sealed interface Route : NavKey {
     @Serializable
-    data object Library : Route
+    data class Library(
+        val initialFilterLetter: String? = null,
+        val openSearch: Boolean = false,
+    ) : Route
 
     @Serializable
     data class Lyrics(val songId: Long? = null) : Route
@@ -76,7 +79,7 @@ public fun Navigator(
 
 public class Navigator(private val backStack: NavBackStack<NavKey>) {
     fun navigateToLibrary() {
-        backStack.add(Route.Library)
+        backStack.add(Route.Library())
     }
 
     fun navigateToLyrics(songId: Long? = null) {
