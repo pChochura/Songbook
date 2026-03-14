@@ -12,11 +12,17 @@ screen resolutions.
 Whenever there is a string used in the composition, prefer referencing it via stringResource
 instead of hardcoding it.
 
+Always use `com.pointlessapps.songbook.ui.theme.MaterialTheme.spacing` for spacing values.
+Always use `androidx.compose.material3.MaterialTheme.typography` for typography values.
+Always use `androidx.compose.material3.MaterialTheme.colorScheme` for color values.
+Always use `androidx.compose.material3.MaterialTheme.shapes` for shape values.
+
 ### Screen Conventions
 
 Every functionality is split by screens (Lyrics, Library, Settings and so on).
-The navigation between them is routed via the Route class and using the Navigator class with the 
+The navigation between them is routed via the Route class and using the Navigator class with the
 koin being the middle-man:
+
 ```kotlin
 internal val lyricsModule = module {
     viewModelOf(::LyricsViewModel)
@@ -85,6 +91,7 @@ internal class ViewModelTemp : ViewModel() {
 ```
 
 ### DRY (Don't Repeat Yourself)
+
 - Extract repeated logic into shared functions, composables
 - Reuse existing UI components from `ui/components/` before creating new ones
 - Share domain models and mappers across modules via `core/`
