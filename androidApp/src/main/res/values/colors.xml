@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_background">#FF111218</color>
+    <color name="widget_cell_background">#FF1E2030</color>
+    <color name="widget_divider">#FF2A2A3A</color>
+    <color name="widget_title">#FFFFFFFF</color>
+    <color name="widget_subtitle">#FF9E9E9E</color>
+    <color name="widget_letter">#FFFFFFFF</color>
+</resources>

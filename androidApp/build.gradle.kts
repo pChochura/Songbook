@@ -44,4 +44,7 @@ dependencies {
 
     implementation(this.platform(libs.compose.bom))
     implementation(libs.compose.ui.tooling.preview)
+
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
 }
