@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.library.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,12 +19,14 @@ import androidx.compose.material.icons.filled.CropFree
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +55,15 @@ internal fun ImportSongDialog(
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
     var lyrics by remember(initialOcrText) { mutableStateOf(initialOcrText ?: "") }
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+        focusedBorderColor = MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+        focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+        cursorColor = MaterialTheme.colorScheme.primary,
+    )
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -118,6 +130,7 @@ internal fun ImportSongDialog(
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             placeholder = { Text(stringResource(Res.string.import_dialog_song_title_placeholder)) },
+                            colors = textFieldColors,
                         )
                     }
                     Column(
@@ -131,6 +144,7 @@ internal fun ImportSongDialog(
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             placeholder = { Text(stringResource(Res.string.import_dialog_artist_placeholder)) },
+                            colors = textFieldColors,
                         )
                     }
                 }
@@ -144,7 +158,13 @@ internal fun ImportSongDialog(
                         Icon(imageVector = Icons.Default.Title, contentDescription = null, modifier = Modifier.size(18.dp))
                         Text(stringResource(Res.string.import_dialog_lyrics_label), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
-                        OutlinedButton(onClick = onOcrRequested) {
+                        OutlinedButton(
+                            onClick = onOcrRequested,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)),
+                        ) {
                             Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                                 Icon(imageVector = Icons.Default.CropFree, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Text(stringResource(Res.string.import_dialog_ocr_button))
@@ -157,6 +177,7 @@ internal fun ImportSongDialog(
                         modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
                         minLines = 10,
                         placeholder = { Text(stringResource(Res.string.import_dialog_lyrics_placeholder)) },
+                        colors = textFieldColors,
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -188,6 +209,12 @@ internal fun ImportSongDialog(
                     Button(
                         onClick = { onManualConfirmed(title, artist, lyrics) },
                         enabled = title.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f),
+                            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                        ),
                     ) {
                         Text(stringResource(Res.string.import_dialog_confirm))
                     }
