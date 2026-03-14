@@ -23,9 +23,6 @@
     <!-- Library Screen -->
     <string name="library_header_tagline">YOUR PERSONAL SONGBOOK</string>
     <string name="library_header_title">Song Library</string>
-    <string name="library_header_description">Access %1$d carefully transcribed songs with dynamic chord display options.</string>
-    <string name="library_stat_songs">SONGS</string>
-    <string name="library_stat_artists">ARTISTS</string>
     <string name="library_songs_section_title">All Songs</string>
     <string name="library_songs_found">%1$d Found</string>
     <string name="library_sort_by_date">Sort by: Date Added</string>
@@ -33,9 +30,8 @@
     <string name="library_search_filter_letter">Letter: %1$s</string>
     <string name="library_search_clear_filter">Clear filter</string>
     <string name="library_add_song_title">Add New Song</string>
-    <string name="library_add_song_subtitle">Import text, PDF, or ChordPro</string>
+    <string name="library_add_song_subtitle">Import text or an image</string>
     <string name="library_song_key_default">C Major</string>
-    <string name="library_song_duration_default">0:00</string>
     <string name="library_song_bpm">%1$d BPM</string>
 
     <!-- Import Song Dialog -->

@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,7 +36,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
@@ -64,20 +65,12 @@ import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.shared.generated.resources.Res
 import com.pointlessapps.songbook.shared.generated.resources.library_add_song_subtitle
 import com.pointlessapps.songbook.shared.generated.resources.library_add_song_title
-import com.pointlessapps.songbook.shared.generated.resources.library_header_description
-import com.pointlessapps.songbook.shared.generated.resources.library_header_tagline
-import com.pointlessapps.songbook.shared.generated.resources.library_header_title
 import com.pointlessapps.songbook.shared.generated.resources.library_search_clear_filter
 import com.pointlessapps.songbook.shared.generated.resources.library_search_filter_letter
 import com.pointlessapps.songbook.shared.generated.resources.library_search_placeholder
-import com.pointlessapps.songbook.shared.generated.resources.library_song_bpm
-import com.pointlessapps.songbook.shared.generated.resources.library_song_duration_default
-import com.pointlessapps.songbook.shared.generated.resources.library_song_key_default
 import com.pointlessapps.songbook.shared.generated.resources.library_songs_found
 import com.pointlessapps.songbook.shared.generated.resources.library_songs_section_title
 import com.pointlessapps.songbook.shared.generated.resources.library_sort_by_date
-import com.pointlessapps.songbook.shared.generated.resources.library_stat_artists
-import com.pointlessapps.songbook.shared.generated.resources.library_stat_songs
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.theme.spacing
 import io.github.ismoy.imagepickerkmp.features.ocr.annotations.ExperimentalOCRApi
@@ -140,7 +133,7 @@ internal fun LibraryScreen(
             containerColor = MaterialTheme.colorScheme.background,
         ) { paddingValues ->
             LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
+                columns = GridCells.Adaptive(minSize = 120.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -152,10 +145,6 @@ internal fun LibraryScreen(
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
                 verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    LibraryHeader(state.totalSongs, state.totalArtists)
-                }
-
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -195,14 +184,14 @@ internal fun LibraryScreen(
                     }
                 }
 
-                items(state.filteredSongs) { song ->
+                items(state.filteredSongs, key = { it.id }) { song ->
                     SongCard(
                         song = song,
                         onClick = { navigator.navigateToLyrics(song.id) },
                     )
                 }
 
-                item {
+                item(key = "add_song_button") {
                     AddSongCard(onClick = { viewModel.showImportDialog() })
                 }
             }
@@ -276,7 +265,6 @@ private fun SearchBar(
             .fillMaxWidth()
             .imePadding()
             .navigationBarsPadding()
-            .background(MaterialTheme.colorScheme.surface)
             .padding(
                 horizontal = MaterialTheme.spacing.huge,
                 vertical = MaterialTheme.spacing.medium,
@@ -365,77 +353,11 @@ private fun SearchBar(
 }
 
 @Composable
-private fun LibraryHeader(totalSongs: Int, totalArtists: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom,
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(Res.string.library_header_tagline),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(Res.string.library_header_title),
-                style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(Res.string.library_header_description, totalSongs),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.outline,
-            )
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-            StatCard(
-                value = totalSongs.toString(),
-                label = stringResource(Res.string.library_stat_songs),
-            )
-            StatCard(
-                value = totalArtists.toString(),
-                label = stringResource(Res.string.library_stat_artists),
-            )
-        }
-    }
-}
-
-@Composable
-private fun StatCard(value: String, label: String) {
+private fun LazyGridItemScope.SongCard(song: SongEntity, onClick: () -> Unit) {
     Card(
+        modifier = Modifier.animateItem().fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.size(80.dp),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outline,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SongCard(song: SongEntity, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        onClick = onClick,
     ) {
         Column(modifier = Modifier.padding(MaterialTheme.spacing.large)) {
             Row(
@@ -468,86 +390,47 @@ private fun SongCard(song: SongEntity, onClick: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
             )
-
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MusicNote,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = song.key ?: stringResource(Res.string.library_song_key_default),
-                        style = MaterialTheme.typography.labelSmall,
-                    )
-                }
-                Text(
-                    text = song.duration
-                        ?: stringResource(Res.string.library_song_duration_default),
-                    style = MaterialTheme.typography.labelSmall,
-                )
-                Text(
-                    text = stringResource(Res.string.library_song_bpm, song.bpm ?: 0),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(4.dp),
-                        )
-                        .padding(horizontal = 4.dp, vertical = 2.dp),
-                )
-            }
         }
     }
 }
 
 @Composable
-private fun AddSongCard(onClick: () -> Unit) {
-    Box(
+private fun LazyGridItemScope.AddSongCard(onClick: () -> Unit) {
+    Column(
         modifier = Modifier
+            .animateItem()
             .fillMaxWidth()
-            .height(180.dp)
             .clip(RoundedCornerShape(8.dp))
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(8.dp),
             )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
+            .clickable(onClick = onClick)
+            .padding(
+                horizontal = MaterialTheme.spacing.large,
+                vertical = MaterialTheme.spacing.medium,
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.outline,
-            )
-            Text(
-                text = stringResource(Res.string.library_add_song_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(Res.string.library_add_song_subtitle),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-            )
-        }
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.outline,
+        )
+        Text(
+            text = stringResource(Res.string.library_add_song_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(Res.string.library_add_song_subtitle),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline,
+            textAlign = TextAlign.Center,
+        )
     }
 }
