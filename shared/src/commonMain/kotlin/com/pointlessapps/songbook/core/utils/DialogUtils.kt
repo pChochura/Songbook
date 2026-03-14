@@ -6,7 +6,7 @@ import androidx.compose.ui.window.DialogProperties
 val EdgeToEdgeDialogProperties: DialogProperties = PlatformDialogProperties(
     dismissOnBackPress = true,
     dismissOnClickOutside = true,
-    usePlatformDefaultWidth = false,
+    usePlatformDefaultWidth = true,
     usePlatformInsets = false,
     decorFitsSystemWindows = false,
 )

@@ -22,16 +22,18 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
+import com.pointlessapps.songbook.shared.generated.resources.Res
+import com.pointlessapps.songbook.shared.generated.resources.lyrics_capture_ocr_button
+import com.pointlessapps.songbook.shared.generated.resources.lyrics_no_song_message
+import com.pointlessapps.songbook.shared.generated.resources.lyrics_section_label
 import com.pointlessapps.songbook.ui.components.ChordSelectionPopup
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.components.LyricsLine
 import com.pointlessapps.songbook.ui.components.LyricsSection
-import com.pointlessapps.songbook.shared.generated.resources.*
 import com.pointlessapps.songbook.ui.components.SongControlBar
 import com.pointlessapps.songbook.ui.components.SongHeader
 import com.pointlessapps.songbook.ui.components.SongStatusBar
 import com.pointlessapps.songbook.ui.theme.spacing
-import org.jetbrains.compose.resources.stringResource
 import io.github.ismoy.imagepickerkmp.features.ocr.annotations.ExperimentalOCRApi
 import io.github.ismoy.imagepickerkmp.features.ocr.data.providers.CloudOCRProvider
 import io.github.ismoy.imagepickerkmp.features.ocr.model.ImagePickerOCRConfig
@@ -40,6 +42,7 @@ import io.github.ismoy.imagepickerkmp.features.ocr.presentation.ImagePickerLaunc
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalOCRApi::class)
 @Composable
@@ -67,7 +70,6 @@ internal fun LyricsScreen(
             },
             bottomBar = {
                 SongStatusBar(
-                    tempo = 120,
                     onFullscreenClicked = { viewModel.setOcrActive(true) },
                 )
             },
@@ -78,10 +80,10 @@ internal fun LyricsScreen(
                     modifier = Modifier
                         .fillMaxHeight()
                         .widthIn(max = 800.dp)
-                        .padding(paddingValues)
                         .padding(horizontal = MaterialTheme.spacing.huge),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                    contentPadding = paddingValues,
                 ) {
                     if (state.parsedSections != null) {
                         item {

@@ -1,18 +1,37 @@
 package com.pointlessapps.songbook.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.shared.generated.resources.*
+import com.pointlessapps.songbook.shared.generated.resources.Res
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_key
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_both
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_side_by_side
+import com.pointlessapps.songbook.shared.generated.resources.song_control_bar_mode_standard
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
@@ -25,12 +44,11 @@ fun SongControlBar(
     modifier: Modifier = Modifier,
 ) {
     val spacing = MaterialTheme.spacing
-    val colorScheme = MaterialTheme.colorScheme
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
             .padding(
                 horizontal = spacing.large,
                 vertical = spacing.medium,
@@ -46,17 +64,17 @@ fun SongControlBar(
                 Text(
                     text = stringResource(
                         Res.string.song_control_bar_key,
-                        if (transposition >= 0) "+$transposition" else transposition.toString()
+                        if (transposition >= 0) "+$transposition" else transposition.toString(),
                     ),
                     style = MaterialTheme.typography.labelMedium,
-                    color = colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
             Row(
                 modifier = Modifier
                     .background(
-                        color = colorScheme.outline.copy(alpha = 0.2f),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(spacing.small),
                     )
                     .padding(spacing.extraSmall),
@@ -69,7 +87,7 @@ fun SongControlBar(
                     Icon(
                         imageVector = Icons.Default.Remove,
                         contentDescription = null,
-                        tint = colorScheme.onSurface,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(spacing.large),
                     )
                 }
@@ -80,37 +98,17 @@ fun SongControlBar(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = null,
-                        tint = colorScheme.onSurface,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(spacing.large),
                     )
                 }
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.medium),
-            ) {
-                Text(
-                    text = stringResource(Res.string.song_control_bar_text_size_label),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colorScheme.onSurface,
-                )
-                Slider(
-                    value = 0.5f,
-                    onValueChange = {},
-                    modifier = Modifier.width(150.dp),
-                    colors = SliderDefaults.colors(
-                        thumbColor = colorScheme.onSurface,
-                        activeTrackColor = colorScheme.primary,
-                    ),
-                )
             }
         }
 
         Row(
             modifier = Modifier
                 .background(
-                    color = colorScheme.outline.copy(alpha = 0.1f),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
                     shape = RoundedCornerShape(spacing.large),
                 )
                 .padding(spacing.extraSmall),
@@ -118,7 +116,7 @@ fun SongControlBar(
             val modes = listOf(
                 Res.string.song_control_bar_mode_standard,
                 Res.string.song_control_bar_mode_side_by_side,
-                Res.string.song_control_bar_mode_text_only,
+                Res.string.song_control_bar_mode_both,
             )
             var selectedMode by remember { mutableStateOf(modes[0]) }
             modes.forEach { mode ->
@@ -126,11 +124,11 @@ fun SongControlBar(
                     onClick = { selectedMode = mode },
                     colors = ButtonDefaults.textButtonColors(
                         containerColor = if (selectedMode == mode) {
-                            colorScheme.outline.copy(alpha = 0.2f)
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                         } else {
                             Color.Transparent
                         },
-                        contentColor = colorScheme.onSurface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                     shape = RoundedCornerShape(14.dp),
                     contentPadding = PaddingValues(

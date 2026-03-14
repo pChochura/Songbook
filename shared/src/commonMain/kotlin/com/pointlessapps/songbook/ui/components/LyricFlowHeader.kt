@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +26,9 @@ fun LyricFlowHeader(
 ) {
     Row(
         modifier = modifier
-            .statusBarsPadding()
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
+            .statusBarsPadding()
             .padding(
                 horizontal = MaterialTheme.spacing.large,
                 vertical = MaterialTheme.spacing.medium,

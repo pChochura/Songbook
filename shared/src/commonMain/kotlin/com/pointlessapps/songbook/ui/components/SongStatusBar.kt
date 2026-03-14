@@ -12,60 +12,41 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.pointlessapps.songbook.shared.generated.resources.Res
 import com.pointlessapps.songbook.shared.generated.resources.song_status_bar_fullscreen
-import com.pointlessapps.songbook.shared.generated.resources.song_status_bar_tempo
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SongStatusBar(
-    tempo: Int,
     onFullscreenClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
             .navigationBarsPadding()
             .padding(
                 horizontal = MaterialTheme.spacing.large,
                 vertical = MaterialTheme.spacing.small,
             ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.End,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+        IconButton(
+            onClick = onFullscreenClicked,
+            modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
         ) {
-            Text(
-                text = stringResource(Res.string.song_status_bar_tempo, tempo),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outline,
+            Icon(
+                imageVector = Icons.Default.Fullscreen,
+                contentDescription = stringResource(Res.string.song_status_bar_fullscreen),
+                tint = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.size(MaterialTheme.spacing.large),
             )
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
-        ) {
-            IconButton(
-                onClick = onFullscreenClicked,
-                modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Fullscreen,
-                    contentDescription = stringResource(Res.string.song_status_bar_fullscreen),
-                    tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(MaterialTheme.spacing.large),
-                )
-            }
         }
     }
 }

@@ -9,7 +9,7 @@
     <string name="song_control_bar_auto_scroll">Auto-scroll</string>
     <string name="song_control_bar_mode_standard">Standard</string>
     <string name="song_control_bar_mode_side_by_side">Side-by-Side</string>
-    <string name="song_control_bar_mode_text_only">Text Only</string>
+    <string name="song_control_bar_mode_both">Both</string>
     <string name="song_control_bar_text_size_label">T</string>
     <string name="song_status_bar_tempo">TEMPO: %1$d BPM</string>
     <string name="song_status_bar_capo">CAPO: %1$d</string>
