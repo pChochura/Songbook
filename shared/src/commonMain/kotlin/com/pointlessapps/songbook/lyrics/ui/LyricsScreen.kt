@@ -28,10 +28,8 @@ import com.pointlessapps.songbook.ui.components.SongControlBar
 import com.pointlessapps.songbook.ui.components.SongHeader
 import com.pointlessapps.songbook.ui.components.SongStatusBar
 import com.pointlessapps.songbook.ui.theme.spacing
-import io.github.ismoy.imagepickerkmp.features.ocr.annotations.ExperimentalOCRApi
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalOCRApi::class)
 @Composable
 internal fun LyricsScreen(
     viewModel: LyricsViewModel,

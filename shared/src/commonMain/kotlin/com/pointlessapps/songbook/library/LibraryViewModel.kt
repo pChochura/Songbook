@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
-import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.data.SongDao
 import com.pointlessapps.songbook.data.SongEntity
 import kotlinx.coroutines.channels.Channel
@@ -24,9 +23,6 @@ internal data class LibraryState(
     val isLoading: Boolean = false,
     val totalSongs: Int = 0,
     val totalArtists: Int = 0,
-    val showImportDialog: Boolean = false,
-    val isOcrActive: Boolean = false,
-    val ocrScannedText: String? = null,
     val searchQuery: String = "",
     val filterLetter: Char? = null,
 ) {
@@ -81,41 +77,19 @@ internal class LibraryViewModel(
     }
 
     fun setSearchQuery(query: String) {
-        state = state.copy(searchQuery = query, filterLetter = if (query.isNotBlank()) null else state.filterLetter)
+        state = state.copy(
+            searchQuery = query,
+            filterLetter = if (query.isNotBlank()) null else state.filterLetter,
+        )
     }
 
     fun setFilterLetter(letter: Char?) {
         state = state.copy(filterLetter = letter, searchQuery = "")
     }
 
-    fun showImportDialog() {
-        state = state.copy(showImportDialog = true)
-    }
-
-    fun hideImportDialog() {
-        state = state.copy(showImportDialog = false, ocrScannedText = null)
-    }
-
-    fun setOcrActive(active: Boolean) {
-        state = state.copy(isOcrActive = active)
-    }
-
-    fun onOcrScanned(rawText: String) {
-        state = state.copy(isOcrActive = false, showImportDialog = true, ocrScannedText = rawText)
-    }
-
-    fun onManualInputConfirmed(title: String, artist: String, lyricsText: String) {
+    fun onImportSongRequested() {
         viewModelScope.launch {
-            state = state.copy(showImportDialog = false, ocrScannedText = null)
-            val sections = listOf(lyricsText.split("\n").map { ParsedLine(it) })
-            val entity = SongEntity(
-                title = title,
-                artist = artist,
-                lyrics = lyricsText,
-                sections = sections,
-            )
-            val newId = songDao.insertSong(entity)
-            eventChannel.send(LibraryEvent.NavigateTo(Route.Lyrics(newId)))
+            eventChannel.send(LibraryEvent.NavigateTo(Route.ImportSong))
         }
     }
 }

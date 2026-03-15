@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.room)
 }
 
-group = "com.pointlessapps.Songbook"
+group = "com.pointlessapps.songbook"
 version = "1.0.0"
 
 room {
@@ -23,8 +23,8 @@ kotlin {
     }
 
     android {
-        namespace = "com.pointlessapps.Songbook.shared"
-        compileSdk = libs.versions.androidCompileSdk.get().toInt()
+        namespace = "com.pointlessapps.songbook.shared"
+        compileSdk = libs.versions.sdk.compile.get().toInt()
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -56,7 +56,6 @@ kotlin {
             implementation(libs.compose.mp.components.resources)
 
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.image.picker)
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
@@ -66,6 +65,11 @@ kotlin {
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
             implementation(libs.androidx.navigation3.ui)
+
+            implementation(libs.peekaboo.ui)
+            implementation(libs.peekaboo.image.picker)
+
+            implementation(projects.ai)
         }
     }
 }

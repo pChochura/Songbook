@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
@@ -52,9 +51,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigationevent.NavigationEventInfo
-import androidx.navigationevent.compose.NavigationBackHandler
-import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.data.SongEntity
@@ -71,19 +67,8 @@ import com.pointlessapps.songbook.shared.generated.resources.library_songs_secti
 import com.pointlessapps.songbook.shared.generated.resources.library_sort_by_date
 import com.pointlessapps.songbook.ui.components.LyricFlowHeader
 import com.pointlessapps.songbook.ui.theme.spacing
-import io.github.ismoy.imagepickerkmp.features.ocr.annotations.ExperimentalOCRApi
-import io.github.ismoy.imagepickerkmp.features.ocr.data.providers.CloudOCRProvider
-import io.github.ismoy.imagepickerkmp.features.ocr.model.ImagePickerOCRConfig
-import io.github.ismoy.imagepickerkmp.features.ocr.model.ScanMode
-import io.github.ismoy.imagepickerkmp.features.ocr.presentation.ImagePickerLauncherOCR
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.compose.resources.stringResource
 
-private data object CurrentInfo : NavigationEventInfo()
-
-@OptIn(ExperimentalOCRApi::class)
 @Composable
 internal fun LibraryScreen(
     viewModel: LibraryViewModel,
@@ -95,22 +80,15 @@ internal fun LibraryScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                is LibraryEvent.NavigateTo -> navigator.navigateToLyrics((event.route as Route.Lyrics).songId)
+                is LibraryEvent.NavigateTo -> when (val route = event.route) {
+                    is Route.Lyrics -> navigator.navigateToLyrics(route.songId)
+                    Route.ImportSong -> navigator.navigateToImportSong()
+                    else -> Unit
+                }
                 LibraryEvent.FocusSearch -> focusRequester.requestFocus()
             }
         }
     }
-
-    val navigationEventState = rememberNavigationEventState(
-        currentInfo = CurrentInfo,
-        backInfo = listOf(NavigationEventInfo.None),
-    )
-    NavigationBackHandler(
-        state = navigationEventState,
-        isBackEnabled = state.isOcrActive,
-        onBackCancelled = {},
-        onBackCompleted = { viewModel.onOcrScanned("") },
-    )
 
     Row(
         modifier = Modifier
@@ -190,48 +168,9 @@ internal fun LibraryScreen(
                 }
 
                 item(key = "add_song_button") {
-                    AddSongCard(onClick = { viewModel.showImportDialog() })
+                    AddSongCard(onClick = viewModel::onImportSongRequested)
                 }
             }
-        }
-    }
-
-    if (state.showImportDialog) {
-        ImportSongDialog(
-            initialOcrText = state.ocrScannedText,
-            onDismiss = viewModel::hideImportDialog,
-            onOcrRequested = {
-                viewModel.setOcrActive(true)
-                viewModel.hideImportDialog()
-            },
-            onManualConfirmed = viewModel::onManualInputConfirmed,
-        )
-    }
-
-    if (state.isOcrActive) {
-        Box(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
-            ImagePickerLauncherOCR(
-                config = ImagePickerOCRConfig(
-                    scanMode = ScanMode.Cloud(
-                        provider = CloudOCRProvider.Gemini(
-                            apiKey = "AIzaSyBM2JGn74cCsqf2aotqWmiyn55A56AigVg",
-                            model = "gemini-3.1-flash-lite",
-                        ),
-                    ),
-                    onOCRCompleted = { result ->
-                        @Suppress("UNCHECKED_CAST")
-                        val rawText =
-                            ((result.metadata?.get("gemini_structured_data") as? Map<String, Any>)
-                                ?.get("text_content") as? JsonArray)?.mapNotNull { element ->
-                                element.jsonObject["text"]?.jsonPrimitive?.content
-                            }?.joinToString("\n") ?: ""
-                        viewModel.onOcrScanned(rawText)
-                    },
-                    onError = { viewModel.setOcrActive(false) },
-                    onCancel = { viewModel.setOcrActive(false) },
-                    enableCrop = true,
-                ),
-            )
         }
     }
 }

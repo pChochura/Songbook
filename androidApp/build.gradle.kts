@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.pointlessapps.songbook"
-    compileSdk = libs.versions.androidCompileSdk.get().toInt()
+    compileSdk = libs.versions.sdk.compile.get().toInt()
 
     defaultConfig {
         applicationId = "com.pointlessapps.songbook"
-        minSdk = libs.versions.androidMinSdk.get().toInt()
-        targetSdk = libs.versions.androidTargetSdk.get().toInt()
+        minSdk = libs.versions.sdk.min.get().toInt()
+        targetSdk = libs.versions.sdk.target.get().toInt()
         versionCode = 1
         versionName = "1.0"
     }
@@ -29,17 +29,26 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "androidx.camera") {
+                useVersion("1.4.0")
+                because("CameraX 1.4.0+ aligns native libs for 16 KB page-size compatibility.")
+            }
+        }
+    }
 }
 
 dependencies {
-    implementation(project(":shared"))
+    implementation(projects.shared)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.navigation3.ui)
-    implementation(libs.androidx.lifecycle.viewmodelNavigation3)
     implementation(libs.koin.android)
 
     implementation(this.platform(libs.compose.bom))

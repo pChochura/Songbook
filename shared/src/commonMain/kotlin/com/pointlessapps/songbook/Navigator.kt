@@ -28,6 +28,9 @@ public sealed interface Route : NavKey {
 
     @Serializable
     data class Lyrics(val songId: Long? = null) : Route
+
+    @Serializable
+    data object ImportSong : Route
 }
 
 private val navigationConfig = SavedStateConfiguration {
@@ -35,6 +38,7 @@ private val navigationConfig = SavedStateConfiguration {
         polymorphic(NavKey::class) {
             subclass(Route.Library::class, Route.Library.serializer())
             subclass(Route.Lyrics::class, Route.Lyrics.serializer())
+            subclass(Route.ImportSong::class, Route.ImportSong.serializer())
         }
     }
 }
@@ -84,6 +88,10 @@ public class Navigator(private val backStack: NavBackStack<NavKey>) {
 
     fun navigateToLyrics(songId: Long? = null) {
         backStack.add(Route.Lyrics(songId))
+    }
+
+    fun navigateToImportSong() {
+        backStack.add(Route.ImportSong)
     }
 }
 
