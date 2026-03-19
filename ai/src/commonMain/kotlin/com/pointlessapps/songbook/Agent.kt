@@ -54,7 +54,7 @@ object Agent {
 
     suspend fun extractSongData(bytes: ByteArray): SongData? {
         val response = httpClient.post("$BASE_URL/$MODEL:generateContent") {
-            parameter("key", "AIzaSyBM2JGn74cCsqf2aotqWmiyn55A56AigVg")
+            parameter("key", geminiApiKey)
             contentType(ContentType.Application.Json)
             setBody(
                 createOcrRequestBody(
