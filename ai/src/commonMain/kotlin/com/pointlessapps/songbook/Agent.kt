@@ -27,7 +27,7 @@ object Agent {
         isLenient = true
     }
 
-    private const val MODEL = "gemini-2.5-flash"
+    private const val MODEL = "gemini-2.5-flash-lite"
     private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
     private val httpClient: HttpClient = HttpClient {
         install(ContentNegotiation) {
@@ -52,7 +52,7 @@ object Agent {
         }
     }
 
-    suspend fun extractSongData(bytes: ByteArray): SongData? {
+    suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
         val response = httpClient.post("$BASE_URL/$MODEL:generateContent") {
             parameter("key", geminiApiKey)
             contentType(ContentType.Application.Json)
@@ -73,9 +73,11 @@ object Agent {
 
         val body = withContext(Dispatchers.Default) { response.body<OcrResponseBody>() }
         val responseText = body.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
-        return responseText?.removeSurrounding(
-            prefix = "```json",
-            suffix = "```",
-        )?.let(jsonInstance::decodeFromString)
+        return runCatching<List<SongData>?> {
+            responseText?.removeSurrounding(
+                prefix = "```json",
+                suffix = "```",
+            )?.let(jsonInstance::decodeFromString)
+        }.getOrNull()
     }
 }

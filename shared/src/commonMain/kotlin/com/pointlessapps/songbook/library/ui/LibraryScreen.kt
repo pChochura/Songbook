@@ -1,7 +1,6 @@
 package com.pointlessapps.songbook.library.ui
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -9,10 +8,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
@@ -27,18 +29,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,16 +51,23 @@ import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.data.SongEntity
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
-import com.pointlessapps.songbook.shared.generated.resources.Res
-import com.pointlessapps.songbook.shared.generated.resources.library_add_song_subtitle
-import com.pointlessapps.songbook.shared.generated.resources.library_add_song_title
-import com.pointlessapps.songbook.shared.generated.resources.library_search_clear_filter
-import com.pointlessapps.songbook.shared.generated.resources.library_search_filter_letter
-import com.pointlessapps.songbook.shared.generated.resources.library_search_placeholder
-import com.pointlessapps.songbook.shared.generated.resources.library_songs_found
-import com.pointlessapps.songbook.shared.generated.resources.library_songs_section_title
-import com.pointlessapps.songbook.shared.generated.resources.library_sort_by_date
-import com.pointlessapps.songbook.ui.components.LyricFlowHeader
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_app_name
+import com.pointlessapps.songbook.shared.library_add_song_subtitle
+import com.pointlessapps.songbook.shared.library_add_song_title
+import com.pointlessapps.songbook.shared.library_header_title
+import com.pointlessapps.songbook.shared.library_search_placeholder
+import com.pointlessapps.songbook.shared.library_songs_found
+import com.pointlessapps.songbook.shared.library_sort_by_date
+import com.pointlessapps.songbook.ui.TopBar
+import com.pointlessapps.songbook.ui.components.SongbookChip
+import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
+import com.pointlessapps.songbook.ui.components.SongbookText
+import com.pointlessapps.songbook.ui.components.SongbookTextField
+import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
@@ -85,205 +87,138 @@ internal fun LibraryScreen(
                     Route.ImportSong -> navigator.navigateToImportSong()
                     else -> Unit
                 }
+
                 LibraryEvent.FocusSearch -> focusRequester.requestFocus()
             }
         }
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-    ) {
-        Scaffold(
-            topBar = { LyricFlowHeader() },
-            bottomBar = {
-                SearchBar(
-                    query = state.searchQuery,
-                    filterLetter = state.filterLetter,
-                    onQueryChange = viewModel::setSearchQuery,
-                    onClearFilter = { viewModel.setFilterLetter(null) },
-                    focusRequester = focusRequester,
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.background,
-        ) { paddingValues ->
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 120.dp),
+    SongbookScaffoldLayout(
+        topBar = @Composable {
+            TopBar(
+                leftButton = null,
+                rightButton = null,
+                title = Res.string.common_app_name,
+            )
+        },
+        fab = @Composable {
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = MaterialTheme.spacing.huge),
-                contentPadding = PaddingValues(
-                    top = MaterialTheme.spacing.huge,
-                    bottom = MaterialTheme.spacing.huge,
-                ),
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-                        ) {
-                            Text(
-                                text = stringResource(Res.string.library_songs_section_title),
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Text(
-                                text = stringResource(
-                                    Res.string.library_songs_found,
-                                    state.filteredSongs.size,
-                                ),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .background(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                        shape = MaterialTheme.shapes.extraSmall,
-                                    )
-                                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                            )
-                        }
-
-                        Text(
-                            text = stringResource(Res.string.library_sort_by_date),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.outline,
-                        )
-                    }
-                }
-
-                items(state.filteredSongs, key = { it.id }) { song ->
-                    SongCard(
-                        song = song,
-                        onClick = { navigator.navigateToLyrics(song.id) },
+                    .navigationBarsPadding()
+                    .imePadding()
+                    .padding(
+                        horizontal = MaterialTheme.spacing.huge,
+                        vertical = MaterialTheme.spacing.medium,
                     )
-                }
+                    .padding(bottom = MaterialTheme.spacing.large)
+                    .height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SongbookTextField(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(MaterialTheme.shapes.medium)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = MaterialTheme.shapes.medium,
+                        )
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                        .padding(
+                            horizontal = MaterialTheme.spacing.large,
+                            vertical = MaterialTheme.spacing.medium,
+                        ),
+                    value = state.searchQuery,
+                    onValueChange = viewModel::setSearchQuery,
+                    textFieldStyle = defaultSongbookTextFieldStyle().copy(
+                        placeholder = stringResource(Res.string.library_search_placeholder),
+                        placeholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
 
-                item(key = "add_song_button") {
-                    AddSongCard(onClick = viewModel::onImportSongRequested)
+                AnimatedContent(
+                    targetState = state.filterLetter,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() using null },
+                ) { filterLetter ->
+                    if (filterLetter == null) return@AnimatedContent
+
+                    SongbookChip(
+                        modifier = Modifier.fillMaxHeight().widthIn(min = 64.dp),
+                        label = filterLetter.toString(),
+                        isSelected = true,
+                        onClick = { viewModel.setFilterLetter(null) },
+                        chipStyle = defaultSongbookChipStyle().copy(
+                            selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                            selectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            selectedOutlineColor = MaterialTheme.colorScheme.outlineVariant,
+                            iconRes = IconClose,
+                            iconAlignment = Alignment.End,
+                        ),
+                    )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun SearchBar(
-    query: String,
-    filterLetter: Char?,
-    onQueryChange: (String) -> Unit,
-    onClearFilter: () -> Unit,
-    focusRequester: FocusRequester,
-) {
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-        focusedBorderColor = MaterialTheme.colorScheme.primary,
-        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-        focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-        cursorColor = MaterialTheme.colorScheme.primary,
-        focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-        unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline,
-        focusedTrailingIconColor = MaterialTheme.colorScheme.outline,
-        unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .imePadding()
-            .navigationBarsPadding()
-            .padding(
-                horizontal = MaterialTheme.spacing.huge,
-                vertical = MaterialTheme.spacing.medium,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-    ) {
-        OutlinedTextField(
-            value = query,
-            onValueChange = onQueryChange,
+        },
+    ) { paddingValues ->
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 120.dp),
             modifier = Modifier
-                .weight(1f)
-                .focusRequester(focusRequester)
-                .animateContentSize(),
-            singleLine = true,
-            placeholder = {
-                Text(
-                    text = stringResource(Res.string.library_search_placeholder),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
-                )
-            },
-            trailingIcon = if (query.isNotEmpty()) {
-                {
-                    IconButton(onClick = { onQueryChange("") }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(Res.string.library_search_clear_filter),
-                            modifier = Modifier.size(MaterialTheme.spacing.large),
-                        )
-                    }
-                }
-            } else null,
-            colors = textFieldColors,
-            shape = MaterialTheme.shapes.medium,
-        )
-
-        AnimatedContent(
-            targetState = filterLetter,
-            contentKey = { it != null },
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-        ) { filterLetter ->
-            if (filterLetter == null) return@AnimatedContent
-
-            Box(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.medium)
-                    .height(OutlinedTextFieldDefaults.MinHeight)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .clickable(onClick = onClearFilter)
-                    .padding(
-                        horizontal = MaterialTheme.spacing.medium,
-                        vertical = MaterialTheme.spacing.small,
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = MaterialTheme.spacing.large),
+            contentPadding = PaddingValues(
+                top = MaterialTheme.spacing.huge,
+                bottom = MaterialTheme.spacing.huge,
+            ),
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+        ) {
+            item(key = "header", span = { GridItemSpan(maxLineSpan) }) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                 ) {
-                    Text(
-                        text = stringResource(
-                            Res.string.library_search_filter_letter,
-                            filterLetter,
+                    SongbookText(
+                        text = stringResource(Res.string.library_header_title),
+                        textStyle = defaultSongbookTextStyle().copy(
+                            textColor = MaterialTheme.colorScheme.onSurface,
+                            typography = MaterialTheme.typography.titleLarge,
                         ),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontWeight = FontWeight.Bold,
                     )
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(Res.string.library_search_clear_filter),
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(MaterialTheme.spacing.large),
+
+                    SongbookChip(
+                        label = stringResource(
+                            Res.string.library_songs_found,
+                            state.filteredSongs.size,
+                        ),
+                        isSelected = false,
+                        onClick = {},
+                    )
+
+                    SongbookText(
+                        modifier = Modifier
+                            .weight(1f)
+                            .wrapContentWidth(Alignment.End),
+                        text = stringResource(Res.string.library_sort_by_date),
+                        textStyle = defaultSongbookTextStyle().copy(
+                            textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            typography = MaterialTheme.typography.labelMedium,
+                        ),
                     )
                 }
+            }
+
+            items(state.filteredSongs, key = { it.id }) { song ->
+                SongCard(
+                    song = song,
+                    onClick = { navigator.navigateToLyrics(song.id) },
+                )
+            }
+
+            item(key = "add_song_button") {
+                AddSongCard(onClick = viewModel::onImportSongRequested)
             }
         }
     }

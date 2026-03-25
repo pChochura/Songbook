@@ -8,28 +8,32 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CropFree
-import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,29 +42,38 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.library.ImportSongEvent
 import com.pointlessapps.songbook.library.ImportSongViewModel
-import com.pointlessapps.songbook.shared.generated.resources.Res
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_artist_label
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_artist_placeholder
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_cancel
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_confirm
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_header_subtitle
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_header_title
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_lyrics_label
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_lyrics_placeholder
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_lyrics_tip
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_ocr_button
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_song_title_label
-import com.pointlessapps.songbook.shared.generated.resources.import_dialog_song_title_placeholder
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.import_dialog_artist_label
+import com.pointlessapps.songbook.shared.import_dialog_artist_placeholder
+import com.pointlessapps.songbook.shared.import_dialog_camera_button
+import com.pointlessapps.songbook.shared.import_dialog_cancel
+import com.pointlessapps.songbook.shared.import_dialog_confirm
+import com.pointlessapps.songbook.shared.import_dialog_gallery_button
+import com.pointlessapps.songbook.shared.import_dialog_header_title
+import com.pointlessapps.songbook.shared.import_dialog_lyrics_editor
+import com.pointlessapps.songbook.shared.import_dialog_lyrics_placeholder
+import com.pointlessapps.songbook.shared.import_dialog_lyrics_tip
+import com.pointlessapps.songbook.shared.import_dialog_ocr_button
+import com.pointlessapps.songbook.shared.import_dialog_ocr_subtitle
+import com.pointlessapps.songbook.shared.import_dialog_song_identity
+import com.pointlessapps.songbook.shared.import_dialog_song_title_label
+import com.pointlessapps.songbook.shared.import_dialog_song_title_placeholder
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.preat.peekaboo.image.picker.FilterOptions
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import com.preat.peekaboo.ui.camera.CameraMode
+import com.preat.peekaboo.ui.camera.PeekabooCamera
+import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -110,153 +123,112 @@ internal fun ImportSongScreen(
             }
         },
     ) { paddingValues ->
-        val textFieldColors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-            cursorColor = MaterialTheme.colorScheme.primary,
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
+                .padding(paddingValues)
                 .imePadding()
                 .padding(MaterialTheme.spacing.extraLarge),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
-            // Header Info
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+            // OCR Import Banner
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
+                shape = MaterialTheme.shapes.large,
             ) {
-                Box(
+                Column(
                     modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                            shape = CircleShape,
-                        )
-                        .padding(MaterialTheme.spacing.medium),
-                    contentAlignment = Alignment.Center,
+                        .fillMaxWidth()
+                        .padding(MaterialTheme.spacing.extraLarge),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.MusicNote,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
-                    )
-                }
-                Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)) {
-                    Text(
-                        text = stringResource(Res.string.import_dialog_header_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = stringResource(Res.string.import_dialog_header_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline,
-                    )
-                }
-            }
-
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-
-            // Title + Artist
-            Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large)) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-                ) {
-                    Text(
-                        stringResource(Res.string.import_dialog_song_title_label),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    OutlinedTextField(
-                        value = state.title,
-                        onValueChange = viewModel::updateTitle,
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        placeholder = { Text(stringResource(Res.string.import_dialog_song_title_placeholder)) },
-                        colors = textFieldColors,
-                        shape = MaterialTheme.shapes.medium,
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-                ) {
-                    Text(
-                        stringResource(Res.string.import_dialog_artist_label),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    OutlinedTextField(
-                        value = state.artist,
-                        onValueChange = viewModel::updateArtist,
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        placeholder = { Text(stringResource(Res.string.import_dialog_artist_placeholder)) },
-                        colors = textFieldColors,
-                        shape = MaterialTheme.shapes.medium,
-                    )
-                }
-            }
-
-            // Lyrics
-            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f),
+                                shape = CircleShape,
+                            )
+                            .padding(MaterialTheme.spacing.medium),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Title,
+                            imageVector = Icons.Default.CropFree,
                             contentDescription = null,
-                            modifier = Modifier.size(MaterialTheme.spacing.large),
-                        )
-                        Text(
-                            stringResource(Res.string.import_dialog_lyrics_label),
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
                         )
                     }
-                    OutlinedButton(
-                        onClick = { imagePickerLauncher.launch() },
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                        border = BorderStroke(
-                            1.dp,
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                        ),
-                    ) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
-                            Icon(
-                                imageVector = Icons.Default.CropFree,
-                                contentDescription = null,
-                                modifier = Modifier.size(MaterialTheme.spacing.large),
-                            )
-                            Text(stringResource(Res.string.import_dialog_ocr_button))
-                        }
+                    Text(
+                        text = stringResource(Res.string.import_dialog_ocr_button),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                    Text(
+                        text = stringResource(Res.string.import_dialog_ocr_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center,
+                    )
+                    if (state.isLoading) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f),
+                        )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
+                        OcrActionButton(
+                            label = stringResource(Res.string.import_dialog_camera_button),
+                            icon = Icons.Default.CameraAlt,
+                            onClick = { viewModel.onCameraRequested() },
+                            style = OcrButtonStyle.Outlined,
+                        )
+                        OcrActionButton(
+                            label = stringResource(Res.string.import_dialog_gallery_button),
+                            icon = Icons.Default.Photo,
+                            onClick = { imagePickerLauncher.launch() },
+                            style = OcrButtonStyle.Filled,
+                        )
                     }
                 }
+            }
+
+            // Song Identity
+            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
+                SectionHeader(stringResource(Res.string.import_dialog_song_identity))
+                Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large)) {
+                    LabeledTextField(
+                        label = stringResource(Res.string.import_dialog_song_title_label),
+                        value = state.title,
+                        onValueChange = viewModel::updateTitle,
+                        placeholder = stringResource(Res.string.import_dialog_song_title_placeholder),
+                        modifier = Modifier.weight(1f),
+                    )
+                    LabeledTextField(
+                        label = stringResource(Res.string.import_dialog_artist_label),
+                        value = state.artist,
+                        onValueChange = viewModel::updateArtist,
+                        placeholder = stringResource(Res.string.import_dialog_artist_placeholder),
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            // Lyrics & Chords Editor
+            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
+                SectionHeader(stringResource(Res.string.import_dialog_lyrics_editor))
                 OutlinedTextField(
                     value = state.lyrics,
                     onValueChange = viewModel::updateLyrics,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
                     minLines = 10,
                     placeholder = { Text(stringResource(Res.string.import_dialog_lyrics_placeholder)) },
-                    colors = textFieldColors,
                     shape = MaterialTheme.shapes.medium,
                 )
                 Row(
@@ -277,8 +249,6 @@ internal fun ImportSongScreen(
                     )
                 }
             }
-
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
 
             // Footer
             Row(
@@ -305,5 +275,118 @@ internal fun ImportSongScreen(
                 }
             }
         }
+    }
+
+    if (state.showCamera) {
+        PeekabooCamera(
+            state = rememberPeekabooCameraState(
+                initialCameraMode = CameraMode.Back,
+                onCapture = { viewModel.onCameraCaptureDone(it) },
+            ),
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
+}
+
+private enum class OcrButtonStyle { Outlined, Filled }
+
+@Composable
+private fun OcrActionButton(
+    label: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    style: OcrButtonStyle,
+    modifier: Modifier = Modifier,
+) {
+    val contentColor = when (style) {
+        OcrButtonStyle.Outlined -> MaterialTheme.colorScheme.onPrimaryContainer
+        OcrButtonStyle.Filled -> MaterialTheme.colorScheme.primaryContainer
+    }
+    val containerColor = when (style) {
+        OcrButtonStyle.Outlined -> MaterialTheme.colorScheme.primaryContainer
+        OcrButtonStyle.Filled -> MaterialTheme.colorScheme.onPrimaryContainer
+    }
+    val content: @Composable () -> Unit = {
+        Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(MaterialTheme.spacing.large),
+            )
+            Text(label)
+        }
+    }
+    when (style) {
+        OcrButtonStyle.Outlined -> OutlinedButton(
+            onClick = onClick,
+            modifier = modifier,
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = contentColor,
+                containerColor = containerColor,
+            ),
+            border = BorderStroke(width = Dp.Hairline, color = contentColor),
+            content = { content() },
+        )
+
+        OcrButtonStyle.Filled -> Button(
+            onClick = onClick,
+            modifier = modifier,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = containerColor,
+                contentColor = contentColor,
+            ),
+            content = { content() },
+        )
+    }
+}
+
+@Composable
+private fun LabeledTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            placeholder = { Text(placeholder) },
+            shape = MaterialTheme.shapes.medium,
+        )
+    }
+}
+
+@Composable
+private fun SectionHeader(title: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+    ) {
+        Box(
+            modifier = Modifier
+                .width(3.dp)
+                .height(18.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = MaterialTheme.shapes.extraSmall,
+                ),
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }

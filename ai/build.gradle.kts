@@ -11,21 +11,20 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-group = "com.pointlessapps.songbook"
-version = "1.0.0"
-
 val generateBuildConfig by tasks.registering {
     val outputDir = layout.buildDirectory.dir("generated/source/buildConfig")
-    val apiKey = localProperties.getProperty("GEMINI_API_KEY", "")
+    val geminiApiKey = localProperties.getProperty("GEMINI_API_KEY", "")
+    val ollamaApiKey = localProperties.getProperty("OLLAMA_API_KEY", "")
     outputs.dir(outputDir)
     doLast {
         val dir = outputDir.get().asFile
         dir.mkdirs()
-        File(dir, "GeminiApiKey.kt").writeText(
+        File(dir, "ApiKeys.kt").writeText(
             """
             package com.pointlessapps.songbook
 
-            internal const val geminiApiKey: String = "$apiKey"
+            internal const val geminiApiKey: String = "$geminiApiKey"
+            internal const val ollamaApiKey: String = "$ollamaApiKey"
             """.trimIndent(),
         )
     }
@@ -37,7 +36,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool<*>>()
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.addAll("-Xwhen-guards", "-XXLanguage:+ExpectRefinement")
+        freeCompilerArgs.addAll("-XXLanguage:+ExpectRefinement")
     }
 
     android {

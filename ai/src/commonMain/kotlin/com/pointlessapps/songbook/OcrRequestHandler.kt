@@ -4,35 +4,47 @@ import com.pointlessapps.songbook.model.OcrRequestBody
 import kotlin.io.encoding.Base64
 
 internal fun createOcrPrompt() = """
-Act as a music transcription assistant. I will provide you with an image of a song sheet that contains printed lyrics and potentially handwritten chords. Your task is to extract this information and return it **strictly** as a structured JSON object.
+### Final Refined Prompt
+
+**Role:** Act as a music transcription assistant specializing in multi-document batch processing of song sheets.
+
+**Task:** Extract information from one or more song sheets in a single image. Distinguish between chords synchronized with specific lines of lyrics and general chord notations or repetition symbols written in the margins.
 
 **Extraction Rules:**
 
-1. **Title:** Extract the song title. Remove any leading numbers or punctuation (e.g., "3. Song Name" becomes "Song Name").
-2. **Lyrics:** Extract all verses. For each line, remove any leading verse numbers (e.g., "1. Lyrics here" becomes "Lyrics here").
-3. **Chords:** Look for handwritten letters (like D, G, A7) written above or beside the text. Map these chords to the corresponding lines of text. Return them as a comma-separated string. If no chords are present for a line, return `null`.
-4. **Structure:** Organize the content into a list of sections, identifying each as a 'verse', 'chorus', or 'bridge'.
+1.  **Multi-Song Detection:** Identify each distinct song in the image. Return a JSON array of song objects.
+2.  **Title & Artist:** Extract the song title and artist. Sanitize titles by removing leading numbers or punctuation. Use `null` if the artist is missing.
+3.  **Sections & Categorization:** Organize the song into sections (e.g., `verse`, `chorus`, `bridge`).
+4.  **Sectional Chords & Symbols (Beside Text):** Within each section, include a field `chords_beside`. Capture any chords, progressions, or repetition symbols (e.g., `%`, `x2`, `(bis)`) written in the margins or to the side of that specific section. **Return these as an array of strings.** Use `[]` if none are present.
+5.  **Lyrics & Synced Chords:** For each line within a section:
+    * `text`: The cleaned lyric line (no leading verse numbers).
+    * `chords_above`: Chords written directly over or above the words. **Return these as an array of strings.** Use `[]` if no chords are present.
+6.  **Validation Logic:** Cross-reference all extracted "chords" against standard musical notation (A-G, sharps/flats, minor, 7ths, etc.). If a handwritten character is ambiguous (e.g., an '8' that looks like a 'B'), prioritize the musical interpretation.
 
 **Output Format:**
 
 ```json
-{
-  "title": "the title of the song",
-  "sections": [
-    {
-      "type": "verse|chorus|bridge",
-      "lines": [
-        {
-          "text": "the cleaned text of the specific line",
-          "chords": "comma, separated, chords" 
-        }
-      ]
-    }
-  ]
-}
+[
+  {
+    "title": "Song Title",
+    "artist": "Artist Name",
+    "sections": [
+      {
+        "type": "verse|chorus|bridge",
+        "chords_beside": ["G", "D7", "%", "x2"],
+        "lines": [
+          {
+            "text": "Lyric line here",
+            "chords_above": ["G", "C"]
+          }
+        ]
+      }
+    ]
+  }
+]
 ```
 
-**Constraint:** Do not include any conversational prose or explanations. Return only the JSON block.
+**Constraint:** Return **strictly** the JSON array. No conversational prose or explanations.
 """.trimIndent()
 
 internal fun createOcrRequestBody(

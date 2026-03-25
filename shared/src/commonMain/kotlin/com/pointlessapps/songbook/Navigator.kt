@@ -19,7 +19,7 @@ import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.navigation3.koinEntryProvider
 import org.koin.core.annotation.KoinExperimentalAPI
 
-public sealed interface Route : NavKey {
+internal sealed interface Route : NavKey {
     @Serializable
     data class Library(
         val initialFilterLetter: String? = null,
@@ -47,7 +47,7 @@ private const val DEFAULT_TRANSITION_DURATION_MILLISECOND = 500
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-public fun Navigator(
+internal fun Navigator(
     startingRoute: Route,
     backStack: NavBackStack<NavKey> = rememberNavBackStack(
         configuration = navigationConfig,
@@ -81,7 +81,7 @@ public fun Navigator(
     }
 }
 
-public class Navigator(private val backStack: NavBackStack<NavKey>) {
+internal class Navigator(private val backStack: NavBackStack<NavKey>) {
     fun navigateToLibrary() {
         backStack.add(Route.Library())
     }
@@ -95,5 +95,5 @@ public class Navigator(private val backStack: NavBackStack<NavKey>) {
     }
 }
 
-public val LocalNavigator: ProvidableCompositionLocal<Navigator> =
+internal val LocalNavigator: ProvidableCompositionLocal<Navigator> =
     staticCompositionLocalOf { error("LocalNavigator not initialized") }

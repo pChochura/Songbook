@@ -1,9 +1,6 @@
 <resources>
     <string name="common_app_name">Songbook</string>
     <string name="common_play">Play</string>
-    <string name="lyric_flow_navigation_rail_library">Library</string>
-    <string name="lyric_flow_navigation_rail_now_playing">Now Playing</string>
-    <string name="lyric_flow_navigation_rail_controls">Controls</string>
     <string name="song_control_bar_key">KEY: %1$s</string>
     <string name="song_control_bar_reset">Reset</string>
     <string name="song_control_bar_auto_scroll">Auto-scroll</string>
@@ -22,7 +19,6 @@
     <string name="chord_selection_popup_remove">Remove</string>
 
     <!-- Library Screen -->
-    <string name="library_header_tagline">YOUR PERSONAL SONGBOOK</string>
     <string name="library_header_title">Song Library</string>
     <string name="library_songs_section_title">All Songs</string>
     <string name="library_songs_found">%1$d Found</string>
@@ -45,6 +41,11 @@
     <string name="import_dialog_artist_placeholder">Artist</string>
     <string name="import_dialog_lyrics_label">Song Lyrics</string>
     <string name="import_dialog_ocr_button">OCR Import</string>
+    <string name="import_dialog_ocr_subtitle">Capture or upload a photo to automatically extract lyrics and chords.</string>
+    <string name="import_dialog_camera_button">Take Photo</string>
+    <string name="import_dialog_gallery_button">From Gallery</string>
+    <string name="import_dialog_song_identity">Song Identity</string>
+    <string name="import_dialog_lyrics_editor">Lyrics &amp; Chords Editor</string>
     <string name="import_dialog_lyrics_placeholder">Enter lyrics here…</string>
     <string name="import_dialog_lyrics_tip">Tip: Use [Chord] for inline chords or line breaks to separate verses.</string>
     <string name="import_dialog_cancel">Cancel</string>

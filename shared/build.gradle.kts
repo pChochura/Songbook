@@ -19,7 +19,7 @@ room {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.addAll("-Xwhen-guards", "-XXLanguage:+ExpectRefinement")
+        freeCompilerArgs.addAll("-XXLanguage:+ExpectRefinement")
     }
 
     android {
@@ -72,6 +72,10 @@ kotlin {
             implementation(projects.ai)
         }
     }
+}
+
+compose.resources {
+    packageOfResClass = "com.pointlessapps.songbook.shared"
 }
 
 dependencies {

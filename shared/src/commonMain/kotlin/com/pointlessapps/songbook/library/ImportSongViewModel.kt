@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
-import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.domain.models.ParsedLine
 import com.pointlessapps.songbook.data.SongDao
 import com.pointlessapps.songbook.data.SongEntity
@@ -24,6 +23,7 @@ internal data class ImportSongState(
     val artist: String = "",
     val lyrics: String = "",
     val isLoading: Boolean = false,
+    val showCamera: Boolean = false,
 )
 
 internal class ImportSongViewModel(
@@ -48,12 +48,21 @@ internal class ImportSongViewModel(
         state = state.copy(lyrics = lyrics)
     }
 
+    fun onCameraRequested() {
+        state = state.copy(showCamera = true)
+    }
+
+    fun onCameraCaptureDone(bytes: ByteArray?) {
+        state = state.copy(showCamera = false)
+        onImageCaptured(bytes)
+    }
+
     fun onImageCaptured(bytes: ByteArray?) {
         viewModelScope.launch {
             bytes?.let {
                 state = state.copy(isLoading = true)
                 val songData = Agent.extractSongData(it)
-                if (songData != null) {
+                songData?.firstOrNull()?.let { songData ->
                     state = state.copy(
                         title = songData.title ?: "",
                         artist = songData.author ?: "",
@@ -62,8 +71,6 @@ internal class ImportSongViewModel(
                         },
                         isLoading = false,
                     )
-                } else {
-                    state = state.copy(isLoading = false)
                 }
             }
         }
