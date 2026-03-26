@@ -30,7 +30,13 @@ data class SongData(
             Chorus,
 
             @SerialName("bridge")
-            Bridge
+            Bridge,
+
+            @SerialName("outro")
+            Outro,
+
+            @SerialName("intro")
+            Intro
         }
 
         @Serializable

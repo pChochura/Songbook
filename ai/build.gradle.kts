@@ -15,6 +15,7 @@ val generateBuildConfig by tasks.registering {
     val outputDir = layout.buildDirectory.dir("generated/source/buildConfig")
     val geminiApiKey = localProperties.getProperty("GEMINI_API_KEY", "")
     val ollamaApiKey = localProperties.getProperty("OLLAMA_API_KEY", "")
+    val g4fApiKey = localProperties.getProperty("G4F_API_KEY", "")
     outputs.dir(outputDir)
     doLast {
         val dir = outputDir.get().asFile
@@ -25,6 +26,7 @@ val generateBuildConfig by tasks.registering {
 
             internal const val geminiApiKey: String = "$geminiApiKey"
             internal const val ollamaApiKey: String = "$ollamaApiKey"
+            internal const val g4fApiKey: String = "$g4fApiKey"
             """.trimIndent(),
         )
     }
