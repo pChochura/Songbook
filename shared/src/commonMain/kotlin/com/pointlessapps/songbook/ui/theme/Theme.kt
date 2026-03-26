@@ -11,14 +11,13 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.Font
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.montserrat_bold
 import com.pointlessapps.songbook.shared.montserrat_light
 import com.pointlessapps.songbook.shared.montserrat_medium
 import com.pointlessapps.songbook.shared.montserrat_normal
 import com.pointlessapps.songbook.shared.montserrat_semi_bold
+import org.jetbrains.compose.resources.Font
 
 @Composable
 private fun typography(): Typography {
@@ -68,9 +67,9 @@ private fun typography(): Typography {
 
 @Composable
 private fun shapes() = Shapes(
-    small = RoundedCornerShape(4.dp),
-    medium = RoundedCornerShape(10.dp),
-    large = RoundedCornerShape(16.dp),
+    small = RoundedCornerShape(SMALL_CORNER_RADIUS),
+    medium = RoundedCornerShape(MEDIUM_CORNER_RADIUS),
+    large = RoundedCornerShape(LARGE_CORNER_RADIUS),
 )
 
 @Composable

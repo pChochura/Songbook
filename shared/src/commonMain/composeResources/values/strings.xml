@@ -30,6 +30,7 @@
     <string name="library_add_song_subtitle">Import text or an image</string>
     <string name="library_song_key_default">C Major</string>
     <string name="library_song_bpm">%1$d BPM</string>
+    <string name="library_add_to_favourites">Add to favourites</string>
 
     <!-- Import Song Dialog -->
     <string name="import_dialog_header_title">Add New Song</string>

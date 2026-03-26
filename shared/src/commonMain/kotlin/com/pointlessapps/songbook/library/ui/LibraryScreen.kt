@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -19,23 +18,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -43,7 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalNavigator
@@ -55,19 +44,29 @@ import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_app_name
 import com.pointlessapps.songbook.shared.library_add_song_subtitle
 import com.pointlessapps.songbook.shared.library_add_song_title
+import com.pointlessapps.songbook.shared.library_add_to_favourites
 import com.pointlessapps.songbook.shared.library_header_title
 import com.pointlessapps.songbook.shared.library_search_placeholder
 import com.pointlessapps.songbook.shared.library_songs_found
 import com.pointlessapps.songbook.shared.library_sort_by_date
 import com.pointlessapps.songbook.ui.TopBar
+import com.pointlessapps.songbook.ui.components.SongbookCard
 import com.pointlessapps.songbook.ui.components.SongbookChip
+import com.pointlessapps.songbook.ui.components.SongbookIcon
+import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.SongbookTextField
+import com.pointlessapps.songbook.ui.components.dashedSongbookCardStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.IconClose
+import com.pointlessapps.songbook.ui.theme.IconFavouriteEmpty
+import com.pointlessapps.songbook.ui.theme.IconNote
+import com.pointlessapps.songbook.ui.theme.IconPlus
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
@@ -191,7 +190,7 @@ internal fun LibraryScreen(
                     SongbookChip(
                         label = stringResource(
                             Res.string.library_songs_found,
-                            state.filteredSongs.size,
+                            state.songs.size,
                         ),
                         isSelected = false,
                         onClick = {},
@@ -210,10 +209,10 @@ internal fun LibraryScreen(
                 }
             }
 
-            items(state.filteredSongs, key = { it.id }) { song ->
+            items(state.songs, key = { it.id }) { song ->
                 SongCard(
                     song = song,
-                    onClick = { navigator.navigateToLyrics(song.id) },
+                    onClick = { viewModel.onLyricsRequested(song.id) },
                 )
             }
 
@@ -225,44 +224,56 @@ internal fun LibraryScreen(
 }
 
 @Composable
-private fun LazyGridItemScope.SongCard(song: SongEntity, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.animateItem().fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+private fun SongCard(song: SongEntity, onClick: () -> Unit) {
+    SongbookCard(
         onClick = onClick,
+        onLongClick = { },
     ) {
         Column(
             modifier = Modifier.padding(MaterialTheme.spacing.large),
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(
+                space = MaterialTheme.spacing.medium,
+                alignment = Alignment.CenterVertically,
+            ),
+            horizontalAlignment = Alignment.Start,
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    imageVector = Icons.Default.MusicNote,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
+                SongbookIcon(
+                    iconRes = IconNote,
+                    iconStyle = defaultSongbookIconStyle().copy(
+                        tint = MaterialTheme.colorScheme.primary,
+                    ),
                 )
-                Icon(
-                    imageVector = Icons.Default.StarBorder,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
+                SongbookIconButton(
+                    iconRes = IconFavouriteEmpty,
+                    tooltipLabel = Res.string.library_add_to_favourites,
+                    onClick = {},
+                    iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                        outlineColor = Color.Transparent,
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    ),
                 )
             }
 
             Column {
-                Text(
+                SongbookText(
                     text = song.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    textStyle = defaultSongbookTextStyle().copy(
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                        typography = MaterialTheme.typography.titleMedium,
+                    ),
                 )
-                Text(
+                SongbookText(
                     text = song.artist,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline,
+                    textStyle = defaultSongbookTextStyle().copy(
+                        textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        typography = MaterialTheme.typography.bodySmall,
+                    ),
                 )
             }
         }
@@ -270,42 +281,42 @@ private fun LazyGridItemScope.SongCard(song: SongEntity, onClick: () -> Unit) {
 }
 
 @Composable
-private fun LazyGridItemScope.AddSongCard(onClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .animateItem()
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.small)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                shape = MaterialTheme.shapes.small,
-            )
-            .clickable(onClick = onClick)
-            .padding(
-                horizontal = MaterialTheme.spacing.large,
-                vertical = MaterialTheme.spacing.medium,
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+private fun AddSongCard(onClick: () -> Unit) {
+    SongbookCard(
+        onClick = onClick,
+        onLongClick = { },
+        cardStyle = dashedSongbookCardStyle(),
     ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = null,
-            modifier = Modifier.size(32.dp),
-            tint = MaterialTheme.colorScheme.outline,
-        )
-        Text(
-            text = stringResource(Res.string.library_add_song_title),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            text = stringResource(Res.string.library_add_song_subtitle),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline,
-            textAlign = TextAlign.Center,
-        )
+        Column(
+            modifier = Modifier.padding(MaterialTheme.spacing.large),
+            verticalArrangement = Arrangement.spacedBy(
+                space = MaterialTheme.spacing.medium,
+                alignment = Alignment.CenterVertically,
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            SongbookIcon(
+                iconRes = IconPlus,
+                iconStyle = defaultSongbookIconStyle().copy(
+                    tint = MaterialTheme.colorScheme.primary,
+                ),
+            )
+            SongbookText(
+                text = stringResource(Res.string.library_add_song_title),
+                textStyle = defaultSongbookTextStyle().copy(
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    typography = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                ),
+            )
+            SongbookText(
+                text = stringResource(Res.string.library_add_song_subtitle),
+                textStyle = defaultSongbookTextStyle().copy(
+                    textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    typography = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                ),
+            )
+        }
     }
 }

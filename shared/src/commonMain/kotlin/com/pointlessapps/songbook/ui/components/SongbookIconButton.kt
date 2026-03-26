@@ -3,7 +3,6 @@ package com.pointlessapps.songbook.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +21,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -61,7 +59,6 @@ fun SongbookIconButton(
                         iconButtonStyle.disabledContainerColor
                     },
                 )
-                .padding(MaterialTheme.spacing.medium)
                 .semantics { role = Role.Button }
                 .combinedClickable(
                     enabled = iconButtonStyle.enabled,

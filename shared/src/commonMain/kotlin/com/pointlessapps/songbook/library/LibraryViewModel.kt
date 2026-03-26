@@ -9,6 +9,7 @@ import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.data.SongDao
 import com.pointlessapps.songbook.data.SongEntity
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -21,28 +22,9 @@ internal sealed interface LibraryEvent {
 internal data class LibraryState(
     val songs: List<SongEntity> = emptyList(),
     val isLoading: Boolean = false,
-    val totalSongs: Int = 0,
-    val totalArtists: Int = 0,
     val searchQuery: String = "",
     val filterLetter: Char? = null,
-) {
-    val filteredSongs: List<SongEntity>
-        get() {
-            var result = songs
-            if (filterLetter != null) {
-                result = result.filter {
-                    it.title.firstOrNull()?.uppercaseChar() == filterLetter
-                }
-            }
-            if (searchQuery.isNotBlank()) {
-                val query = searchQuery.trim().lowercase()
-                result = result.filter {
-                    it.title.lowercase().contains(query) || it.artist.lowercase().contains(query)
-                }
-            }
-            return result
-        }
-}
+)
 
 internal class LibraryViewModel(
     private val initialFilterLetter: String? = null,
@@ -53,23 +35,22 @@ internal class LibraryViewModel(
     var state by mutableStateOf(LibraryState())
         private set
 
-    private val eventChannel = Channel<LibraryEvent>()
+    private val eventChannel = Channel<LibraryEvent>(BUFFERED)
     val events = eventChannel.receiveAsFlow()
 
     init {
         if (initialFilterLetter != null) {
-            state = state.copy(filterLetter = initialFilterLetter.firstOrNull()?.uppercaseChar())
+            state = state.copy(
+                filterLetter = initialFilterLetter.firstOrNull()?.uppercaseChar(),
+            )
         }
+        if (openSearch) eventChannel.trySend(LibraryEvent.FocusSearch)
+
         viewModelScope.launch {
-            if (openSearch) {
-                eventChannel.send(LibraryEvent.FocusSearch)
-            }
             state = state.copy(isLoading = true)
             songDao.getAllSongs().collectLatest { songs ->
                 state = state.copy(
                     songs = songs,
-                    totalSongs = songs.size,
-                    totalArtists = songs.distinctBy { it.artist }.size,
                     isLoading = false,
                 )
             }
@@ -77,10 +58,7 @@ internal class LibraryViewModel(
     }
 
     fun setSearchQuery(query: String) {
-        state = state.copy(
-            searchQuery = query,
-            filterLetter = if (query.isNotBlank()) null else state.filterLetter,
-        )
+        state = state.copy(searchQuery = query)
     }
 
     fun setFilterLetter(letter: Char?) {
@@ -88,8 +66,10 @@ internal class LibraryViewModel(
     }
 
     fun onImportSongRequested() {
-        viewModelScope.launch {
-            eventChannel.send(LibraryEvent.NavigateTo(Route.ImportSong))
-        }
+        eventChannel.trySend(LibraryEvent.NavigateTo(Route.ImportSong))
+    }
+
+    fun onLyricsRequested(id: Long) {
+        eventChannel.trySend(LibraryEvent.NavigateTo(Route.Lyrics(id)))
     }
 }

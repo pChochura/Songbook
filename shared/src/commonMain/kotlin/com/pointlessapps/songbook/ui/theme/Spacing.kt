@@ -27,3 +27,6 @@ val MaterialTheme.spacing: Spacing
     get() = LocalSpacing.current
 
 internal val DEFAULT_BORDER_WIDTH = 1.dp
+internal val SMALL_CORNER_RADIUS = 4.dp
+internal val MEDIUM_CORNER_RADIUS = 10.dp
+internal val LARGE_CORNER_RADIUS = 16.dp
