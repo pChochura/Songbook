@@ -37,7 +37,7 @@ internal data class PopupState(
 )
 
 internal class LyricsViewModel(
-    private val songId: Long? = null,
+    private val songId: Long,
     private val songDao: SongDao,
 ) : ViewModel() {
 
@@ -48,15 +48,13 @@ internal class LyricsViewModel(
     val events = eventChannel.receiveAsFlow()
 
     init {
-        songId?.let { id ->
-            viewModelScope.launch {
-                songDao.getSongById(id)?.let { song ->
-                    state = state.copy(
-                        title = song.title,
-                        artist = song.artist,
-                        parsedSections = song.sections,
-                    )
-                }
+        viewModelScope.launch {
+            songDao.getSongById(songId)?.let { song ->
+                state = state.copy(
+                    title = song.title,
+                    artist = song.artist,
+                    parsedSections = song.sections,
+                )
             }
         }
     }

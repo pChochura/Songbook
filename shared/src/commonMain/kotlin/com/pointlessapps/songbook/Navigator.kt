@@ -82,6 +82,11 @@ internal fun Navigator(
 }
 
 internal class Navigator(private val backStack: NavBackStack<NavKey>) {
+
+    fun navigateBack() {
+        backStack.removeLastOrNull()
+    }
+
     fun navigateToLibrary() {
         backStack.add(Route.Library())
     }

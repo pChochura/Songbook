@@ -101,63 +101,12 @@ internal fun LibraryScreen(
             )
         },
         fab = @Composable {
-            Row(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .imePadding()
-                    .padding(
-                        horizontal = MaterialTheme.spacing.huge,
-                        vertical = MaterialTheme.spacing.medium,
-                    )
-                    .padding(bottom = MaterialTheme.spacing.large)
-                    .height(IntrinsicSize.Min),
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SongbookTextField(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(MaterialTheme.shapes.medium)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = MaterialTheme.shapes.medium,
-                        )
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                        .padding(
-                            horizontal = MaterialTheme.spacing.large,
-                            vertical = MaterialTheme.spacing.medium,
-                        ),
-                    value = state.searchQuery,
-                    onValueChange = viewModel::setSearchQuery,
-                    textFieldStyle = defaultSongbookTextFieldStyle().copy(
-                        placeholder = stringResource(Res.string.library_search_placeholder),
-                        placeholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        textColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                )
-
-                AnimatedContent(
-                    targetState = state.filterLetter,
-                    transitionSpec = { fadeIn() togetherWith fadeOut() using null },
-                ) { filterLetter ->
-                    if (filterLetter == null) return@AnimatedContent
-
-                    SongbookChip(
-                        modifier = Modifier.fillMaxHeight().widthIn(min = 64.dp),
-                        label = filterLetter.toString(),
-                        isSelected = true,
-                        onClick = { viewModel.setFilterLetter(null) },
-                        chipStyle = defaultSongbookChipStyle().copy(
-                            selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                            selectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            selectedOutlineColor = MaterialTheme.colorScheme.outlineVariant,
-                            iconRes = IconClose,
-                            iconAlignment = Alignment.End,
-                        ),
-                    )
-                }
-            }
+            BottomBar(
+                query = state.searchQuery,
+                filterLetter = state.filterLetter,
+                onQueryChanged = viewModel::setSearchQuery,
+                onFilterLetterRemoved = { viewModel.setFilterLetter(null) },
+            )
         },
     ) { paddingValues ->
         LazyVerticalGrid(
@@ -219,6 +168,72 @@ internal fun LibraryScreen(
             item(key = "add_song_button") {
                 AddSongCard(onClick = viewModel::onImportSongRequested)
             }
+        }
+    }
+}
+
+@Composable
+private fun BottomBar(
+    query: String,
+    filterLetter: Char?,
+    onQueryChanged: (String) -> Unit,
+    onFilterLetterRemoved: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .navigationBarsPadding()
+            .imePadding()
+            .padding(
+                horizontal = MaterialTheme.spacing.huge,
+                vertical = MaterialTheme.spacing.medium,
+            )
+            .padding(bottom = MaterialTheme.spacing.large)
+            .height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SongbookTextField(
+            modifier = Modifier
+                .weight(1f)
+                .clip(MaterialTheme.shapes.medium)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .padding(
+                    horizontal = MaterialTheme.spacing.large,
+                    vertical = MaterialTheme.spacing.medium,
+                ),
+            value = query,
+            onValueChange = onQueryChanged,
+            textFieldStyle = defaultSongbookTextFieldStyle().copy(
+                placeholder = stringResource(Res.string.library_search_placeholder),
+                placeholderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                textColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        )
+
+        AnimatedContent(
+            targetState = filterLetter,
+            transitionSpec = { fadeIn() togetherWith fadeOut() using null },
+        ) { filterLetter ->
+            if (filterLetter == null) return@AnimatedContent
+
+            SongbookChip(
+                modifier = Modifier.fillMaxHeight().widthIn(min = 64.dp),
+                label = filterLetter.toString(),
+                isSelected = true,
+                onClick = onFilterLetterRemoved,
+                chipStyle = defaultSongbookChipStyle().copy(
+                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedOutlineColor = MaterialTheme.colorScheme.outlineVariant,
+                    iconRes = IconClose,
+                    iconAlignment = Alignment.End,
+                ),
+            )
         }
     }
 }
