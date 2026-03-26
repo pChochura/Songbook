@@ -7,8 +7,6 @@ import com.pointlessapps.songbook.lyrics.LyricsViewModel
 internal fun LyricsScreen(
     viewModel: LyricsViewModel,
 ) {
-    val state = viewModel.state
-
 //    Row(
 //        modifier = Modifier
 //            .fillMaxSize()

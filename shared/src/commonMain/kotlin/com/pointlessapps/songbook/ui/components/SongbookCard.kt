@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.ui.components
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -10,7 +11,8 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,13 +37,15 @@ fun SongbookCard(
     cardStyle: SongbookCardStyle = defaultSongbookCardStyle(),
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val offset by animateFloatAsState(
-        targetValue = 10f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(5000),
-        ),
-        label = "border stroke",
-    )
+    val offset = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        offset.animateTo(
+            targetValue = 20f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(5000, easing = LinearEasing),
+            ),
+        )
+    }
 
     Box(
         modifier = modifier
@@ -59,7 +63,7 @@ fun SongbookCard(
                             join = StrokeJoin.Round,
                             pathEffect = PathEffect.dashPathEffect(
                                 intervals = floatArrayOf(10f, 10f),
-                                phase = offset,
+                                phase = offset.value,
                             ),
                         )
                         val cornerRadius = CornerRadius(
