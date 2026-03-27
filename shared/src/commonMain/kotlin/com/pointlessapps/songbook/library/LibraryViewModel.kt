@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
-import com.pointlessapps.songbook.data.SongDao
-import com.pointlessapps.songbook.data.SongEntity
+import com.pointlessapps.songbook.core.model.Song
+import com.pointlessapps.songbook.core.repository.SongRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.collectLatest
@@ -20,7 +20,7 @@ internal sealed interface LibraryEvent {
 }
 
 internal data class LibraryState(
-    val songs: List<SongEntity> = emptyList(),
+    val songs: List<Song> = emptyList(),
     val isLoading: Boolean = false,
     val searchQuery: String = "",
     val filterLetter: Char? = null,
@@ -29,7 +29,7 @@ internal data class LibraryState(
 internal class LibraryViewModel(
     private val initialFilterLetter: String? = null,
     private val openSearch: Boolean = false,
-    private val songDao: SongDao,
+    private val songRepository: SongRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf(LibraryState())
@@ -48,7 +48,7 @@ internal class LibraryViewModel(
 
         viewModelScope.launch {
             state = state.copy(isLoading = true)
-            songDao.getAllSongs().collectLatest { songs ->
+            songRepository.getAllSongs().collectLatest { songs ->
                 state = state.copy(
                     songs = songs,
                     isLoading = false,

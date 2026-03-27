@@ -19,7 +19,7 @@ internal val libraryModule = module {
         LibraryViewModel(
             initialFilterLetter = params.getOrNull(),
             openSearch = params.getOrNull() ?: false,
-            songDao = get(),
+            songRepository = get(),
         )
     }
 

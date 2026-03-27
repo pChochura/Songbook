@@ -28,4 +28,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":androidApp", ":shared", ":ai")
+include(":androidApp", ":shared", ":core", ":ai")

@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
-import com.pointlessapps.songbook.data.SongEntity
+import com.pointlessapps.songbook.core.model.Song
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.shared.Res
@@ -239,7 +239,7 @@ private fun BottomBar(
 }
 
 @Composable
-private fun SongCard(song: SongEntity, onClick: () -> Unit) {
+private fun SongCard(song: Song, onClick: () -> Unit) {
     SongbookCard(
         onClick = onClick,
         onLongClick = { },

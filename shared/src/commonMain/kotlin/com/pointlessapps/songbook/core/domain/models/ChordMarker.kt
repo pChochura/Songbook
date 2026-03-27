@@ -1,6 +1,0 @@
-package com.pointlessapps.songbook.core.domain.models
-
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class ChordMarker(val chord: Chord, val offset: Int)
