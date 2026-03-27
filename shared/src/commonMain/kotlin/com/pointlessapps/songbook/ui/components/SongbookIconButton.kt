@@ -1,17 +1,12 @@
 package com.pointlessapps.songbook.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltip
-import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipAnchorPosition
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,9 +18,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SongbookIconButton(
     iconRes: DrawableResource,
@@ -35,10 +29,9 @@ fun SongbookIconButton(
     onLongClick: () -> Unit = {},
     iconButtonStyle: SongbookIconButtonStyle = defaultSongbookIconButtonStyle(),
 ) {
-    TooltipBox(
-        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
-        tooltip = { PlainTooltip { Text(stringResource(tooltipLabel)) } },
-        state = rememberTooltipState(),
+    SongbookTooltip(
+        position = iconButtonStyle.tooltipPosition,
+        contentDescription = tooltipLabel,
     ) {
         SongbookIcon(
             modifier = modifier
@@ -87,6 +80,7 @@ fun defaultSongbookIconButtonStyle() = SongbookIconButtonStyle(
     disabledOutlineColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
     shape = CircleShape,
     enabled = true,
+    tooltipPosition = Position.ABOVE,
 )
 
 data class SongbookIconButtonStyle(
@@ -98,6 +92,7 @@ data class SongbookIconButtonStyle(
     val disabledOutlineColor: Color,
     val shape: Shape,
     val enabled: Boolean,
+    val tooltipPosition: Position,
 )
 
 private val ICON_BUTTON_BORDER_WIDTH = 1.dp

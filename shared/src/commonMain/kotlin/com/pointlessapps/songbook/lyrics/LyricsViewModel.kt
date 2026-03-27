@@ -17,12 +17,19 @@ import kotlinx.coroutines.launch
 
 internal sealed interface LyricsEvent
 
+internal enum class LyricsMode {
+    Inline,
+    SideBySide,
+    TextOnly,
+}
+
 internal data class LyricsState(
     val songId: Long? = null,
     val title: String = "Untitled Song",
     val artist: String = "Unknown Artist",
     val transposition: Int = 0,
     val isOcrActive: Boolean = false,
+    val mode: LyricsMode = LyricsMode.Inline,
     val parsedSections: List<List<ParsedLine>> = emptyList(),
     val popupState: PopupState? = null,
     val isLoading: Boolean = false,
@@ -57,6 +64,10 @@ internal class LyricsViewModel(
                 )
             }
         }
+    }
+
+    fun updateMode(mode: LyricsMode) {
+        state = state.copy(mode = mode)
     }
 
     fun transposeUp() {

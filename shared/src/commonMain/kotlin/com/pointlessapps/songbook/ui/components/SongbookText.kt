@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -15,10 +16,12 @@ fun SongbookText(
     text: String,
     modifier: Modifier = Modifier,
     textStyle: SongbookTextStyle = defaultSongbookTextStyle(),
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) = SongbookText(
     text = AnnotatedString(text),
     modifier = modifier,
     textStyle = textStyle,
+    onTextLayout = onTextLayout,
 )
 
 @Composable
@@ -26,6 +29,7 @@ fun SongbookText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     textStyle: SongbookTextStyle = defaultSongbookTextStyle(),
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) = Text(
     modifier = modifier,
     text = text,
@@ -35,6 +39,7 @@ fun SongbookText(
     ),
     overflow = textStyle.textOverflow,
     maxLines = textStyle.maxLines,
+    onTextLayout = onTextLayout,
 )
 
 @Composable

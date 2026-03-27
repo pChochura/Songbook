@@ -2,6 +2,7 @@
     <string name="common_app_name">Songbook</string>
     <string name="common_play">Play</string>
     <string name="common_back">Back</string>
+    <string name="common_menu">Menu</string>
     <string name="song_control_bar_key">KEY: %1$s</string>
     <string name="song_control_bar_reset">Reset</string>
     <string name="song_control_bar_auto_scroll">Auto-scroll</string>

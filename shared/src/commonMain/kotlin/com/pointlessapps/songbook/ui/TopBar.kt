@@ -1,7 +1,9 @@
 package com.pointlessapps.songbook.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.ui.components.Position
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
@@ -29,7 +32,7 @@ internal fun TopBar(
     rightButton: TopBarButton?,
     title: StringResource,
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.7f))
@@ -38,13 +41,12 @@ internal fun TopBar(
                 horizontal = MaterialTheme.spacing.large,
                 vertical = MaterialTheme.spacing.medium,
             ),
-        contentAlignment = Alignment.Center,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         leftButton?.let {
             SongbookIconButton(
-                modifier = Modifier
-                    .size(TOP_BAR_ICON_SIZE)
-                    .align(Alignment.CenterStart),
+                modifier = Modifier.size(TOP_BAR_ICON_SIZE),
                 iconRes = it.icon,
                 tooltipLabel = it.tooltip,
                 onClick = it.onClick,
@@ -52,12 +54,15 @@ internal fun TopBar(
                     containerColor = Color.Transparent,
                     outlineColor = Color.Transparent,
                     contentColor = MaterialTheme.colorScheme.onSurface,
+                    tooltipPosition = Position.BELOW,
                 ),
             )
         }
 
         Box(
-            modifier = Modifier.heightIn(min = TOP_BAR_ICON_SIZE),
+            modifier = Modifier
+                .heightIn(min = TOP_BAR_ICON_SIZE)
+                .weight(1f),
             contentAlignment = Alignment.Center,
         ) {
             SongbookText(
@@ -72,9 +77,7 @@ internal fun TopBar(
 
         rightButton?.let {
             SongbookIconButton(
-                modifier = Modifier
-                    .size(TOP_BAR_ICON_SIZE)
-                    .align(Alignment.CenterEnd),
+                modifier = Modifier.size(TOP_BAR_ICON_SIZE),
                 iconRes = it.icon,
                 tooltipLabel = it.tooltip,
                 onClick = it.onClick,
@@ -82,6 +85,7 @@ internal fun TopBar(
                     containerColor = Color.Transparent,
                     outlineColor = Color.Transparent,
                     contentColor = MaterialTheme.colorScheme.onSurface,
+                    tooltipPosition = Position.BELOW,
                 ),
             )
         }
@@ -94,4 +98,4 @@ internal data class TopBarButton(
     val onClick: () -> Unit,
 )
 
-private val TOP_BAR_ICON_SIZE = 48.dp
+private val TOP_BAR_ICON_SIZE = 24.dp

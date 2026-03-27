@@ -54,6 +54,8 @@ package/
 │   ├── models/               # Domain models
 │   └── repository/           # Repository interfaces (and implementations in a form of *RepositoryImpl)
 └── di/Module.kt              # Koin DI registration
+ui/
+└── components/               # Common UI components
 ```
 
 ### ViewModel Pattern
