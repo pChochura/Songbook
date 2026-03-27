@@ -20,6 +20,7 @@ internal val libraryModule = module {
             initialFilterLetter = params.getOrNull(),
             openSearch = params.getOrNull() ?: false,
             songRepository = get(),
+            authRepository = get(),
         )
     }
 

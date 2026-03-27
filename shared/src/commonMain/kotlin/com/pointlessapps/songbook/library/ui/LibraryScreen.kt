@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
-import com.pointlessapps.songbook.core.model.Song
+import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.shared.Res

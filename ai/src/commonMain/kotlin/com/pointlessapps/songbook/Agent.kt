@@ -10,7 +10,6 @@ import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.timeout
-import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -75,7 +74,7 @@ private object GeminiAgent : AgentImplementation {
 
     override suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
         val response = httpClient.post("$BASE_URL/$MODEL:generateContent") {
-            parameter("key", geminiApiKey)
+//            parameter("key", geminiApiKey)
             contentType(ContentType.Application.Json)
             setBody(
                 createOcrRequestBody(
@@ -108,7 +107,7 @@ private object OllamaAgent : AgentImplementation {
 
     override suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
         val response = httpClient.post(BASE_URL) {
-            headers.append(HttpHeaders.Authorization, "Bearer $ollamaApiKey")
+//            headers.append(HttpHeaders.Authorization, "Bearer $ollamaApiKey")
             contentType(ContentType.Application.Json)
             setBody(
                 createOllamaRequestBody(
@@ -139,9 +138,7 @@ private object G4fAgent : AgentImplementation {
 
     override suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
         val response = httpClient.post(BASE_URL) {
-            if (g4fApiKey.isNotBlank()) {
-                headers.append(HttpHeaders.Authorization, "Bearer $g4fApiKey")
-            }
+//            headers.append(HttpHeaders.Authorization, "Bearer $g4fApiKey")
             contentType(ContentType.Application.Json)
             setBody(
                 createG4fRequestBody(

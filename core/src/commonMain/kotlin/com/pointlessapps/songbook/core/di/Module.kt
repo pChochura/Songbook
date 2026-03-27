@@ -1,10 +1,12 @@
 package com.pointlessapps.songbook.core.di
 
-import com.pointlessapps.songbook.core.repository.SongRepository
-import com.pointlessapps.songbook.core.repository.SongRepositoryImpl
+import com.pointlessapps.songbook.core.auth.di.authModule
+import com.pointlessapps.songbook.core.song.di.songModule
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal expect val platformModule: Module
@@ -12,5 +14,16 @@ internal expect val platformModule: Module
 val coreModule = module {
     includes(platformModule)
 
-    singleOf(::SongRepositoryImpl).bind<SongRepository>()
+    single<SupabaseClient> {
+        createSupabaseClient(
+            supabaseUrl = getProperty("SUPABASE_URL"),
+            supabaseKey = getProperty("SUPABASE_KEY"),
+        ) {
+            install(Postgrest)
+            install(Auth)
+        }
+    }
+
+    includes(authModule)
+    includes(songModule)
 }

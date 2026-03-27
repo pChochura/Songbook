@@ -6,11 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
-import com.pointlessapps.songbook.core.model.Song
-import com.pointlessapps.songbook.core.repository.SongRepository
+import com.pointlessapps.songbook.core.auth.AuthRepository
+import com.pointlessapps.songbook.core.song.SongRepository
+import com.pointlessapps.songbook.core.song.model.Song
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -30,6 +30,7 @@ internal class LibraryViewModel(
     private val initialFilterLetter: String? = null,
     private val openSearch: Boolean = false,
     private val songRepository: SongRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf(LibraryState())
@@ -48,12 +49,14 @@ internal class LibraryViewModel(
 
         viewModelScope.launch {
             state = state.copy(isLoading = true)
-            songRepository.getAllSongs().collectLatest { songs ->
-                state = state.copy(
-                    songs = songs,
-                    isLoading = false,
-                )
+            authRepository.initialize()
+            if (!authRepository.isSignedIn()) {
+                authRepository.signInAnonymously()
             }
+            state = state.copy(
+                songs = songRepository.getAllSongs(),
+                isLoading = false,
+            )
         }
     }
 

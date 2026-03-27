@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.core.model
+package com.pointlessapps.songbook.core.song.model
 
 import kotlinx.serialization.Serializable
 
@@ -13,9 +13,6 @@ data class Song(
 @Serializable
 data class Section(
     val name: String,
-    val text: String,
-    val chords: List<Chord>,
+    val lyrics: String,
+    val chords: List<String>,
 )
-
-@Serializable
-data class Chord(val value: String)
