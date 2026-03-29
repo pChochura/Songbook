@@ -18,25 +18,25 @@ internal class SongRepositoryImpl(
     supabase: SupabaseClient,
 ) : SongRepository {
 
-    private val songsTable = supabase.from("songs")
+    private val table = supabase.from("songs")
 
     override suspend fun getAllSongs() = withContext(Dispatchers.IO) {
-        songsTable.select().decodeList<Song>()
+        table.select().decodeList<Song>()
     }
 
     override suspend fun getSongById(id: Long) = withContext(Dispatchers.IO) {
-        songsTable.select {
+        table.select {
             filter { Song::id eq id }
         }.decodeSingleOrNull<Song>()
     }
 
     override suspend fun saveSong(song: Song) = withContext(Dispatchers.IO) {
-        songsTable.insert(song).decodeSingle<Song>().id
+        table.insert(song).decodeSingle<Song>().id
     }
 
     override suspend fun deleteSong(id: Long) {
         withContext(Dispatchers.IO) {
-            songsTable.delete { filter { Song::id eq id } }
+            table.delete { filter { Song::id eq id } }
         }
     }
 }

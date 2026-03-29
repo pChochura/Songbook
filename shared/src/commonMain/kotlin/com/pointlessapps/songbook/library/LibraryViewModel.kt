@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.auth.AuthRepository
+import com.pointlessapps.songbook.core.setlist.SetlistRepository
+import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Song
 import kotlinx.coroutines.channels.Channel
@@ -20,15 +22,15 @@ internal sealed interface LibraryEvent {
 }
 
 internal data class LibraryState(
+    val setlists: List<Setlist> = emptyList(),
     val songs: List<Song> = emptyList(),
     val isLoading: Boolean = false,
-    val searchQuery: String = "",
-    val filterLetter: Char? = null,
 )
 
 internal class LibraryViewModel(
-    private val initialFilterLetter: String? = null,
-    private val openSearch: Boolean = false,
+    initialFilterLetter: String? = null,
+    openSearch: Boolean = false,
+    private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
@@ -40,11 +42,6 @@ internal class LibraryViewModel(
     val events = eventChannel.receiveAsFlow()
 
     init {
-        if (initialFilterLetter != null) {
-            state = state.copy(
-                filterLetter = initialFilterLetter.firstOrNull()?.uppercaseChar(),
-            )
-        }
         if (openSearch) eventChannel.trySend(LibraryEvent.FocusSearch)
 
         viewModelScope.launch {
@@ -53,19 +50,16 @@ internal class LibraryViewModel(
             if (!authRepository.isSignedIn()) {
                 authRepository.signInAnonymously()
             }
+
+            val setlists = setlistRepository.getAllSetlists()
+            val songs = songRepository.getAllSongs()
+
             state = state.copy(
-                songs = songRepository.getAllSongs(),
+                setlists = setlists,
+                songs = songs,
                 isLoading = false,
             )
         }
-    }
-
-    fun setSearchQuery(query: String) {
-        state = state.copy(searchQuery = query)
-    }
-
-    fun setFilterLetter(letter: Char?) {
-        state = state.copy(filterLetter = letter, searchQuery = "")
     }
 
     fun onImportSongRequested() {

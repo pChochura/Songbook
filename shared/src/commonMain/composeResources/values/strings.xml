@@ -21,8 +21,10 @@
     <string name="chord_selection_popup_remove">Remove</string>
 
     <!-- Library Screen -->
-    <string name="library_header_title">Song Library</string>
+    <string name="library_header_title">Library</string>
     <string name="library_songs_section_title">All Songs</string>
+    <string name="library_setlists_section_title">Setlists</string>
+    <string name="library_setlist_songs">Songs: %1$d</string>
     <string name="library_songs_found">%1$d Found</string>
     <string name="library_sort_by_date">Sort by: Date Added</string>
     <string name="library_search_placeholder">Search songs and artists…</string>
