@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
 import com.pointlessapps.songbook.core.song.SongRepository
+import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.model.SongData
@@ -69,7 +70,7 @@ internal class ImportSongViewModel(
                         Section(
                             name = "${it.type.name} ${sectionTypeCount.getOrPut(it.type) { 0 } + 1}",
                             lyrics = it.lines.joinToString("\n") { it.text },
-                            chords = it.chordsBeside,
+                            chords = it.chordsBeside.map { Chord(value = it, position = 0) },
                         )
                     },
                 )

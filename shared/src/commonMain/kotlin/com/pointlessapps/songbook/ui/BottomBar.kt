@@ -48,7 +48,7 @@ internal fun BottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(MaterialTheme.spacing.extraLarge),
+            .padding(bottom = MaterialTheme.spacing.extraLarge),
         horizontalArrangement = Arrangement.spacedBy(
             space = MaterialTheme.spacing.large,
             alignment = Alignment.CenterHorizontally,

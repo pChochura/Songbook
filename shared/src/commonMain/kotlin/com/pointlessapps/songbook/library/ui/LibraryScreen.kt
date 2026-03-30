@@ -1,7 +1,6 @@
 package com.pointlessapps.songbook.library.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.library.LibraryEvent
@@ -38,6 +38,7 @@ import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.add
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -75,12 +76,10 @@ internal fun LibraryScreen(
             columns = GridCells.Adaptive(minSize = 120.dp),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = MaterialTheme.spacing.large),
-            contentPadding = PaddingValues(
-                top = MaterialTheme.spacing.huge,
-                bottom = MaterialTheme.spacing.huge,
-            ),
+                .padding(horizontal = MaterialTheme.spacing.huge),
+            contentPadding = paddingValues.add(
+                vertical = MaterialTheme.spacing.huge,
+            ).add(bottom = LocalBottomBarPadding.current.padding.value),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
