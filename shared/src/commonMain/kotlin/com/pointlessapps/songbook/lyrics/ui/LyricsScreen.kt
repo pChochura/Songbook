@@ -27,6 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.lyrics.LyricsEvent
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
@@ -87,6 +90,16 @@ internal fun LyricsScreen(
             LyricsEvent.NavigateBack -> navigator.navigateBack()
         }
     }
+
+    NavigationBackHandler(
+        state = rememberNavigationEventState(
+            currentInfo = NavigationEventInfo.None,
+            backInfo = listOf(NavigationEventInfo.None),
+        ),
+        isBackEnabled = !isTopBarVisible,
+        onBackCancelled = {},
+        onBackCompleted = { isTopBarVisible = true },
+    )
 
     SongbookScaffoldLayout(
         topBar = @Composable {
@@ -198,6 +211,7 @@ internal fun LyricsScreen(
                     isTopBarVisible = !isTopBarVisible
                     isBottomSheetVisible = false
                 }
+
                 Mode -> isModeDialogVisible = true
                 TextScale -> isTextScaleDialogVisible = true
                 KeyOffset -> isKeyOffsetDialogVisible = true
