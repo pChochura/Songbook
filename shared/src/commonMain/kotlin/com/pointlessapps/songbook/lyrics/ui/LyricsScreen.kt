@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -90,13 +91,11 @@ internal fun LyricsScreen(
                 )
             }
 
-//            items(state.parsedSections.indices.toList()) { sectionIndex ->
-//                LyricsSection(
-//                    title = "Section ${sectionIndex + 1}",
-//                    lines = state.parsedSections[sectionIndex],
-//                    mode = state.mode,
-//                )
-//            }
+            items(state.sections) {
+                SongbookText(
+                    text = it.lyrics
+                )
+            }
 
             item {
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))

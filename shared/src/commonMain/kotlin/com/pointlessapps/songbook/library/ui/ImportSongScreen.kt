@@ -212,7 +212,7 @@ internal fun ImportSongScreen(
                     )
                     LabeledTextField(
                         label = stringResource(Res.string.import_dialog_artist_label),
-                        value = state.artist,
+                        value = state.author,
                         onValueChange = viewModel::updateArtist,
                         placeholder = stringResource(Res.string.import_dialog_artist_placeholder),
                         modifier = Modifier.weight(1f),

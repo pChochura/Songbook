@@ -62,6 +62,7 @@ kotlin {
             implementation(libs.peekaboo.image.picker)
 
             implementation(projects.core)
+            implementation(projects.ai)
         }
     }
 }

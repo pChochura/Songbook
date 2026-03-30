@@ -10,6 +10,7 @@ import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.timeout
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -20,22 +21,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
-object Agent {
-    var type: Type = Type.Gemini
+interface Agent {
+    val key: String
 
-    suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
-        val agent: AgentImplementation = when (type) {
-            Type.Gemini -> GeminiAgent
-            Type.Ollama -> OllamaAgent
-            Type.G4f -> G4fAgent
-        }
-        return agent.extractSongData(bytes)
-    }
-
-    enum class Type { Gemini, Ollama, G4f }
-}
-
-private interface AgentImplementation {
     suspend fun extractSongData(bytes: ByteArray): List<SongData>?
 }
 
@@ -68,13 +56,18 @@ private val httpClient: HttpClient = HttpClient {
     }
 }
 
-private object GeminiAgent : AgentImplementation {
-    private const val MODEL = "gemini-2.5-flash-lite"
-    private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+internal class GeminiAgent(
+    override val key: String,
+) : Agent {
+
+    private companion object {
+        const val MODEL = "gemini-2.5-flash-lite"
+        const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+    }
 
     override suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
         val response = httpClient.post("$BASE_URL/$MODEL:generateContent") {
-//            parameter("key", geminiApiKey)
+            parameter("key", key)
             contentType(ContentType.Application.Json)
             setBody(
                 createOcrRequestBody(
@@ -102,12 +95,17 @@ private object GeminiAgent : AgentImplementation {
     }
 }
 
-private object OllamaAgent : AgentImplementation {
-    private const val BASE_URL = "https://ollama.com/api/generate"
+internal class OllamaAgent(
+    override val key: String,
+) : Agent {
+
+    private companion object {
+        private const val BASE_URL = "https://ollama.com/api/generate"
+    }
 
     override suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
         val response = httpClient.post(BASE_URL) {
-//            headers.append(HttpHeaders.Authorization, "Bearer $ollamaApiKey")
+            headers.append(HttpHeaders.Authorization, "Bearer $key")
             contentType(ContentType.Application.Json)
             setBody(
                 createOllamaRequestBody(
@@ -133,12 +131,16 @@ private object OllamaAgent : AgentImplementation {
     }
 }
 
-private object G4fAgent : AgentImplementation {
-    private const val BASE_URL = "https://g4f.dev/v1/chat/completions"
+internal class G4fAgent(
+    override val key: String,
+) : Agent {
+
+    private companion object {
+        const val BASE_URL = "https://g4f.dev/v1/chat/completions"
+    }
 
     override suspend fun extractSongData(bytes: ByteArray): List<SongData>? {
         val response = httpClient.post(BASE_URL) {
-//            headers.append(HttpHeaders.Authorization, "Bearer $g4fApiKey")
             contentType(ContentType.Application.Json)
             setBody(
                 createG4fRequestBody(

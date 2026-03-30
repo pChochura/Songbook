@@ -5,7 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pointlessapps.songbook.Agent
 import com.pointlessapps.songbook.core.song.SongRepository
+import com.pointlessapps.songbook.core.song.model.NewSong
+import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.model.SongData
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -17,13 +21,15 @@ internal sealed interface ImportSongEvent {
 
 internal data class ImportSongState(
     val title: String = "",
-    val artist: String = "",
+    val author: String = "",
     val lyrics: String = "",
+    val sections: List<Section> = emptyList(),
     val isLoading: Boolean = false,
     val showCamera: Boolean = false,
 )
 
 internal class ImportSongViewModel(
+    private val agent: Agent,
     private val songRepository: SongRepository,
 ) : ViewModel() {
 
@@ -38,7 +44,7 @@ internal class ImportSongViewModel(
     }
 
     fun updateArtist(artist: String) {
-        state = state.copy(artist = artist)
+        state = state.copy(author = artist)
     }
 
     fun updateLyrics(lyrics: String) {
@@ -56,10 +62,38 @@ internal class ImportSongViewModel(
 
     fun onImageCaptured(bytes: ByteArray?) {
         viewModelScope.launch {
+            bytes?.let {
+                val result = agent.extractSongData(it)
+                val data = result?.firstOrNull() ?: return@launch
+                val sectionTypeCount = mutableMapOf<SongData.Section.Type, Int>()
+                state = state.copy(
+                    title = data.title.orEmpty(),
+                    author = data.author.orEmpty(),
+                    lyrics = data.sections.joinToString("\n") {
+                        "[${it.type.name}]\n${it.lines.joinToString("\n") { it.text }}"
+                    },
+                    sections = data.sections.map {
+                        Section(
+                            name = "${it.type.name} ${sectionTypeCount.getOrPut(it.type) { 0 } + 1}",
+                            lyrics = it.lines.joinToString("\n") { it.text },
+                            chords = it.chordsBeside,
+                        )
+                    },
+                )
+            }
         }
     }
 
     fun onManualInputConfirmed() {
+        viewModelScope.launch {
+            songRepository.saveSong(
+                NewSong(
+                    title = state.title,
+                    artist = state.author,
+                    sections = state.sections,
+                ),
+            )
+        }
     }
 
     fun onBack() {
