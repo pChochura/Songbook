@@ -212,6 +212,7 @@ internal fun LyricsScreen(
             onConfirmClicked = {
                 viewModel.deleteSong()
                 isConfirmDeleteDialogVisible = false
+                isBottomSheetVisible = false
             },
             onDismissRequest = { isConfirmDeleteDialogVisible = false },
         )
