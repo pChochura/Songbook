@@ -80,7 +80,7 @@ fun SongbookDialog(
                 content()
             }
 
-            if (dialogStyle.iconRes != null) {
+            if (dialogStyle.icon != null) {
                 var iconSize by remember { mutableIntStateOf(0) }
                 Box(
                     modifier = Modifier
@@ -101,7 +101,7 @@ fun SongbookDialog(
                 ) {
                     SongbookIcon(
                         modifier = Modifier.size(DIALOG_ICON_SIZE),
-                        iconRes = dialogStyle.iconRes,
+                        icon = dialogStyle.icon,
                         iconStyle = defaultSongbookIconStyle().copy(tint = dialogStyle.iconColor),
                     )
                 }
@@ -113,7 +113,7 @@ fun SongbookDialog(
 @Composable
 fun defaultSongbookDialogStyle() = SongbookDialogStyle(
     label = "",
-    iconRes = null,
+    icon = null,
     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     outlineColor = MaterialTheme.colorScheme.outlineVariant,
     accentColor = MaterialTheme.colorScheme.primary,
@@ -124,7 +124,7 @@ fun defaultSongbookDialogStyle() = SongbookDialogStyle(
 
 data class SongbookDialogStyle(
     val label: String,
-    val iconRes: DrawableResource?,
+    val icon: DrawableResource?,
     val containerColor: Color,
     val outlineColor: Color,
     val accentColor: Color,

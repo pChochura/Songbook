@@ -25,7 +25,7 @@ internal data class LyricsState(
     val title: String = "Untitled Song",
     val artist: String = "Unknown Artist",
     val sections: List<Section> = emptyList(),
-    val fontScale: Float = 1.0f,
+    val textScale: Int = 100,
     val isOcrActive: Boolean = false,
     val mode: LyricsMode = LyricsMode.Inline,
     val isLoading: Boolean = false,
@@ -42,8 +42,8 @@ internal class LyricsViewModel(
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    fun onFontScaleChanged(fontScale: Float) {
-        state = state.copy(fontScale = fontScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
+    fun onTextScaleChanged(textScale: Int) {
+        state = state.copy(textScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
     }
 
     init {
@@ -70,8 +70,12 @@ internal class LyricsViewModel(
         }
     }
 
-    private companion object {
-        const val MIN_ZOOM = 1.0f
-        const val MAX_ZOOM = 3.0f
+    fun onModeChanged(mode: LyricsMode) {
+        state = state.copy(mode = mode)
+    }
+
+    companion object {
+        const val MIN_ZOOM = 100
+        const val MAX_ZOOM = 300
     }
 }

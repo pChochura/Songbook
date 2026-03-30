@@ -47,7 +47,7 @@ internal fun TopBar(
         leftButton?.let {
             SongbookIconButton(
                 modifier = Modifier.size(TOP_BAR_ICON_SIZE),
-                iconRes = it.icon,
+                icon = it.icon,
                 tooltipLabel = it.tooltip,
                 onClick = it.onClick,
                 iconButtonStyle = defaultSongbookIconButtonStyle().copy(
@@ -78,7 +78,7 @@ internal fun TopBar(
         rightButton?.let {
             SongbookIconButton(
                 modifier = Modifier.size(TOP_BAR_ICON_SIZE),
-                iconRes = it.icon,
+                icon = it.icon,
                 tooltipLabel = it.tooltip,
                 onClick = it.onClick,
                 iconButtonStyle = defaultSongbookIconButtonStyle().copy(

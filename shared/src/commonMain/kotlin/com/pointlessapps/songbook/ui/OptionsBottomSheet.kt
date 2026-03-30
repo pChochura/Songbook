@@ -3,9 +3,16 @@ package com.pointlessapps.songbook.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -36,47 +43,49 @@ internal fun OptionsBottomSheet(
     header: @Composable () -> Unit = { },
 ) {
     ModalBottomSheet(
+        contentWindowInsets = { WindowInsets() },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
         dragHandle = null,
         onDismissRequest = onDismissRequest,
         sheetState = state,
     ) {
-        Column(
-            modifier = Modifier.padding(MaterialTheme.spacing.extraLarge),
+        LazyColumn(
+            contentPadding = PaddingValues(all = MaterialTheme.spacing.extraLarge),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
-            header()
-            items.forEach { OptionsBottomSheetItemButton(it) }
+            item { Spacer(Modifier.statusBarsPadding()) }
+            item { header() }
+            items(items) {
+                when (it) {
+                    is OptionsBottomSheetItem.Button -> OptionsBottomSheetItemButton(it)
+                    OptionsBottomSheetItem.Divider -> HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                    )
+                }
+            }
+            item { Spacer(Modifier.navigationBarsPadding()) }
         }
     }
 }
 
 @Composable
-fun OptionsBottomSheetTitleHeader(
-    title: String,
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        SongbookText(
-            modifier = Modifier.fillMaxWidth(),
-            text = title,
-            textStyle = defaultSongbookTextStyle().copy(
-                textColor = MaterialTheme.colorScheme.onSurface,
-                typography = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-            ),
-        )
-
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-    }
+internal fun OptionsBottomSheetTitleHeader(title: String) {
+    SongbookText(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = MaterialTheme.spacing.small),
+        text = title,
+        textStyle = defaultSongbookTextStyle().copy(
+            textColor = MaterialTheme.colorScheme.onSurface,
+            typography = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+        ),
+    )
 }
 
 @Composable
-fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem) {
+internal fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem.Button) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,7 +97,7 @@ fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem) {
     ) {
         item.icon?.let {
             SongbookIcon(
-                iconRes = it,
+                icon = it,
                 iconStyle = defaultSongbookIconStyle().copy(tint = item.color),
             )
         }
@@ -107,7 +116,7 @@ fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem) {
 
             if (item.description != null) {
                 SongbookText(
-                    text = stringResource(item.description),
+                    text = item.description,
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = item.color.copy(0.6f),
                         typography = MaterialTheme.typography.labelSmall,
@@ -118,23 +127,26 @@ fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem) {
     }
 }
 
-@ConsistentCopyVisibility
-data class OptionsBottomSheetItem private constructor(
-    val icon: DrawableResource?,
-    val label: StringResource,
-    val description: StringResource?,
-    val color: Color,
-    val onClick: () -> Unit,
-) {
+internal sealed interface OptionsBottomSheetItem {
+    data class Button(
+        val icon: DrawableResource?,
+        val label: StringResource,
+        val description: String?,
+        val color: Color,
+        val onClick: () -> Unit,
+    ) : OptionsBottomSheetItem
+
+    data object Divider : OptionsBottomSheetItem
+
     companion object {
         @Composable
         fun new(
             label: StringResource,
             onClick: () -> Unit,
             icon: DrawableResource? = null,
-            description: StringResource? = null,
+            description: String? = null,
             color: Color = MaterialTheme.colorScheme.onSurface,
-        ) = OptionsBottomSheetItem(
+        ) = Button(
             icon = icon,
             label = label,
             description = description,

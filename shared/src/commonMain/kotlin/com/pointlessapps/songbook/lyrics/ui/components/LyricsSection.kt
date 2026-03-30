@@ -21,7 +21,9 @@ import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 
-internal fun LazyListScope.lyricsSection(section: Section, fontScale: Float) {
+internal fun LazyListScope.lyricsSection(section: Section, textScale: Int) {
+    val textScaleFloat = textScale / 100f
+
     if (section.name.isNotEmpty()) {
         item {
             SongbookText(
@@ -65,7 +67,7 @@ internal fun LazyListScope.lyricsSection(section: Section, fontScale: Float) {
                                 labelColor = MaterialTheme.colorScheme.onPrimary,
                                 outlineColor = Color.Transparent,
                                 labelTypography = MaterialTheme.typography.labelLarge.copy(
-                                    fontSize = MaterialTheme.typography.labelLarge.fontSize * fontScale,
+                                    fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
                                 ),
                             ),
                         )
@@ -80,7 +82,7 @@ internal fun LazyListScope.lyricsSection(section: Section, fontScale: Float) {
                     softWrap = false,
                     textColor = MaterialTheme.colorScheme.onSurface,
                     typography = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * fontScale,
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
                     ),
                 ),
             )

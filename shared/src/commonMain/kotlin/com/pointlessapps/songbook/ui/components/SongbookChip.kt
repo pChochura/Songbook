@@ -67,7 +67,7 @@ fun SongbookChip(
         val iconContent = movableContentOf {
             SongbookIcon(
                 modifier = Modifier.size(CHIP_ICON_SIZE),
-                iconRes = chipStyle.iconRes,
+                icon = chipStyle.iconRes,
                 iconStyle = defaultSongbookIconStyle().copy(
                     tint = chipStyle.iconColor,
                 ),

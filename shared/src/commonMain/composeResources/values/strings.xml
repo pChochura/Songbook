@@ -3,22 +3,14 @@
     <string name="common_play">Play</string>
     <string name="common_back">Back</string>
     <string name="common_menu">Menu</string>
-    <string name="song_control_bar_key">KEY: %1$s</string>
-    <string name="song_control_bar_reset">Reset</string>
-    <string name="song_control_bar_auto_scroll">Auto-scroll</string>
-    <string name="song_control_bar_mode_standard">Standard</string>
-    <string name="song_control_bar_mode_side_by_side">Side-by-Side</string>
-    <string name="song_control_bar_mode_both">Both</string>
-    <string name="song_control_bar_text_size_label">T</string>
-    <string name="song_status_bar_tempo">TEMPO: %1$d BPM</string>
-    <string name="song_status_bar_capo">CAPO: %1$d</string>
-    <string name="song_status_bar_live_mode">LIVE MODE ACTIVE</string>
-    <string name="song_status_bar_fullscreen">Fullscreen</string>
-    <string name="chord_selection_popup_title">Chord Directory</string>
-    <string name="chord_selection_popup_subtitle">Select a chord to insert into your lyrics</string>
-    <string name="chord_selection_popup_search_placeholder">Search for a specific chord...</string>
-    <string name="chord_selection_popup_all_chords">ALL CHORDS</string>
-    <string name="chord_selection_popup_remove">Remove</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_delete_the_song">Delete the song?</string>
+    <string name="common_delete_the_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
+    <string name="common_select_display_mode">Select the display mode</string>
+    <string name="common_select_text_scale">Select the text scale</string>
+    <string name="common_decrement">Decrement</string>
+    <string name="common_increment">Increment</string>
 
     <!-- Library Screen -->
     <string name="library_header_title">Library</string>
@@ -61,4 +53,19 @@
     <string name="lyrics_capture_ocr_button">Capture Song via OCR</string>
     <string name="lyrics_section_label">Lyrics</string>
     <string name="lyrics_text_scale">Text scale\n %1$d%</string>
+    <string name="lyrics_menu_text_scale">Text scale</string>
+    <string name="lyrics_menu_mode">Mode</string>
+    <string name="lyrics_menu_edit">Edit</string>
+    <string name="lyrics_menu_add_to_setlist">Add to setlist</string>
+    <string name="lyrics_menu_show_queue">Show queue</string>
+    <string name="lyrics_menu_delete">Delete the song</string>
+    <string name="lyrics_menu_delete_description">The song will be moved to the trash</string>
+    <string name="lyrics_menu_broadcast_to_team">Broadcast to the team</string>
+    <string name="lyrics_menu_broadcast_to_team_description">Send a notification to the team about the song</string>
+    <string name="lyrics_mode_inline">Inline</string>
+    <string name="lyrics_mode_side_by_side">Side by side</string>
+    <string name="lyrics_mode_text_only">Text only</string>
+    <string name="lyrics_mode_inline_description">All of the chords will be displayed above each line</string>
+    <string name="lyrics_mode_side_by_side_description">The chords will be displayed to the side of the lyrics</string>
+    <string name="lyrics_mode_text_only_description">Only the text will be displayed</string>
 </resources>

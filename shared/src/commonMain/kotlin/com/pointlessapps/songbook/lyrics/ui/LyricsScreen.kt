@@ -13,11 +13,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,16 +24,26 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
+import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
+import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheet
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.AddToSetlist
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Broadcast
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Delete
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Edit
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Mode
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.ShowQueue
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.TextScale
 import com.pointlessapps.songbook.lyrics.ui.components.SongHeader
 import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
+import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ModeDialog
+import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
 import com.pointlessapps.songbook.lyrics.ui.components.lyricsSection
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_back
 import com.pointlessapps.songbook.shared.common_menu
 import com.pointlessapps.songbook.shared.lyrics_section_label
-import com.pointlessapps.songbook.ui.OptionsBottomSheet
-import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
-import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
@@ -42,7 +51,7 @@ import com.pointlessapps.songbook.ui.theme.IconArrowLeft
 import com.pointlessapps.songbook.ui.theme.IconMoveHandle
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
-import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,10 +60,10 @@ internal fun LyricsScreen(
 ) {
     val state = viewModel.state
     val navigator = LocalNavigator.current
-    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     val transformableState = rememberTransformableState { zoomChange, _, _ ->
-        viewModel.onFontScaleChanged(state.fontScale * zoomChange)
+        viewModel.onTextScaleChanged((state.textScale * zoomChange).roundToInt())
     }
 
     SongbookScaffoldLayout(
@@ -107,30 +116,68 @@ internal fun LyricsScreen(
 
                 item { Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall)) }
 
-                state.sections.forEach { lyricsSection(it, state.fontScale) }
+                state.sections.forEach { lyricsSection(it, state.textScale) }
             }
 
             TextScaleOverlay(
                 show = transformableState.isTransformInProgress,
-                fontScale = state.fontScale,
+                textScale = state.textScale,
                 modifier = Modifier.align(Alignment.Center),
             )
         }
     }
 
-    if (isBottomSheetVisible) {
-        OptionsBottomSheet(
-            state = rememberModalBottomSheetState(),
-            onDismissRequest = { isBottomSheetVisible = false },
-            header = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
-            items = listOf(
-                OptionsBottomSheetItem.new(
-                    label = Res.string.common_menu,
-                    onClick = {
+    var isModeDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isConfirmDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
-                    },
-                ),
-            ),
+    LyricsOptionsBottomSheet(
+        show = isBottomSheetVisible,
+        state = state,
+        onDismissRequest = { isBottomSheetVisible = false },
+        onAction = {
+            when (it) {
+                Edit -> TODO()
+                Mode -> isModeDialogVisible = true
+                TextScale -> isTextScaleDialogVisible = true
+                AddToSetlist -> TODO()
+                ShowQueue -> TODO()
+                Broadcast -> TODO()
+                Delete -> isConfirmDeleteDialogVisible = true
+            }
+        },
+    )
+
+    if (isModeDialogVisible) {
+        ModeDialog(
+            mode = state.mode,
+            onModeSelected = {
+                viewModel.onModeChanged(it)
+                isModeDialogVisible = false
+            },
+            onDismissRequest = { isModeDialogVisible = false },
+        )
+    }
+
+    if (isTextScaleDialogVisible) {
+        TextScaleDialog(
+            textScale = state.textScale,
+            minTextScale = MIN_ZOOM,
+            maxTextScale = MAX_ZOOM,
+            onTextScaleSelected = {
+                viewModel.onTextScaleChanged(it)
+                isTextScaleDialogVisible = false
+            },
+            onDismissRequest = { isTextScaleDialogVisible = false },
+        )
+    }
+
+    if (isConfirmDeleteDialogVisible) {
+        ConfirmDeleteDialog(
+            onConfirmClicked = {
+                isConfirmDeleteDialogVisible = false
+            },
+            onDismissRequest = { isConfirmDeleteDialogVisible = false },
         )
     }
 }

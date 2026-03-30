@@ -44,13 +44,13 @@ internal fun SongCard(song: Song, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SongbookIcon(
-                    iconRes = IconNote,
+                    icon = IconNote,
                     iconStyle = defaultSongbookIconStyle().copy(
                         tint = MaterialTheme.colorScheme.primary,
                     ),
                 )
                 SongbookIconButton(
-                    iconRes = IconFavouriteEmpty,
+                    icon = IconFavouriteEmpty,
                     tooltipLabel = Res.string.library_add_to_favourites,
                     onClick = {},
                     iconButtonStyle = defaultSongbookIconButtonStyle().copy(

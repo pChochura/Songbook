@@ -47,7 +47,7 @@ fun SongbookSnackbar(
             ),
         ) {
             SongbookIcon(
-                iconRes = IconWarning,
+                icon = IconWarning,
                 modifier = Modifier.size(ICON_SIZE),
                 iconStyle = defaultSongbookIconStyle().copy(
                     tint = MaterialTheme.colorScheme.inverseOnSurface,

@@ -135,7 +135,7 @@ internal fun BottomBarButton(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SongbookIcon(
-                iconRes = bottomBarButton.icon,
+                icon = bottomBarButton.icon,
                 modifier = Modifier.size(FAB_ICON_SIZE),
                 iconStyle = defaultSongbookIconStyle().copy(
                     tint = if (isActive) {
@@ -180,7 +180,7 @@ internal fun BottomBarSupportingButton(
         contentAlignment = Alignment.Center,
     ) {
         SongbookIcon(
-            iconRes = icon,
+            icon = icon,
             modifier = Modifier.size(FAB_ICON_SIZE),
             iconStyle = defaultSongbookIconStyle().copy(
                 tint = MaterialTheme.colorScheme.onSecondary,

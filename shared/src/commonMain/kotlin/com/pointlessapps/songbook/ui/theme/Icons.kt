@@ -29,6 +29,7 @@ import com.pointlessapps.songbook.shared.ic_folder
 import com.pointlessapps.songbook.shared.ic_help
 import com.pointlessapps.songbook.shared.ic_improve
 import com.pointlessapps.songbook.shared.ic_minus
+import com.pointlessapps.songbook.shared.ic_mode
 import com.pointlessapps.songbook.shared.ic_move
 import com.pointlessapps.songbook.shared.ic_move_handle
 import com.pointlessapps.songbook.shared.ic_note
@@ -36,6 +37,7 @@ import com.pointlessapps.songbook.shared.ic_person
 import com.pointlessapps.songbook.shared.ic_placeholder
 import com.pointlessapps.songbook.shared.ic_play
 import com.pointlessapps.songbook.shared.ic_plus
+import com.pointlessapps.songbook.shared.ic_queue
 import com.pointlessapps.songbook.shared.ic_restore
 import com.pointlessapps.songbook.shared.ic_search
 import com.pointlessapps.songbook.shared.ic_settings
@@ -43,11 +45,13 @@ import com.pointlessapps.songbook.shared.ic_share
 import com.pointlessapps.songbook.shared.ic_sort
 import com.pointlessapps.songbook.shared.ic_stats
 import com.pointlessapps.songbook.shared.ic_tag
+import com.pointlessapps.songbook.shared.ic_text_size
 import com.pointlessapps.songbook.shared.ic_today
 import com.pointlessapps.songbook.shared.ic_undo
 import com.pointlessapps.songbook.shared.ic_unfold
 import com.pointlessapps.songbook.shared.ic_visibility
 import com.pointlessapps.songbook.shared.ic_visibility_off
+import com.pointlessapps.songbook.shared.ic_voice
 import com.pointlessapps.songbook.shared.ic_warning
 
 val IconAddFile = Res.drawable.ic_add_file
@@ -98,3 +102,7 @@ val IconVisibility = Res.drawable.ic_visibility
 val IconVisibilityOff = Res.drawable.ic_visibility_off
 val IconWarning = Res.drawable.ic_warning
 val IconNote = Res.drawable.ic_note
+val IconMode = Res.drawable.ic_mode
+val IconTextSize = Res.drawable.ic_text_size
+val IconQueue = Res.drawable.ic_queue
+val IconVoice = Res.drawable.ic_voice

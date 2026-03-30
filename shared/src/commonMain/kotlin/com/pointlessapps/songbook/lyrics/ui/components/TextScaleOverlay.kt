@@ -22,7 +22,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun TextScaleOverlay(
     show: Boolean,
-    fontScale: Float,
+    textScale: Int,
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
@@ -39,10 +39,7 @@ internal fun TextScaleOverlay(
             contentAlignment = Alignment.Center,
         ) {
             SongbookText(
-                text = stringResource(
-                    resource = Res.string.lyrics_text_scale,
-                    (fontScale * 100).toInt(),
-                ),
+                text = stringResource(Res.string.lyrics_text_scale, textScale),
                 textStyle = defaultSongbookTextStyle().copy(
                     textColor = MaterialTheme.colorScheme.onSurface,
                     typography = MaterialTheme.typography.titleMedium,

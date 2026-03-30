@@ -35,7 +35,7 @@ internal fun SetlistCard(setlist: Setlist, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SongbookIcon(
-                iconRes = IconBookmarks,
+                icon = IconBookmarks,
                 iconStyle = defaultSongbookIconStyle().copy(
                     tint = MaterialTheme.colorScheme.primary,
                 ),

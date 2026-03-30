@@ -57,7 +57,7 @@ fun SongbookButton(
         val content = movableContentOf {
             if (buttonStyle.iconRes != null) {
                 SongbookIcon(
-                    iconRes = buttonStyle.iconRes,
+                    icon = buttonStyle.iconRes,
                     modifier = Modifier
                         .size(ICON_SIZE)
                         .then(iconModifier),

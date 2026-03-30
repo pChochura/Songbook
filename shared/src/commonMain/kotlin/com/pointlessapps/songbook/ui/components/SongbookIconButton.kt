@@ -22,7 +22,7 @@ import org.jetbrains.compose.resources.StringResource
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SongbookIconButton(
-    iconRes: DrawableResource,
+    icon: DrawableResource,
     tooltipLabel: StringResource,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -58,7 +58,7 @@ fun SongbookIconButton(
                     onClick = onClick,
                     onLongClick = onLongClick,
                 ),
-            iconRes = iconRes,
+            icon = icon,
             iconStyle = defaultSongbookIconStyle().copy(
                 tint = if (iconButtonStyle.enabled) {
                     iconButtonStyle.contentColor

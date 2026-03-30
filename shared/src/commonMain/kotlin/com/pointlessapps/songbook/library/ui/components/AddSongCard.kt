@@ -37,7 +37,7 @@ internal fun AddSongCard(onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             SongbookIcon(
-                iconRes = IconPlus,
+                icon = IconPlus,
                 iconStyle = defaultSongbookIconStyle().copy(
                     tint = MaterialTheme.colorScheme.primary,
                 ),

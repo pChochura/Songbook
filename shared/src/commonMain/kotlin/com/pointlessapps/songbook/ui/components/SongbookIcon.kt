@@ -10,12 +10,12 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SongbookIcon(
-    iconRes: DrawableResource,
+    icon: DrawableResource,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
     iconStyle: SongbookIconStyle = defaultSongbookIconStyle(),
 ) = Icon(
-    painter = painterResource(iconRes),
+    painter = painterResource(icon),
     modifier = modifier,
     tint = iconStyle.tint,
     contentDescription = contentDescription,
