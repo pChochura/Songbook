@@ -39,6 +39,7 @@ fun SongbookText(
     ),
     overflow = textStyle.textOverflow,
     maxLines = textStyle.maxLines,
+    softWrap = textStyle.softWrap,
     onTextLayout = onTextLayout,
 )
 
@@ -50,6 +51,7 @@ fun defaultSongbookTextStyle() = SongbookTextStyle(
     textAlign = TextAlign.Start,
     textOverflow = TextOverflow.Visible,
     maxLines = Int.MAX_VALUE,
+    softWrap = true,
 )
 
 data class SongbookTextStyle(
@@ -59,4 +61,5 @@ data class SongbookTextStyle(
     val typography: TextStyle,
     val textOverflow: TextOverflow,
     val maxLines: Int,
+    val softWrap: Boolean,
 )

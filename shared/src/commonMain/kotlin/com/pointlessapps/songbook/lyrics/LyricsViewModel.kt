@@ -42,6 +42,10 @@ internal class LyricsViewModel(
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    fun onFontScaleChanged(fontScale: Float) {
+        state = state.copy(fontScale = fontScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
+    }
+
     init {
         viewModelScope.launch {
             songRepository.getSongById(songId).collect {
@@ -58,11 +62,16 @@ internal class LyricsViewModel(
                                     Chord("Bm", 23),
                                     Chord("A", 35),
                                 ),
-                            )
+                            ),
                         ),
                     )
                 }
             }
         }
+    }
+
+    private companion object {
+        const val MIN_ZOOM = 1.0f
+        const val MAX_ZOOM = 3.0f
     }
 }

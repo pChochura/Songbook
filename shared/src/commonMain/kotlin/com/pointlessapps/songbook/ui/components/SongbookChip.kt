@@ -1,6 +1,5 @@
 package com.pointlessapps.songbook.ui.components
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.ui.theme.IconDone
 import com.pointlessapps.songbook.ui.theme.spacing
@@ -57,8 +57,7 @@ fun SongbookChip(
             .padding(
                 horizontal = MaterialTheme.spacing.small,
                 vertical = MaterialTheme.spacing.extraSmall,
-            )
-            .animateContentSize(),
+            ),
         horizontalArrangement = Arrangement.spacedBy(
             space = MaterialTheme.spacing.extraSmall,
             alignment = Alignment.CenterHorizontally,
@@ -84,7 +83,7 @@ fun SongbookChip(
                 .sizeIn(minHeight = CHIP_ICON_SIZE),
             text = label,
             textStyle = defaultSongbookTextStyle().copy(
-                typography = MaterialTheme.typography.labelLarge,
+                typography = chipStyle.labelTypography,
                 textColor = if (isSelected) {
                     chipStyle.selectedLabelColor
                 } else {
@@ -107,6 +106,7 @@ fun defaultSongbookChipStyle() = SongbookChipStyle(
     selectedOutlineColor = MaterialTheme.colorScheme.secondaryContainer,
     labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
     selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    labelTypography = MaterialTheme.typography.labelLarge,
     iconColor = MaterialTheme.colorScheme.onSecondaryContainer,
     iconRes = IconDone,
     iconAlignment = Alignment.Start,
@@ -119,6 +119,7 @@ data class SongbookChipStyle(
     val selectedOutlineColor: Color,
     val labelColor: Color,
     val selectedLabelColor: Color,
+    val labelTypography: TextStyle,
     val iconColor: Color,
     val iconRes: DrawableResource,
     val iconAlignment: Alignment.Horizontal,
