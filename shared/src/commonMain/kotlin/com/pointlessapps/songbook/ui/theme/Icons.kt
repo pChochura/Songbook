@@ -26,6 +26,7 @@ import com.pointlessapps.songbook.shared.ic_favourite_empty
 import com.pointlessapps.songbook.shared.ic_filter
 import com.pointlessapps.songbook.shared.ic_fold
 import com.pointlessapps.songbook.shared.ic_folder
+import com.pointlessapps.songbook.shared.ic_fullscreen
 import com.pointlessapps.songbook.shared.ic_help
 import com.pointlessapps.songbook.shared.ic_improve
 import com.pointlessapps.songbook.shared.ic_key
@@ -108,3 +109,4 @@ val IconTextSize = Res.drawable.ic_text_size
 val IconQueue = Res.drawable.ic_queue
 val IconVoice = Res.drawable.ic_voice
 val IconKey = Res.drawable.ic_key
+val IconFullscreen = Res.drawable.ic_fullscreen

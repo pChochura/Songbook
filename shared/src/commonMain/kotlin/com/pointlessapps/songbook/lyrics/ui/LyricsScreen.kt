@@ -1,5 +1,7 @@
 package com.pointlessapps.songbook.lyrics.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.horizontalScroll
@@ -8,6 +10,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalNavigator
@@ -32,6 +37,7 @@ import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetA
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Broadcast
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Delete
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Edit
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Fullscreen
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.KeyOffset
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Mode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.ShowQueue
@@ -46,12 +52,16 @@ import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
 import com.pointlessapps.songbook.lyrics.ui.components.lyricsSection
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_back
+import com.pointlessapps.songbook.shared.common_close_fullscreen
 import com.pointlessapps.songbook.shared.common_menu
 import com.pointlessapps.songbook.shared.lyrics_section_label
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
+import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.theme.IconArrowLeft
+import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.IconMoveHandle
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
@@ -65,6 +75,7 @@ internal fun LyricsScreen(
 ) {
     val state = viewModel.state
     val navigator = LocalNavigator.current
+    var isTopBarVisible by rememberSaveable { mutableStateOf(true) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     val transformableState = rememberTransformableState { zoomChange, _, _ ->
@@ -79,19 +90,25 @@ internal fun LyricsScreen(
 
     SongbookScaffoldLayout(
         topBar = @Composable {
-            TopBar(
-                leftButton = TopBarButton(
-                    icon = IconArrowLeft,
-                    tooltip = Res.string.common_back,
-                    onClick = { navigator.navigateBack() },
-                ),
-                rightButton = TopBarButton(
-                    icon = IconMoveHandle,
-                    tooltip = Res.string.common_menu,
-                    onClick = { isBottomSheetVisible = true },
-                ),
-                title = Res.string.lyrics_section_label,
-            )
+            AnimatedContent(isTopBarVisible) {
+                if (it) {
+                    TopBar(
+                        leftButton = TopBarButton(
+                            icon = IconArrowLeft,
+                            tooltip = Res.string.common_back,
+                            onClick = { navigator.navigateBack() },
+                        ),
+                        rightButton = TopBarButton(
+                            icon = IconMoveHandle,
+                            tooltip = Res.string.common_menu,
+                            onClick = { isBottomSheetVisible = true },
+                        ),
+                        title = Res.string.lyrics_section_label,
+                    )
+                } else {
+                    Spacer(Modifier.statusBarsPadding())
+                }
+            }
         },
     ) { paddingValues ->
         Box(
@@ -127,7 +144,13 @@ internal fun LyricsScreen(
 
                 item { Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall)) }
 
-                state.sections.forEach { lyricsSection(it, state.textScale) }
+                state.sections.forEach {
+                    lyricsSection(
+                        section = it,
+                        textScale = state.textScale,
+                        mode = state.mode,
+                    )
+                }
             }
 
             TextScaleOverlay(
@@ -135,6 +158,26 @@ internal fun LyricsScreen(
                 textScale = state.textScale,
                 modifier = Modifier.align(Alignment.Center),
             )
+
+            AnimatedVisibility(
+                visible = !isTopBarVisible,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(paddingValues)
+                    .padding(all = MaterialTheme.spacing.huge),
+            ) {
+                SongbookIconButton(
+                    icon = IconClose,
+                    tooltipLabel = Res.string.common_close_fullscreen,
+                    onClick = { isTopBarVisible = true },
+                    iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            .copy(alpha = 0.7f),
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        outlineColor = Color.Transparent,
+                    ),
+                )
+            }
         }
     }
 
@@ -151,6 +194,10 @@ internal fun LyricsScreen(
         onAction = {
             when (it) {
                 Edit -> TODO()
+                Fullscreen -> {
+                    isTopBarVisible = !isTopBarVisible
+                    isBottomSheetVisible = false
+                }
                 Mode -> isModeDialogVisible = true
                 TextScale -> isTextScaleDialogVisible = true
                 KeyOffset -> isKeyOffsetDialogVisible = true

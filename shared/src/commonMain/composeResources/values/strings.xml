@@ -5,6 +5,7 @@
     <string name="common_menu">Menu</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_close_fullscreen">Close fullscreen</string>
     <string name="common_delete_the_song">Delete the song?</string>
     <string name="common_delete_the_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
     <string name="common_select_display_mode">Select the display mode</string>
@@ -59,6 +60,8 @@
     <string name="lyrics_text_scale">Text scale\n %1$d%</string>
     <string name="lyrics_menu_text_scale">Text scale</string>
     <string name="lyrics_menu_key_offset">Key offset</string>
+    <string name="lyrics_menu_toggle_fullscreen">Toggle fullscreen</string>
+    <string name="lyrics_menu_toggle_fullscreen_description">Toggle the distraction-free view of the lyrics</string>
     <string name="lyrics_menu_mode">Mode</string>
     <string name="lyrics_menu_edit">Edit</string>
     <string name="lyrics_menu_add_to_setlist">Add to setlist</string>

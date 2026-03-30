@@ -25,6 +25,8 @@ import com.pointlessapps.songbook.shared.lyrics_menu_key_offset
 import com.pointlessapps.songbook.shared.lyrics_menu_mode
 import com.pointlessapps.songbook.shared.lyrics_menu_show_queue
 import com.pointlessapps.songbook.shared.lyrics_menu_text_scale
+import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen
+import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen_description
 import com.pointlessapps.songbook.shared.lyrics_mode_inline
 import com.pointlessapps.songbook.shared.lyrics_mode_side_by_side
 import com.pointlessapps.songbook.shared.lyrics_mode_text_only
@@ -35,6 +37,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.IconAddFolder
 import com.pointlessapps.songbook.ui.theme.IconDelete
 import com.pointlessapps.songbook.ui.theme.IconEdit
+import com.pointlessapps.songbook.ui.theme.IconFullscreen
 import com.pointlessapps.songbook.ui.theme.IconKey
 import com.pointlessapps.songbook.ui.theme.IconMode
 import com.pointlessapps.songbook.ui.theme.IconQueue
@@ -71,6 +74,12 @@ internal fun LyricsOptionsBottomSheet(
                     onClick = { onAction(LyricsOptionsBottomSheetAction.Edit) },
                 ),
                 OptionsBottomSheetItem.Divider,
+                OptionsBottomSheetItem.new(
+                    icon = IconFullscreen,
+                    label = Res.string.lyrics_menu_toggle_fullscreen,
+                    description = stringResource(Res.string.lyrics_menu_toggle_fullscreen_description),
+                    onClick = { onAction(LyricsOptionsBottomSheetAction.Fullscreen) },
+                ),
                 OptionsBottomSheetItem.new(
                     icon = IconMode,
                     label = Res.string.lyrics_menu_mode,
@@ -159,5 +168,5 @@ private fun LyricsOptionsBottomSheetHeader(title: String, artist: String) {
 }
 
 internal enum class LyricsOptionsBottomSheetAction {
-    Edit, Mode, TextScale, KeyOffset, AddToSetlist, ShowQueue, Broadcast, Delete
+    Edit, Fullscreen, Mode, TextScale, KeyOffset, AddToSetlist, ShowQueue, Broadcast, Delete
 }

@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.lyrics.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,12 +17,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.IntOffset
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.lyrics.LyricsMode
 import com.pointlessapps.songbook.ui.components.SongbookChip
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 
-internal fun LazyListScope.lyricsSection(section: Section, textScale: Int) {
+internal fun LazyListScope.lyricsSection(
+    section: Section,
+    textScale: Int,
+    mode: LyricsMode,
+) {
     val textScaleFloat = textScale / 100f
 
     if (section.name.isNotEmpty()) {
@@ -37,40 +43,42 @@ internal fun LazyListScope.lyricsSection(section: Section, textScale: Int) {
     }
 
     items(section.lines) { line ->
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth().animateContentSize()) {
             var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
-            Box {
-                textLayoutResult?.let { layout ->
-                    line.chords.forEach { chord ->
-                        val lineIndex = layout.getLineForOffset(chord.position)
-                        val horizontalPosition = layout.getHorizontalPosition(
-                            offset = chord.position,
-                            usePrimaryDirection = true,
-                        )
-                        val verticalPosition = layout.getLineTop(lineIndex)
+            if (mode == LyricsMode.Inline) {
+                Box {
+                    textLayoutResult?.let { layout ->
+                        line.chords.forEach { chord ->
+                            val lineIndex = layout.getLineForOffset(chord.position)
+                            val horizontalPosition = layout.getHorizontalPosition(
+                                offset = chord.position,
+                                usePrimaryDirection = true,
+                            )
+                            val verticalPosition = layout.getLineTop(lineIndex)
 
-                        SongbookChip(
-                            modifier = Modifier.offset {
-                                IntOffset(
-                                    x = horizontalPosition.toInt(),
-                                    y = verticalPosition.toInt(),
-                                )
-                            },
-                            label = chord.value,
-                            isSelected = false,
-                            onClick = {
-                                // TODO add chord explanation dialog
-                            },
-                            chipStyle = defaultSongbookChipStyle().copy(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                labelColor = MaterialTheme.colorScheme.onPrimary,
-                                outlineColor = Color.Transparent,
-                                labelTypography = MaterialTheme.typography.labelLarge.copy(
-                                    fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
+                            SongbookChip(
+                                modifier = Modifier.offset {
+                                    IntOffset(
+                                        x = horizontalPosition.toInt(),
+                                        y = verticalPosition.toInt(),
+                                    )
+                                },
+                                label = chord.value,
+                                isSelected = false,
+                                onClick = {
+                                    // TODO add chord explanation dialog
+                                },
+                                chipStyle = defaultSongbookChipStyle().copy(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                                    outlineColor = Color.Transparent,
+                                    labelTypography = MaterialTheme.typography.labelLarge.copy(
+                                        fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
+                                    ),
                                 ),
-                            ),
-                        )
+                            )
+                        }
                     }
                 }
             }
