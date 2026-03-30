@@ -12,7 +12,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-internal sealed interface LyricsEvent
+internal sealed interface LyricsEvent {
+    object NavigateBack : LyricsEvent
+}
 
 internal enum class LyricsMode {
     Inline,
@@ -72,6 +74,18 @@ internal class LyricsViewModel(
 
     fun onModeChanged(mode: LyricsMode) {
         state = state.copy(mode = mode)
+    }
+
+    fun deleteSong() {
+        viewModelScope.launch {
+            state = state.copy(isLoading = true)
+            songRepository.deleteSong(songId)
+            eventChannel.send(LyricsEvent.NavigateBack)
+        }
+    }
+
+    fun broadcastSongToTeam() {
+        // TODO
     }
 
     companion object {

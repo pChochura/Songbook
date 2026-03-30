@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +38,7 @@ import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
+import com.pointlessapps.songbook.utils.collectWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -49,17 +49,15 @@ internal fun LibraryScreen(
     val navigator = LocalNavigator.current
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is LibraryEvent.NavigateTo -> when (val route = event.route) {
-                    is Route.Lyrics -> navigator.navigateToLyrics(route.songId)
-                    Route.ImportSong -> navigator.navigateToImportSong()
-                    else -> Unit
-                }
-
-                LibraryEvent.FocusSearch -> focusRequester.requestFocus()
+    viewModel.events.collectWithLifecycle { event ->
+        when (event) {
+            is LibraryEvent.NavigateTo -> when (val route = event.route) {
+                is Route.Lyrics -> navigator.navigateToLyrics(route.songId)
+                Route.ImportSong -> navigator.navigateToImportSong()
+                else -> Unit
             }
+
+            LibraryEvent.FocusSearch -> focusRequester.requestFocus()
         }
     }
 

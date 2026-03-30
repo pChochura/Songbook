@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalNavigator
+import com.pointlessapps.songbook.lyrics.LyricsEvent
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
@@ -36,6 +37,7 @@ import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetA
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.TextScale
 import com.pointlessapps.songbook.lyrics.ui.components.SongHeader
 import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
+import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmBroadcastToTeamDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ModeDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
@@ -51,6 +53,7 @@ import com.pointlessapps.songbook.ui.theme.IconArrowLeft
 import com.pointlessapps.songbook.ui.theme.IconMoveHandle
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
+import com.pointlessapps.songbook.utils.collectWithLifecycle
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,6 +67,12 @@ internal fun LyricsScreen(
 
     val transformableState = rememberTransformableState { zoomChange, _, _ ->
         viewModel.onTextScaleChanged((state.textScale * zoomChange).roundToInt())
+    }
+
+    viewModel.events.collectWithLifecycle { event ->
+        when (event) {
+            LyricsEvent.NavigateBack -> navigator.navigateBack()
+        }
     }
 
     SongbookScaffoldLayout(
@@ -129,6 +138,7 @@ internal fun LyricsScreen(
 
     var isModeDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isConfirmDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     LyricsOptionsBottomSheet(
@@ -142,7 +152,7 @@ internal fun LyricsScreen(
                 TextScale -> isTextScaleDialogVisible = true
                 AddToSetlist -> TODO()
                 ShowQueue -> TODO()
-                Broadcast -> TODO()
+                Broadcast -> isBroadcastToTeamDialogVisible = true
                 Delete -> isConfirmDeleteDialogVisible = true
             }
         },
@@ -172,9 +182,20 @@ internal fun LyricsScreen(
         )
     }
 
+    if (isBroadcastToTeamDialogVisible) {
+        ConfirmBroadcastToTeamDialog(
+            onConfirmClicked = {
+                viewModel.broadcastSongToTeam()
+                isBroadcastToTeamDialogVisible = false
+            },
+            onDismissRequest = { isBroadcastToTeamDialogVisible = false },
+        )
+    }
+
     if (isConfirmDeleteDialogVisible) {
         ConfirmDeleteDialog(
             onConfirmClicked = {
+                viewModel.deleteSong()
                 isConfirmDeleteDialogVisible = false
             },
             onDismissRequest = { isConfirmDeleteDialogVisible = false },

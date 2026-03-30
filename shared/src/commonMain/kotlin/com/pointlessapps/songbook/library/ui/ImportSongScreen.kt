@@ -30,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +63,7 @@ import com.pointlessapps.songbook.shared.import_dialog_song_title_placeholder
 import com.pointlessapps.songbook.ui.components.SongbookTextField
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.collectWithLifecycle
 import com.preat.peekaboo.image.picker.FilterOptions
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
@@ -85,12 +85,10 @@ internal fun ImportSongScreen(
         onResult = { viewModel.onImageCaptured(it.firstOrNull()) },
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                ImportSongEvent.Back -> navigator.navigateToLibrary()
-                is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
-            }
+    viewModel.events.collectWithLifecycle { event ->
+        when (event) {
+            ImportSongEvent.Back -> navigator.navigateToLibrary()
+            is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
         }
     }
 
