@@ -42,12 +42,14 @@ internal class LyricsViewModel(
 
     init {
         viewModelScope.launch {
-            songRepository.getSongById(songId)?.let { song ->
-                state = state.copy(
-                    title = song.title,
-                    artist = song.artist,
-                    sections = song.sections,
-                )
+            songRepository.getSongById(songId).collect {
+                it?.let { song ->
+                    state = state.copy(
+                        title = song.title,
+                        artist = song.artist,
+                        sections = song.sections,
+                    )
+                }
             }
         }
     }

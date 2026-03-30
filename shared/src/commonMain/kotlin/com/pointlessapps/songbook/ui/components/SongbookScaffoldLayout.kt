@@ -1,15 +1,9 @@
 package com.pointlessapps.songbook.ui.components
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.platform.LocalDensity
 
 @Composable
 fun SongbookScaffoldLayout(
@@ -38,19 +32,10 @@ fun SongbookScaffoldLayout(
         val fabHeight = fabPlaceables.maxByOrNull { it.height }?.height ?: 0
 
         val bodyContentPlaceables = subcompose(SongbookScaffoldLayoutContent.Content) {
-            val bottomPadding by animateDpAsState(
-                maxOf(
-                    fabHeight,
-                    WindowInsets.ime.getBottom(LocalDensity.current),
-                    WindowInsets.navigationBars.getBottom(LocalDensity.current),
-                ).toDp(),
-                label = "Bottom padding",
-            )
-
             content(
                 PaddingValues(
                     top = topBarHeight.toDp(),
-                    bottom = bottomPadding,
+                    bottom = fabHeight.toDp(),
                 ),
             )
         }.map { it.measure(looseConstraints.copy(maxHeight = layoutHeight)) }

@@ -15,12 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.library_header_title
@@ -38,10 +38,11 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun BottomBar(
+    currentRoute: () -> Route?,
     onNavigateTo: (Route) -> Unit,
     onLongClicked: (Route) -> Unit,
 ) {
-    val currentRoute = LocalNavigator.current.currentRoute
+    val currentRoute = remember { currentRoute() }
 
     Row(
         modifier = Modifier

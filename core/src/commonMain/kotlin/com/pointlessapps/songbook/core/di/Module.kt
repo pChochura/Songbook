@@ -7,6 +7,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.realtime.Realtime
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -20,6 +21,7 @@ val coreModule = module {
             supabaseUrl = getProperty("SUPABASE_URL"),
             supabaseKey = getProperty("SUPABASE_KEY"),
         ) {
+            install(Realtime)
             install(Postgrest)
             install(Auth)
         }

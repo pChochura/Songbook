@@ -3,18 +3,23 @@ package com.pointlessapps.songbook.core.song
 import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Song
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.realtime.selectAsFlow
+import io.github.jan.supabase.realtime.selectSingleValueAsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 interface SongRepository {
-    suspend fun getAllSongs(): List<Song>
-    suspend fun getSongById(id: Long): Song?
+    suspend fun getAllSongs(): Flow<List<Song>>
+    suspend fun getSongById(id: Long): Flow<Song?>
     suspend fun saveSong(newSong: NewSong)
     suspend fun deleteSong(id: Long)
 }
 
+@OptIn(SupabaseExperimental::class)
 internal class SongRepositoryImpl(
     supabase: SupabaseClient,
 ) : SongRepository {
@@ -22,13 +27,13 @@ internal class SongRepositoryImpl(
     private val table = supabase.from("songs")
 
     override suspend fun getAllSongs() = withContext(Dispatchers.IO) {
-        table.select().decodeList<Song>()
+        table.selectAsFlow(Song::id)
     }
 
     override suspend fun getSongById(id: Long) = withContext(Dispatchers.IO) {
-        table.select {
-            filter { Song::id eq id }
-        }.decodeSingleOrNull<Song>()
+        table.selectSingleValueAsFlow(Song::id) {
+            Song::id eq id
+        }
     }
 
     override suspend fun saveSong(newSong: NewSong) {

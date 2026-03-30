@@ -13,6 +13,7 @@ import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Song
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -51,14 +52,17 @@ internal class LibraryViewModel(
                 authRepository.signInAnonymously()
             }
 
-            val setlists = setlistRepository.getAllSetlists()
-            val songs = songRepository.getAllSongs()
-
-            state = state.copy(
-                setlists = setlists,
-                songs = songs,
-                isLoading = false,
-            )
+            combine(
+                setlistRepository.getAllSetlists(),
+                songRepository.getAllSongs(),
+            ) { setlists, songs -> setlists to songs }
+                .collect { (setlists, songs) ->
+                    state = state.copy(
+                        setlists = setlists,
+                        songs = songs,
+                        isLoading = false,
+                    )
+                }
         }
     }
 

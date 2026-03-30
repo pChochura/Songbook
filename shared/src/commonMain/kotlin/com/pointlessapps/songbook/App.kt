@@ -7,16 +7,19 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -40,10 +43,12 @@ fun App(
         ),
     )
     val navigator = Navigator(backstack)
+    val bottomBarPadding = remember { BottomBarPadding() }
 
     SongbookTheme {
         CompositionLocalProvider(
             LocalNavigator provides navigator,
+            LocalBottomBarPadding provides bottomBarPadding,
             LocalSnackbarHostState provides songbookSnackbarHostState,
             LocalTextSelectionColors provides TextSelectionColors(
                 handleColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -65,6 +70,7 @@ fun App(
                     ) {
                         if (it?.hasBottomBar == true) {
                             BottomBar(
+                                currentRoute = { it },
                                 onNavigateTo = {
                                     // TODO
                                 },
@@ -76,13 +82,19 @@ fun App(
                     }
                 },
             ) { paddingValues ->
-                CompositionLocalProvider(LocalInnerPadding provides paddingValues) {
-                    NavDisplay(backstack)
+                LaunchedEffect(paddingValues) {
+                    bottomBarPadding.padding.value = paddingValues.calculateBottomPadding()
                 }
+
+                NavDisplay(backstack)
             }
         }
     }
 }
 
-internal val LocalInnerPadding: ProvidableCompositionLocal<PaddingValues> =
-    staticCompositionLocalOf { error("LocalInnerPadding not initialized") }
+internal val LocalBottomBarPadding: ProvidableCompositionLocal<BottomBarPadding> =
+    staticCompositionLocalOf { error("LocalBottomBarPadding not initialized") }
+
+internal class BottomBarPadding {
+    val padding = mutableStateOf(0.dp)
+}

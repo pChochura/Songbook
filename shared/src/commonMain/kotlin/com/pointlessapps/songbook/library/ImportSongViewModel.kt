@@ -1,5 +1,7 @@
 package com.pointlessapps.songbook.library
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,9 +22,6 @@ internal sealed interface ImportSongEvent {
 }
 
 internal data class ImportSongState(
-    val title: String = "",
-    val author: String = "",
-    val lyrics: String = "",
     val sections: List<Section> = emptyList(),
     val isLoading: Boolean = false,
     val showCamera: Boolean = false,
@@ -33,23 +32,15 @@ internal class ImportSongViewModel(
     private val songRepository: SongRepository,
 ) : ViewModel() {
 
+    val titleTextFieldState = TextFieldState("")
+    val artistTextFieldState = TextFieldState("")
+    val lyricsTextFieldState = TextFieldState("")
+
     var state by mutableStateOf(ImportSongState())
         private set
 
     private val eventChannel = Channel<ImportSongEvent>()
     val events = eventChannel.receiveAsFlow()
-
-    fun updateTitle(title: String) {
-        state = state.copy(title = title)
-    }
-
-    fun updateArtist(artist: String) {
-        state = state.copy(author = artist)
-    }
-
-    fun updateLyrics(lyrics: String) {
-        state = state.copy(lyrics = lyrics)
-    }
 
     fun onCameraRequested() {
         state = state.copy(showCamera = true)
@@ -66,12 +57,14 @@ internal class ImportSongViewModel(
                 val result = agent.extractSongData(it)
                 val data = result?.firstOrNull() ?: return@launch
                 val sectionTypeCount = mutableMapOf<SongData.Section.Type, Int>()
-                state = state.copy(
-                    title = data.title.orEmpty(),
-                    author = data.author.orEmpty(),
-                    lyrics = data.sections.joinToString("\n") {
+                titleTextFieldState.setTextAndPlaceCursorAtEnd(data.title.orEmpty())
+                artistTextFieldState.setTextAndPlaceCursorAtEnd(data.author.orEmpty())
+                lyricsTextFieldState.setTextAndPlaceCursorAtEnd(
+                    data.sections.joinToString("\n") {
                         "[${it.type.name}]\n${it.lines.joinToString("\n") { it.text }}"
                     },
+                )
+                state = state.copy(
                     sections = data.sections.map {
                         Section(
                             name = "${it.type.name} ${sectionTypeCount.getOrPut(it.type) { 0 } + 1}",
@@ -88,8 +81,8 @@ internal class ImportSongViewModel(
         viewModelScope.launch {
             songRepository.saveSong(
                 NewSong(
-                    title = state.title,
-                    artist = state.author,
+                    title = titleTextFieldState.text.toString(),
+                    artist = artistTextFieldState.text.toString(),
                     sections = state.sections,
                 ),
             )

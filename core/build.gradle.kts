@@ -39,6 +39,7 @@ kotlin {
 
             implementation(libs.supabase.auth)
             implementation(libs.supabase.postgres)
+            implementation(libs.supabase.realtime)
         }
 
         androidMain.dependencies {

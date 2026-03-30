@@ -12,28 +12,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.CropFree
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,9 +34,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -67,6 +61,8 @@ import com.pointlessapps.songbook.shared.import_dialog_ocr_subtitle
 import com.pointlessapps.songbook.shared.import_dialog_song_identity
 import com.pointlessapps.songbook.shared.import_dialog_song_title_label
 import com.pointlessapps.songbook.shared.import_dialog_song_title_placeholder
+import com.pointlessapps.songbook.ui.components.SongbookTextField
+import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.preat.peekaboo.image.picker.FilterOptions
 import com.preat.peekaboo.image.picker.SelectionMode
@@ -109,12 +105,6 @@ internal fun ImportSongScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
             ) {
-                IconButton(onClick = { viewModel.onBack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
-                    )
-                }
                 Text(
                     text = stringResource(Res.string.import_dialog_header_title),
                     style = MaterialTheme.typography.titleLarge,
@@ -156,12 +146,6 @@ internal fun ImportSongScreen(
                             .padding(MaterialTheme.spacing.medium),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.CropFree,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(MaterialTheme.spacing.extraLarge),
-                        )
                     }
                     Text(
                         text = stringResource(Res.string.import_dialog_ocr_button),
@@ -185,13 +169,11 @@ internal fun ImportSongScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
                         OcrActionButton(
                             label = stringResource(Res.string.import_dialog_camera_button),
-                            icon = Icons.Default.CameraAlt,
                             onClick = { viewModel.onCameraRequested() },
                             style = OcrButtonStyle.Outlined,
                         )
                         OcrActionButton(
                             label = stringResource(Res.string.import_dialog_gallery_button),
-                            icon = Icons.Default.Photo,
                             onClick = { imagePickerLauncher.launch() },
                             style = OcrButtonStyle.Filled,
                         )
@@ -205,15 +187,13 @@ internal fun ImportSongScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large)) {
                     LabeledTextField(
                         label = stringResource(Res.string.import_dialog_song_title_label),
-                        value = state.title,
-                        onValueChange = viewModel::updateTitle,
+                        textFieldState = viewModel.titleTextFieldState,
                         placeholder = stringResource(Res.string.import_dialog_song_title_placeholder),
                         modifier = Modifier.weight(1f),
                     )
                     LabeledTextField(
                         label = stringResource(Res.string.import_dialog_artist_label),
-                        value = state.author,
-                        onValueChange = viewModel::updateArtist,
+                        textFieldState = viewModel.artistTextFieldState,
                         placeholder = stringResource(Res.string.import_dialog_artist_placeholder),
                         modifier = Modifier.weight(1f),
                     )
@@ -223,24 +203,17 @@ internal fun ImportSongScreen(
             // Lyrics & Chords Editor
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
                 SectionHeader(stringResource(Res.string.import_dialog_lyrics_editor))
-                OutlinedTextField(
-                    value = state.lyrics,
-                    onValueChange = viewModel::updateLyrics,
+                SongbookTextField(
+                    state = viewModel.lyricsTextFieldState,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
-                    minLines = 10,
-                    placeholder = { Text(stringResource(Res.string.import_dialog_lyrics_placeholder)) },
-                    shape = MaterialTheme.shapes.medium,
+                    textFieldStyle = defaultSongbookTextFieldStyle().copy(
+                        placeholder = stringResource(Res.string.import_dialog_lyrics_placeholder),
+                    ),
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Title,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(MaterialTheme.spacing.large),
-                    )
                     Text(
                         text = stringResource(Res.string.import_dialog_lyrics_tip),
                         style = MaterialTheme.typography.labelSmall,
@@ -263,7 +236,7 @@ internal fun ImportSongScreen(
                 }
                 Button(
                     onClick = { viewModel.onManualInputConfirmed() },
-                    enabled = state.title.isNotBlank() && !state.isLoading,
+                    enabled = viewModel.titleTextFieldState.text.isNotEmpty() && !state.isLoading,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -293,7 +266,6 @@ private enum class OcrButtonStyle { Outlined, Filled }
 @Composable
 private fun OcrActionButton(
     label: String,
-    icon: ImageVector,
     onClick: () -> Unit,
     style: OcrButtonStyle,
     modifier: Modifier = Modifier,
@@ -308,11 +280,6 @@ private fun OcrActionButton(
     }
     val content: @Composable () -> Unit = {
         Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(MaterialTheme.spacing.large),
-            )
             Text(label)
         }
     }
@@ -343,8 +310,7 @@ private fun OcrActionButton(
 @Composable
 private fun LabeledTextField(
     label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
+    textFieldState: TextFieldState,
     placeholder: String,
     modifier: Modifier = Modifier,
 ) {
@@ -357,13 +323,19 @@ private fun LabeledTextField(
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
         )
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            placeholder = { Text(placeholder) },
-            shape = MaterialTheme.shapes.medium,
+        SongbookTextField(
+            state = textFieldState,
+            modifier = Modifier
+                .fillMaxWidth(),
+            textFieldStyle = defaultSongbookTextFieldStyle().copy(
+                placeholder = placeholder,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    autoCorrectEnabled = true,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next,
+                ),
+            ),
         )
     }
 }

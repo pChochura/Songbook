@@ -16,30 +16,32 @@ interface AuthRepository {
 }
 
 internal class AuthRepositoryImpl(
-    private val client: SupabaseClient,
+    client: SupabaseClient,
 ) : AuthRepository {
 
+    private val auth = client.auth
+
     override suspend fun initialize() {
-        client.auth.awaitInitialization()
+        auth.awaitInitialization()
     }
 
-    override fun isSignedIn(): Boolean = client.auth.currentUserOrNull() != null
+    override fun isSignedIn(): Boolean = auth.currentUserOrNull() != null
 
     override suspend fun signInWithGoogle(googleIdToken: String) {
-        client.auth.signInWith(IDToken) {
+        auth.signInWith(IDToken) {
             idToken = googleIdToken
             provider = Google
         }
     }
 
     override suspend fun signIn(email: String, password: String) {
-        client.auth.signInWith(Email) {
+        auth.signInWith(Email) {
             this.email = email
             this.password = password
         }
     }
 
     override suspend fun signInAnonymously() {
-        client.auth.signInAnonymously()
+        auth.signInAnonymously()
     }
 }

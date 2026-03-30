@@ -106,7 +106,7 @@ fun defaultSongbookTextFieldStyle() = SongbookTextFieldStyle(
     placeholder = "",
     textStyle = MaterialTheme.typography.bodyLarge,
     textColor = MaterialTheme.colorScheme.onSurface,
-    textAlign = TextAlign.Left,
+    textAlign = TextAlign.Start,
     lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = Int.MAX_VALUE),
     placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
     cursorColor = MaterialTheme.colorScheme.onSurfaceVariant,
