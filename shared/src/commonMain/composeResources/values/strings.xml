@@ -13,6 +13,8 @@
     <string name="common_increment">Increment</string>
     <string name="common_broadcast_to_team">Broadcast to the team</string>
     <string name="common_broadcast_to_team_description">Send a notification to all the team members that the currently playing song is ready.</string>
+    <string name="common_select_key_offset">Select a key offset</string>
+    <string name="common_select_key_offset_description">Change the key of all the chords in the song.</string>
 
     <!-- Library Screen -->
     <string name="library_header_title">Library</string>
@@ -56,6 +58,7 @@
     <string name="lyrics_section_label">Lyrics</string>
     <string name="lyrics_text_scale">Text scale\n %1$d%</string>
     <string name="lyrics_menu_text_scale">Text scale</string>
+    <string name="lyrics_menu_key_offset">Key offset</string>
     <string name="lyrics_menu_mode">Mode</string>
     <string name="lyrics_menu_edit">Edit</string>
     <string name="lyrics_menu_add_to_setlist">Add to setlist</string>

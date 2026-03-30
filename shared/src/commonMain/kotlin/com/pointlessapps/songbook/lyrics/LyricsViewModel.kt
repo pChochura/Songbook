@@ -28,6 +28,7 @@ internal data class LyricsState(
     val artist: String = "Unknown Artist",
     val sections: List<Section> = emptyList(),
     val textScale: Int = 100,
+    val keyOffset: Int = 0,
     val isOcrActive: Boolean = false,
     val mode: LyricsMode = LyricsMode.Inline,
     val isLoading: Boolean = false,
@@ -43,10 +44,6 @@ internal class LyricsViewModel(
 
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
-
-    fun onTextScaleChanged(textScale: Int) {
-        state = state.copy(textScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
-    }
 
     init {
         viewModelScope.launch {
@@ -70,6 +67,14 @@ internal class LyricsViewModel(
                 }
             }
         }
+    }
+
+    fun onTextScaleChanged(textScale: Int) {
+        state = state.copy(textScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
+    }
+
+    fun onKeyOffsetChanged(keyOffset: Int) {
+        state = state.copy(keyOffset = keyOffset)
     }
 
     fun onModeChanged(mode: LyricsMode) {

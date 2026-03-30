@@ -32,6 +32,7 @@ import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetA
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Broadcast
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Delete
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Edit
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.KeyOffset
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Mode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.ShowQueue
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.TextScale
@@ -39,6 +40,7 @@ import com.pointlessapps.songbook.lyrics.ui.components.SongHeader
 import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmBroadcastToTeamDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.lyrics.ui.components.dialogs.KeyOffsetDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ModeDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
 import com.pointlessapps.songbook.lyrics.ui.components.lyricsSection
@@ -138,6 +140,7 @@ internal fun LyricsScreen(
 
     var isModeDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isKeyOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isConfirmDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -150,6 +153,7 @@ internal fun LyricsScreen(
                 Edit -> TODO()
                 Mode -> isModeDialogVisible = true
                 TextScale -> isTextScaleDialogVisible = true
+                KeyOffset -> isKeyOffsetDialogVisible = true
                 AddToSetlist -> TODO()
                 ShowQueue -> TODO()
                 Broadcast -> isBroadcastToTeamDialogVisible = true
@@ -179,6 +183,17 @@ internal fun LyricsScreen(
                 isTextScaleDialogVisible = false
             },
             onDismissRequest = { isTextScaleDialogVisible = false },
+        )
+    }
+
+    if (isKeyOffsetDialogVisible) {
+        KeyOffsetDialog(
+            keyOffset = state.keyOffset,
+            onKeyOffsetSelected = {
+                viewModel.onKeyOffsetChanged(it)
+                isKeyOffsetDialogVisible = false
+            },
+            onDismissRequest = { isKeyOffsetDialogVisible = false },
         )
     }
 

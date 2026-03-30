@@ -21,6 +21,7 @@ import com.pointlessapps.songbook.shared.lyrics_menu_broadcast_to_team_descripti
 import com.pointlessapps.songbook.shared.lyrics_menu_delete
 import com.pointlessapps.songbook.shared.lyrics_menu_delete_description
 import com.pointlessapps.songbook.shared.lyrics_menu_edit
+import com.pointlessapps.songbook.shared.lyrics_menu_key_offset
 import com.pointlessapps.songbook.shared.lyrics_menu_mode
 import com.pointlessapps.songbook.shared.lyrics_menu_show_queue
 import com.pointlessapps.songbook.shared.lyrics_menu_text_scale
@@ -34,6 +35,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.IconAddFolder
 import com.pointlessapps.songbook.ui.theme.IconDelete
 import com.pointlessapps.songbook.ui.theme.IconEdit
+import com.pointlessapps.songbook.ui.theme.IconKey
 import com.pointlessapps.songbook.ui.theme.IconMode
 import com.pointlessapps.songbook.ui.theme.IconQueue
 import com.pointlessapps.songbook.ui.theme.IconTextSize
@@ -86,6 +88,14 @@ internal fun LyricsOptionsBottomSheet(
                     label = Res.string.lyrics_menu_text_scale,
                     description = "${state.textScale}%",
                     onClick = { onAction(LyricsOptionsBottomSheetAction.TextScale) },
+                ),
+                OptionsBottomSheetItem.new(
+                    icon = IconKey,
+                    label = Res.string.lyrics_menu_key_offset,
+                    description = "${if (state.keyOffset > 0) "+" else ""}${
+                        state.keyOffset
+                    }".takeIf { state.keyOffset != 0 },
+                    onClick = { onAction(LyricsOptionsBottomSheetAction.KeyOffset) },
                 ),
                 OptionsBottomSheetItem.Divider,
                 OptionsBottomSheetItem.new(
@@ -149,5 +159,5 @@ private fun LyricsOptionsBottomSheetHeader(title: String, artist: String) {
 }
 
 internal enum class LyricsOptionsBottomSheetAction {
-    Edit, Mode, TextScale, AddToSetlist, ShowQueue, Broadcast, Delete
+    Edit, Mode, TextScale, KeyOffset, AddToSetlist, ShowQueue, Broadcast, Delete
 }

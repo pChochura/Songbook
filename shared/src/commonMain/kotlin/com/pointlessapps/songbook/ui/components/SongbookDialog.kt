@@ -63,9 +63,7 @@ fun SongbookDialog(
                         bottom = MaterialTheme.spacing.huge,
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(
-                    MaterialTheme.spacing.huge,
-                ),
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.huge),
             ) {
                 SongbookText(
                     text = dialogStyle.label,
