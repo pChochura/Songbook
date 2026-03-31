@@ -55,9 +55,9 @@ fun SongbookButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val content = movableContentOf {
-            if (buttonStyle.iconRes != null) {
+            if (buttonStyle.icon != null) {
                 SongbookIcon(
-                    icon = buttonStyle.iconRes,
+                    icon = buttonStyle.icon,
                     modifier = Modifier
                         .size(ICON_SIZE)
                         .then(iconModifier),
@@ -114,7 +114,7 @@ fun defaultSongbookButtonStyle() = SongbookButtonStyle(
     containerColor = MaterialTheme.colorScheme.primary,
     disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
     shape = CircleShape,
-    iconRes = null,
+    icon = null,
     orientation = SongbookButtonOrientation.Horizontal,
     textStyle = defaultSongbookButtonTextStyle(),
     enabled = true,
@@ -130,7 +130,7 @@ data class SongbookButtonStyle(
     val containerColor: Color,
     val disabledContainerColor: Color,
     val shape: Shape,
-    val iconRes: DrawableResource?,
+    val icon: DrawableResource?,
     val orientation: SongbookButtonOrientation,
     val textStyle: SongbookTextStyle,
     val enabled: Boolean,

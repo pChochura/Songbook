@@ -5,8 +5,15 @@
     <string name="common_menu">Menu</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_tooltip">Tooltip</string>
+    <string name="common_scan_photo">Scan a photo</string>
+    <string name="common_from_gallery">From gallery</string>
+    <string name="common_take_photo">Take a photo</string>
     <string name="common_close_fullscreen">Close fullscreen</string>
     <string name="common_delete_the_song">Delete the song?</string>
+    <string name="common_import_song">Import the song</string>
+    <string name="common_discard_changes">Discard changes</string>
+    <string name="common_discard_changes_description">This action cannot be undone and will remove all the changes</string>
     <string name="common_delete_the_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
     <string name="common_select_display_mode">Select the display mode</string>
     <string name="common_select_text_scale">Select the text scale</string>
@@ -33,24 +40,21 @@
     <string name="library_song_bpm">%1$d BPM</string>
     <string name="library_add_to_favourites">Add to favourites</string>
 
-    <!-- Import Song Dialog -->
-    <string name="import_dialog_header_title">Add New Song</string>
-    <string name="import_dialog_header_subtitle">Import lyrics to your library</string>
-    <string name="import_dialog_song_title_label">Song Title</string>
-    <string name="import_dialog_song_title_placeholder">Title</string>
-    <string name="import_dialog_artist_label">Artist</string>
-    <string name="import_dialog_artist_placeholder">Artist</string>
-    <string name="import_dialog_lyrics_label">Song Lyrics</string>
-    <string name="import_dialog_ocr_button">OCR Import</string>
-    <string name="import_dialog_ocr_subtitle">Capture or upload a photo to automatically extract lyrics and chords.</string>
-    <string name="import_dialog_camera_button">Take Photo</string>
-    <string name="import_dialog_gallery_button">From Gallery</string>
-    <string name="import_dialog_song_identity">Song Identity</string>
-    <string name="import_dialog_lyrics_editor">Lyrics &amp; Chords Editor</string>
-    <string name="import_dialog_lyrics_placeholder">Enter lyrics here…</string>
-    <string name="import_dialog_lyrics_tip">Tip: Use [Chord] for inline chords or line breaks to separate verses.</string>
-    <string name="import_dialog_cancel">Cancel</string>
-    <string name="import_dialog_confirm">Import Song</string>
+    <!-- Import Song Screen -->
+    <string name="import_header_title">Add New Song</string>
+    <string name="import_song_title_label">Song Title</string>
+    <string name="import_song_title_placeholder">Title</string>
+    <string name="import_artist_label">Artist</string>
+    <string name="import_artist_placeholder">Artist</string>
+    <string name="import_lyrics_label">Song Lyrics</string>
+    <string name="import_lyrics_placeholder">Lyrics of the song...</string>
+    <string name="import_lyrics_tip">Tip: Use [Chord] for inline chords or naming the sections.</string>
+    <string name="import_menu_rescan">Rescan the photo</string>
+    <string name="import_menu_rescan_description">Import an image from gallery or capture a photo again</string>
+    <string name="import_menu_add_to_setlists">Add to setlists</string>
+    <string name="import_menu_add_to_setlists_description">Select setlists to add the song to</string>
+    <string name="import_menu_preview">Preview</string>
+    <string name="import_menu_preview_description">Show the preview of the song with chords being correctly displayed</string>
 
     <!-- Lyrics Screen -->
     <string name="lyrics_section_label">Lyrics</string>

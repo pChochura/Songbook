@@ -69,7 +69,7 @@ fun SongbookTextField(
         onKeyboardAction = { onImeAction?.invoke() },
         inputTransformation = textFieldStyle.inputTransformation,
         outputTransformation = textFieldStyle.outputTransformation,
-        textStyle = textFieldStyle.textStyle.copy(
+        textStyle = textFieldStyle.typography.copy(
             color = textFieldStyle.textColor,
             textAlign = textFieldStyle.textAlign,
         ),
@@ -83,7 +83,7 @@ fun SongbookTextField(
                     modifier = Modifier.fillMaxWidth(),
                     text = textFieldStyle.placeholder,
                     textStyle = defaultSongbookTextStyle().copy(
-                        typography = textFieldStyle.textStyle,
+                        typography = textFieldStyle.typography,
                         textColor = textFieldStyle.placeholderColor,
                         textAlign = textFieldStyle.textAlign,
                         maxLines = when (val limits = textFieldStyle.lineLimits) {
@@ -103,8 +103,10 @@ fun defaultSongbookTextFieldStyle() = SongbookTextFieldStyle(
     keyboardOptions = KeyboardOptions(
         capitalization = KeyboardCapitalization.Sentences,
     ),
+    inputTransformation = null,
+    outputTransformation = null,
     placeholder = "",
-    textStyle = MaterialTheme.typography.bodyLarge,
+    typography = MaterialTheme.typography.bodyLarge,
     textColor = MaterialTheme.colorScheme.onSurface,
     textAlign = TextAlign.Start,
     lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = Int.MAX_VALUE),
@@ -115,10 +117,10 @@ fun defaultSongbookTextFieldStyle() = SongbookTextFieldStyle(
 
 data class SongbookTextFieldStyle(
     val keyboardOptions: KeyboardOptions,
-    val inputTransformation: InputTransformation? = null,
-    val outputTransformation: OutputTransformation? = null,
+    val inputTransformation: InputTransformation?,
+    val outputTransformation: OutputTransformation?,
     val placeholder: String,
-    val textStyle: TextStyle,
+    val typography: TextStyle,
     val textColor: Color,
     val textAlign: TextAlign,
     val lineLimits: TextFieldLineLimits,

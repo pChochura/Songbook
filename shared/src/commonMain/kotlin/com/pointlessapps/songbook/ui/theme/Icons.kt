@@ -11,6 +11,7 @@ import com.pointlessapps.songbook.shared.ic_bookmark
 import com.pointlessapps.songbook.shared.ic_bookmark_empty
 import com.pointlessapps.songbook.shared.ic_bookmarks
 import com.pointlessapps.songbook.shared.ic_calendar
+import com.pointlessapps.songbook.shared.ic_camera
 import com.pointlessapps.songbook.shared.ic_category
 import com.pointlessapps.songbook.shared.ic_close
 import com.pointlessapps.songbook.shared.ic_color_palette
@@ -28,6 +29,7 @@ import com.pointlessapps.songbook.shared.ic_fold
 import com.pointlessapps.songbook.shared.ic_folder
 import com.pointlessapps.songbook.shared.ic_fullscreen
 import com.pointlessapps.songbook.shared.ic_help
+import com.pointlessapps.songbook.shared.ic_image
 import com.pointlessapps.songbook.shared.ic_improve
 import com.pointlessapps.songbook.shared.ic_key
 import com.pointlessapps.songbook.shared.ic_minus
@@ -41,6 +43,7 @@ import com.pointlessapps.songbook.shared.ic_play
 import com.pointlessapps.songbook.shared.ic_plus
 import com.pointlessapps.songbook.shared.ic_queue
 import com.pointlessapps.songbook.shared.ic_restore
+import com.pointlessapps.songbook.shared.ic_scan
 import com.pointlessapps.songbook.shared.ic_search
 import com.pointlessapps.songbook.shared.ic_settings
 import com.pointlessapps.songbook.shared.ic_share
@@ -110,3 +113,6 @@ val IconQueue = Res.drawable.ic_queue
 val IconVoice = Res.drawable.ic_voice
 val IconKey = Res.drawable.ic_key
 val IconFullscreen = Res.drawable.ic_fullscreen
+val IconScan = Res.drawable.ic_scan
+val IconImage = Res.drawable.ic_image
+val IconCamera = Res.drawable.ic_camera

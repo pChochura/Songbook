@@ -28,6 +28,7 @@ internal val libraryModule = module {
     viewModel {
         ImportSongViewModel(
             agent = get(named("Gemini")),
+            setlistRepository = get(),
             songRepository = get(),
         )
     }

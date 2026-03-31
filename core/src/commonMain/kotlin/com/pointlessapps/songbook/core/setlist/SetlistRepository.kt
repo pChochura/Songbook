@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onCompletion
+import kotlin.random.Random
 
 interface SetlistRepository {
-    suspend fun getAllSetlists(): Flow<List<Setlist>>
-    suspend fun getSetlistById(id: Long): Flow<Setlist?>
+    fun getAllSetlists(): Flow<List<Setlist>>
+    fun getSetlistById(id: Long): Flow<Setlist?>
 }
 
 @OptIn(SupabaseExperimental::class)
@@ -31,17 +31,17 @@ internal class SetlistRepositoryImpl(
     private val realtime = supabase.realtime
     private val table = supabase.from("setlists")
 
-    override suspend fun getAllSetlists(): Flow<List<Setlist>> {
-        val channel = realtime.channel("setlists_all")
-        return flow {
-            val setlistChanges = channel.postgresChangeFlow<PostgresAction>("public") {
-                table = "setlists"
-            }
-            val setlistSongsChanges = channel.postgresChangeFlow<PostgresAction>("public") {
-                table = "setlist_songs"
-            }
-            channel.subscribe()
+    override fun getAllSetlists(): Flow<List<Setlist>> = flow {
+        val channel = realtime.channel("setlists_all_${Random.nextLong()}")
+        val setlistChanges = channel.postgresChangeFlow<PostgresAction>("public") {
+            table = "setlists"
+        }
+        val setlistSongsChanges = channel.postgresChangeFlow<PostgresAction>("public") {
+            table = "setlist_songs"
+        }
+        channel.subscribe()
 
+        try {
             emit(fetchSetlistsWithSongs())
             merge(
                 setlistSongsChanges,
@@ -49,28 +49,28 @@ internal class SetlistRepositoryImpl(
             ).collect {
                 emit(fetchSetlistsWithSongs())
             }
-        }.onCompletion {
+        } finally {
             realtime.removeChannel(channel)
-        }.flowOn(Dispatchers.IO)
-    }
+        }
+    }.flowOn(Dispatchers.IO)
 
-    override suspend fun getSetlistById(id: Long): Flow<Setlist?> {
-        val channel = realtime.channel("setlist_$id")
-        return flow {
-            val changes = channel.postgresChangeFlow<PostgresAction>("public") {
-                table = "setlists"
-                filter("id", FilterOperator.EQ, id)
-            }
-            channel.subscribe()
+    override fun getSetlistById(id: Long): Flow<Setlist?> = flow {
+        val channel = realtime.channel("setlist_${id}_${Random.nextLong()}")
+        val changes = channel.postgresChangeFlow<PostgresAction>("public") {
+            table = "setlists"
+            filter("id", FilterOperator.EQ, id)
+        }
+        channel.subscribe()
 
+        try {
             emit(fetchSetlistByIdWithSongs(id))
             changes.collect {
                 emit(fetchSetlistByIdWithSongs(id))
             }
-        }.onCompletion {
+        } finally {
             realtime.removeChannel(channel)
-        }.flowOn(Dispatchers.IO)
-    }
+        }
+    }.flowOn(Dispatchers.IO)
 
     private suspend fun fetchSetlistsWithSongs(): List<Setlist> = table.select(
         Columns.raw("id, name, songs(*)"),

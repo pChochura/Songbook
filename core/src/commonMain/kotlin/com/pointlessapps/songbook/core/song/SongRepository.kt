@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 interface SongRepository {
-    suspend fun getAllSongs(): Flow<List<Song>>
-    suspend fun getSongById(id: Long): Flow<Song?>
+    fun getAllSongs(): Flow<List<Song>>
+    fun getSongById(id: Long): Flow<Song?>
     suspend fun saveSong(newSong: NewSong)
     suspend fun deleteSong(id: Long)
 }
@@ -27,10 +27,10 @@ internal class SongRepositoryImpl(
 
     private val table = supabase.from("songs")
 
-    override suspend fun getAllSongs() = table.selectAsFlow(Song::id)
+    override fun getAllSongs() = table.selectAsFlow(Song::id)
         .flowOn(Dispatchers.IO)
 
-    override suspend fun getSongById(id: Long) = table.selectSingleValueAsFlow(Song::id) {
+    override fun getSongById(id: Long) = table.selectSingleValueAsFlow(Song::id) {
         Song::id eq id
     }.flowOn(Dispatchers.IO)
 

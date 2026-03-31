@@ -37,6 +37,13 @@ internal sealed interface Route : NavKey {
 
     @Serializable
     data object ImportSong : Route
+
+    @Serializable
+    data class PreviewSong(
+        val title: String,
+        val artist: String,
+        val lyrics: String,
+    ) : Route
 }
 
 internal val navigationConfig = SavedStateConfiguration {
@@ -98,6 +105,10 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
 
     fun navigateToImportSong() {
         backStack.add(Route.ImportSong)
+    }
+
+    fun navigateToPreview(title: String, artist: String, lyrics: String) {
+        backStack.add(Route.PreviewSong(title, artist, lyrics))
     }
 }
 

@@ -52,7 +52,7 @@ data class Section(
     val lines: List<Line>
         get() {
             var currentPos = 0
-            return lyrics.split('\n').map { lineText ->
+            return lyrics.lines().map { lineText ->
                 val lineChords = chords
                     .filter { it.position in currentPos..(currentPos + lineText.length) }
                     .map { it.copy(position = it.position - currentPos) }

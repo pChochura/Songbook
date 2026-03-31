@@ -8,9 +8,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
+import com.pointlessapps.songbook.core.setlist.SetlistRepository
+import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Chord
-import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.model.SongData
 import kotlinx.coroutines.channels.Channel
@@ -18,18 +19,22 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 internal sealed interface ImportSongEvent {
-    data object Back : ImportSongEvent
     data class NavigateToLyrics(val songId: Long) : ImportSongEvent
 }
 
 internal data class ImportSongState(
     val sections: List<Section> = emptyList(),
+    val allSetlists: List<Setlist> = emptyList(),
+    val selectedSetlists: List<Setlist> = emptyList(),
+    val canImport: Boolean = false,
     val isLoading: Boolean = false,
-    val showCamera: Boolean = false,
-)
+) {
+    val setlistsSelection = allSetlists.associateWith { it in selectedSetlists }
+}
 
 internal class ImportSongViewModel(
     private val agent: Agent,
+    private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
 ) : ViewModel() {
 
@@ -43,13 +48,23 @@ internal class ImportSongViewModel(
     private val eventChannel = Channel<ImportSongEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    fun onCameraRequested() {
-        state = state.copy(showCamera = true)
+    init {
+        viewModelScope.launch {
+            state = state.copy(isLoading = true)
+            setlistRepository.getAllSetlists()
+                .collect {
+                    state = state.copy(
+                        allSetlists = it,
+                        isLoading = false,
+                    )
+                }
+        }
     }
 
-    fun onCameraCaptureDone(bytes: ByteArray?) {
-        state = state.copy(showCamera = false)
-        onImageCaptured(bytes)
+    fun onSetlistsSelected(setlists: List<Setlist>) {
+        state = state.copy(
+            selectedSetlists = setlists,
+        )
     }
 
     fun onImageCaptured(bytes: ByteArray?) {
@@ -75,24 +90,6 @@ internal class ImportSongViewModel(
                     },
                 )
             }
-        }
-    }
-
-    fun onManualInputConfirmed() {
-        viewModelScope.launch {
-            songRepository.saveSong(
-                NewSong(
-                    title = titleTextFieldState.text.toString(),
-                    artist = artistTextFieldState.text.toString(),
-                    sections = state.sections,
-                ),
-            )
-        }
-    }
-
-    fun onBack() {
-        viewModelScope.launch {
-            eventChannel.send(ImportSongEvent.Back)
         }
     }
 }
