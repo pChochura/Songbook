@@ -54,13 +54,97 @@ internal class LyricsViewModel(
                         artist = song.artist,
                         sections = listOf(
                             Section(
-                                name = "",
-                                lyrics = "A wczora z wieczora\nA wczora z wieczora",
+                                name = "Verse 1",
+                                lyrics = """
+                                    A wczora z wieczora
+                                    A wczora z wieczora
+                                    Z niebieskiego dwora
+                                    Z niebieskiego dwora
+                                """.trimIndent(),
                                 chords = listOf(
-                                    Chord("B3", 5),
-                                    Chord("Bm", 23),
-                                    Chord("A", 35),
+                                    Chord("C", 2),
+                                    Chord("G", 9),
+                                    Chord("C", 15),
+
+                                    Chord("A", 29),
+
+                                    Chord("d", 44),
+                                    Chord("G", 52),
+
+                                    Chord("C", 65),
+                                    Chord("G", 71),
+                                    Chord("C", 76),
                                 ),
+                            ),
+                            Section(
+                                name = "Verse 2",
+                                lyrics = """
+                                    Przyszła nam nowina
+                                    Przyszła nam nowina
+                                    Panna rodzi Syna
+                                    Panna rodzi Syna
+                                """.trimIndent(),
+                                chords = listOf(),
+                            ),
+                            Section(
+                                name = "Verse 3",
+                                lyrics = """
+                                    Boga prawdziwego
+                                    Boga prawdziwego
+                                    Nieogarnionego
+                                    Nieogarnionego
+                                """.trimIndent(),
+                                chords = listOf(),
+                            ),
+                            Section(
+                                name = "Verse 4",
+                                lyrics = """
+                                    Za wyrokiem Boskim
+                                    Za wyrokiem Boskim
+                                    W Betlejem żydowskim
+                                    W Betlejem żydowskim
+                                """.trimIndent(),
+                                chords = listOf(),
+                            ),
+                            Section(
+                                name = "Verse 5",
+                                lyrics = """
+                                    Pastuszkowie mali
+                                    Pastuszkowie mali
+                                    W polu wtenczas spali
+                                    W polu wtenczas spali
+                                """.trimIndent(),
+                                chords = listOf(),
+                            ),
+                            Section(
+                                name = "Verse 6",
+                                lyrics = """
+                                    Gdy anioł z północy
+                                    Gdy anioł z północy
+                                    Światłość z nieba toczy
+                                    Światłość z nieba toczy
+                                """.trimIndent(),
+                                chords = listOf(),
+                            ),
+                            Section(
+                                name = "Verse 7",
+                                lyrics = """
+                                    Chwałę oznajmując
+                                    Chwałę oznajmując
+                                    Szopę pokazując
+                                    Szopę pokazując
+                                """.trimIndent(),
+                                chords = listOf(),
+                            ),
+                            Section(
+                                name = "Verse 8",
+                                lyrics = """
+                                    Gdzie Panna z Dzieciątkiem
+                                    Gdzie Panna z Dzieciątkiem
+                                    Z wolem i osłątkiem
+                                    Z wolem i osłątkiem
+                                """.trimIndent(),
+                                chords = listOf(),
                             ),
                         ),
                     )

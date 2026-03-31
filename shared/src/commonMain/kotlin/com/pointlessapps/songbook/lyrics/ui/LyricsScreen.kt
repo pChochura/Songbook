@@ -54,18 +54,14 @@ import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ModeDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
 import com.pointlessapps.songbook.lyrics.ui.components.lyricsSection
 import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_back
 import com.pointlessapps.songbook.shared.common_close_fullscreen
-import com.pointlessapps.songbook.shared.common_menu
 import com.pointlessapps.songbook.shared.lyrics_section_label
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
-import com.pointlessapps.songbook.ui.theme.IconArrowLeft
 import com.pointlessapps.songbook.ui.theme.IconClose
-import com.pointlessapps.songbook.ui.theme.IconMoveHandle
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -94,10 +90,8 @@ internal fun LyricsScreen(
     NavigationBackHandler(
         state = rememberNavigationEventState(
             currentInfo = NavigationEventInfo.None,
-            backInfo = listOf(NavigationEventInfo.None),
         ),
         isBackEnabled = !isTopBarVisible,
-        onBackCancelled = {},
         onBackCompleted = { isTopBarVisible = true },
     )
 
@@ -106,14 +100,10 @@ internal fun LyricsScreen(
             AnimatedContent(isTopBarVisible) {
                 if (it) {
                     TopBar(
-                        leftButton = TopBarButton(
-                            icon = IconArrowLeft,
-                            tooltip = Res.string.common_back,
+                        leftButton = TopBarButton.back(
                             onClick = { navigator.navigateBack() },
                         ),
-                        rightButton = TopBarButton(
-                            icon = IconMoveHandle,
-                            tooltip = Res.string.common_menu,
+                        rightButton = TopBarButton.menu(
                             onClick = { isBottomSheetVisible = true },
                         ),
                         title = Res.string.lyrics_section_label,

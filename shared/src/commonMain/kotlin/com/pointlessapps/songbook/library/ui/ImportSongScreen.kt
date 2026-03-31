@@ -41,6 +41,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.library.ImportSongEvent
 import com.pointlessapps.songbook.library.ImportSongViewModel
@@ -60,6 +63,10 @@ import com.pointlessapps.songbook.shared.import_dialog_ocr_subtitle
 import com.pointlessapps.songbook.shared.import_dialog_song_identity
 import com.pointlessapps.songbook.shared.import_dialog_song_title_label
 import com.pointlessapps.songbook.shared.import_dialog_song_title_placeholder
+import com.pointlessapps.songbook.shared.lyrics_section_label
+import com.pointlessapps.songbook.ui.TopBar
+import com.pointlessapps.songbook.ui.TopBarButton
+import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookTextField
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle
 import com.pointlessapps.songbook.ui.theme.spacing
@@ -90,6 +97,38 @@ internal fun ImportSongScreen(
             ImportSongEvent.Back -> navigator.navigateToLibrary()
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
         }
+    }
+
+    NavigationBackHandler(
+        state = rememberNavigationEventState(
+            currentInfo = NavigationEventInfo.None,
+        ),
+        isBackEnabled = state.showCamera,
+        onBackCompleted = { viewModel.onCameraCaptureDone(null) },
+    )
+
+    SongbookScaffoldLayout(
+        topBar = @Composable {
+            TopBar(
+                leftButton = TopBarButton.back(
+                    onClick = { navigator.navigateBack() },
+                ),
+                rightButton = null,
+                title = Res.string.lyrics_section_label,
+            )
+        },
+    ) {
+
+    }
+
+    if (state.showCamera) {
+        PeekabooCamera(
+            state = rememberPeekabooCameraState(
+                initialCameraMode = CameraMode.Back,
+                onCapture = { viewModel.onCameraCaptureDone(it) },
+            ),
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 
     Scaffold(
@@ -246,16 +285,6 @@ internal fun ImportSongScreen(
                 }
             }
         }
-    }
-
-    if (state.showCamera) {
-        PeekabooCamera(
-            state = rememberPeekabooCameraState(
-                initialCameraMode = CameraMode.Back,
-                onCapture = { viewModel.onCameraCaptureDone(it) },
-            ),
-            modifier = Modifier.fillMaxSize(),
-        )
     }
 }
 

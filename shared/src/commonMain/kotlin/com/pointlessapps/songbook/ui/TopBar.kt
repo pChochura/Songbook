@@ -16,11 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_back
+import com.pointlessapps.songbook.shared.common_menu
 import com.pointlessapps.songbook.ui.components.Position
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.theme.IconArrowLeft
+import com.pointlessapps.songbook.ui.theme.IconMoveHandle
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -96,6 +101,20 @@ internal data class TopBarButton(
     val icon: DrawableResource,
     val tooltip: StringResource,
     val onClick: () -> Unit,
-)
+) {
+    companion object {
+        fun back(onClick: () -> Unit) = TopBarButton(
+            icon = IconArrowLeft,
+            tooltip = Res.string.common_back,
+            onClick = onClick,
+        )
+
+        fun menu(onClick: () -> Unit) = TopBarButton(
+            icon = IconMoveHandle,
+            tooltip = Res.string.common_menu,
+            onClick = onClick,
+        )
+    }
+}
 
 private val TOP_BAR_ICON_SIZE = 24.dp

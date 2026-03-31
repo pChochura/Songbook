@@ -36,7 +36,6 @@
     <!-- Import Song Dialog -->
     <string name="import_dialog_header_title">Add New Song</string>
     <string name="import_dialog_header_subtitle">Import lyrics to your library</string>
-    <string name="import_dialog_close">Close</string>
     <string name="import_dialog_song_title_label">Song Title</string>
     <string name="import_dialog_song_title_placeholder">Title</string>
     <string name="import_dialog_artist_label">Artist</string>
@@ -54,8 +53,6 @@
     <string name="import_dialog_confirm">Import Song</string>
 
     <!-- Lyrics Screen -->
-    <string name="lyrics_no_song_message">No song captured yet</string>
-    <string name="lyrics_capture_ocr_button">Capture Song via OCR</string>
     <string name="lyrics_section_label">Lyrics</string>
     <string name="lyrics_text_scale">Text scale\n %1$d%</string>
     <string name="lyrics_menu_text_scale">Text scale</string>

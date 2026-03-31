@@ -53,8 +53,8 @@ internal class ImportSongViewModel(
     }
 
     fun onImageCaptured(bytes: ByteArray?) {
-        viewModelScope.launch {
-            bytes?.let {
+        bytes?.let {
+            viewModelScope.launch {
                 val result = agent.extractSongData(it)
                 val data = result?.firstOrNull() ?: return@launch
                 val sectionTypeCount = mutableMapOf<SongData.Section.Type, Int>()
