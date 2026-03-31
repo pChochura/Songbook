@@ -5,6 +5,9 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
 interface AuthRepository {
     suspend fun initialize()
@@ -27,21 +30,21 @@ internal class AuthRepositoryImpl(
 
     override fun isSignedIn(): Boolean = auth.currentUserOrNull() != null
 
-    override suspend fun signInWithGoogle(googleIdToken: String) {
+    override suspend fun signInWithGoogle(googleIdToken: String) = withContext(Dispatchers.IO) {
         auth.signInWith(IDToken) {
             idToken = googleIdToken
             provider = Google
         }
     }
 
-    override suspend fun signIn(email: String, password: String) {
+    override suspend fun signIn(email: String, password: String) = withContext(Dispatchers.IO) {
         auth.signInWith(Email) {
             this.email = email
             this.password = password
         }
     }
 
-    override suspend fun signInAnonymously() {
+    override suspend fun signInAnonymously() = withContext(Dispatchers.IO) {
         auth.signInAnonymously()
     }
 }

@@ -10,6 +10,7 @@ import io.github.jan.supabase.realtime.selectSingleValueAsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 interface SongRepository {
@@ -26,15 +27,12 @@ internal class SongRepositoryImpl(
 
     private val table = supabase.from("songs")
 
-    override suspend fun getAllSongs() = withContext(Dispatchers.IO) {
-        table.selectAsFlow(Song::id)
-    }
+    override suspend fun getAllSongs() = table.selectAsFlow(Song::id)
+        .flowOn(Dispatchers.IO)
 
-    override suspend fun getSongById(id: Long) = withContext(Dispatchers.IO) {
-        table.selectSingleValueAsFlow(Song::id) {
-            Song::id eq id
-        }
-    }
+    override suspend fun getSongById(id: Long) = table.selectSingleValueAsFlow(Song::id) {
+        Song::id eq id
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun saveSong(newSong: NewSong) {
         withContext(Dispatchers.IO) {
@@ -43,6 +41,7 @@ internal class SongRepositoryImpl(
     }
 
     override suspend fun deleteSong(id: Long) {
+        // TODO mark as deleted instead of removing
         withContext(Dispatchers.IO) {
             table.delete { filter { Song::id eq id } }
         }
