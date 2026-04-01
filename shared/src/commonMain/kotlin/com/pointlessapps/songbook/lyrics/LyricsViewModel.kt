@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.core.model.SyncStatus
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -32,6 +33,7 @@ internal data class LyricsState(
     val isOcrActive: Boolean = false,
     val mode: LyricsMode = LyricsMode.Inline,
     val isLoading: Boolean = false,
+    val syncStatus: SyncStatus = SyncStatus.LOCAL,
 )
 
 internal class LyricsViewModel(
@@ -47,11 +49,12 @@ internal class LyricsViewModel(
 
     init {
         viewModelScope.launch {
-            songRepository.getSongById(songId).collect {
-                it?.let { song ->
+            songRepository.getSongById(songId).collect { stateResult ->
+                stateResult.data?.let { song ->
                     state = state.copy(
                         title = song.title,
                         artist = song.artist,
+                        syncStatus = stateResult.status,
                         sections = listOf(
                             Section(
                                 name = "Verse 1",

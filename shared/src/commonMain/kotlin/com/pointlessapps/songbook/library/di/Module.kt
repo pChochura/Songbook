@@ -5,6 +5,7 @@ import com.pointlessapps.songbook.library.ImportSongViewModel
 import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.library.ui.ImportSongScreen
 import com.pointlessapps.songbook.library.ui.LibraryScreen
+import com.pointlessapps.songbook.library.ui.PreviewSongScreen
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.dsl.viewModel
@@ -42,6 +43,14 @@ internal val libraryModule = module {
     navigation<Route.ImportSong> {
         ImportSongScreen(
             viewModel = koinViewModel(),
+        )
+    }
+
+    navigation<Route.PreviewSong> {
+        PreviewSongScreen(
+            title = it.title,
+            artist = it.artist,
+            sections = it.sections,
         )
     }
 }

@@ -21,6 +21,8 @@ androidx-activity = "1.13.0"
 androidx-glance = "1.1.1"
 androidx-lifecycle = "2.10.0"
 androidx-navigation3 = "1.0.0-alpha06"
+androidx-room = "2.8.4"
+androidx-sqlite = "2.6.2"
 
 # Koin
 koin = "4.2.0"
@@ -33,6 +35,7 @@ supabase = "3.4.1"
 
 # Misc
 peekaboo = "0.5.2"
+ksp = "2.3.6"
 
 [libraries]
 # AndroidX
@@ -76,6 +79,11 @@ supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref
 supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
 supabase-realtime = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "supabase" }
 
+# Room
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "androidx-sqlite" }
+
 # Misc
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
@@ -94,3 +102,7 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 # Compose
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+
+# Room
+room = { id = "androidx.room", version.ref = "androidx-room" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

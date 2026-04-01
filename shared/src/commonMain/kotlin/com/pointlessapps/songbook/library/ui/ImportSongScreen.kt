@@ -29,6 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.library.ImportSongEvent
 import com.pointlessapps.songbook.library.ImportSongViewModel
@@ -83,6 +86,11 @@ internal fun ImportSongScreen(
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
         }
     }
+
+    NavigationBackHandler(
+        state = rememberNavigationEventState(NavigationEventInfo.None),
+        onBackCompleted = { isDiscardChangesDialogVisible = true },
+    )
 
     SongbookScaffoldLayout(
         topBar = @Composable {
@@ -210,12 +218,15 @@ internal fun ImportSongScreen(
         onAction = {
             when (it) {
                 AddToSetlists -> isSetlistsDialogVisible = true
-                Rescan -> isRescanDialogVisible = true
+                Rescan -> {
+                    isRescanDialogVisible = true
+                    isBottomSheetVisible = false
+                }
                 Preview -> {
                     navigator.navigateToPreview(
                         title = viewModel.titleTextFieldState.text.toString(),
                         artist = viewModel.artistTextFieldState.text.toString(),
-                        lyrics = viewModel.lyricsTextFieldState.text.toString(),
+                        sections = viewModel.computeSections(),
                     )
                     isBottomSheetVisible = false
                 }

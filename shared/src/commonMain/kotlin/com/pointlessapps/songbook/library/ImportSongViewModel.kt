@@ -8,8 +8,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
+import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
+import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
@@ -28,6 +30,7 @@ internal data class ImportSongState(
     val selectedSetlists: List<Setlist> = emptyList(),
     val canImport: Boolean = false,
     val isLoading: Boolean = false,
+    val syncStatus: SyncStatus = SyncStatus.LOCAL,
 ) {
     val setlistsSelection = allSetlists.associateWith { it in selectedSetlists }
 }
@@ -54,7 +57,8 @@ internal class ImportSongViewModel(
             setlistRepository.getAllSetlists()
                 .collect {
                     state = state.copy(
-                        allSetlists = it,
+                        allSetlists = it.data,
+                        syncStatus = it.status,
                         isLoading = false,
                     )
                 }
@@ -91,5 +95,9 @@ internal class ImportSongViewModel(
                 )
             }
         }
+    }
+
+    fun computeSections(): List<Section> {
+        return LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
     }
 }

@@ -9,15 +9,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_unknown
+import com.pointlessapps.songbook.shared.common_unnamed
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun SongHeader(
     title: String,
     artist: String,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -28,7 +32,7 @@ internal fun SongHeader(
         ),
     ) {
         SongbookText(
-            text = title,
+            text = title.takeIf { it.isNotEmpty() } ?: stringResource(Res.string.common_unnamed),
             textStyle = defaultSongbookTextStyle().copy(
                 textColor = MaterialTheme.colorScheme.onSurface,
                 typography = MaterialTheme.typography.headlineLarge.copy(
@@ -37,7 +41,7 @@ internal fun SongHeader(
             ),
         )
         SongbookText(
-            text = artist,
+            text = artist.takeIf { it.isNotEmpty() } ?: stringResource(Res.string.common_unknown),
             textStyle = defaultSongbookTextStyle().copy(
                 textColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 typography = MaterialTheme.typography.labelMedium,

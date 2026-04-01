@@ -4,9 +4,19 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinMultiplatformLibrary)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.room)
+    alias(libs.plugins.ksp)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 kotlin {
+    sourceSets.configureEach {
+        languageSettings.optIn("kotlin.expectactual.ExperimentalExpectActualAnnotations")
+    }
+
     android {
         namespace = "com.pointlessapps.songbook.core"
         compileSdk = libs.versions.sdk.compile.get().toInt()
@@ -40,6 +50,9 @@ kotlin {
             implementation(libs.supabase.auth)
             implementation(libs.supabase.postgres)
             implementation(libs.supabase.realtime)
+
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
         }
 
         androidMain.dependencies {
@@ -50,4 +63,11 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
     }
+}
+
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
 }

@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.core.di
 
 import com.pointlessapps.songbook.core.auth.di.authModule
+import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.setlist.di.setlistModule
 import com.pointlessapps.songbook.core.song.di.songModule
 import io.github.jan.supabase.SupabaseClient
@@ -26,6 +27,9 @@ val coreModule = module {
             install(Auth)
         }
     }
+
+    single { get<AppDatabase>().songDao() }
+    single { get<AppDatabase>().setlistDao() }
 
     includes(authModule)
     includes(songModule)

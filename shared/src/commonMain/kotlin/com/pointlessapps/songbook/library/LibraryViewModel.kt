@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.auth.AuthRepository
+import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
@@ -26,6 +27,7 @@ internal data class LibraryState(
     val setlists: List<Setlist> = emptyList(),
     val songs: List<Song> = emptyList(),
     val isLoading: Boolean = false,
+    val syncStatus: SyncStatus = SyncStatus.LOCAL,
 )
 
 internal class LibraryViewModel(
@@ -55,14 +57,18 @@ internal class LibraryViewModel(
             combine(
                 setlistRepository.getAllSetlists(),
                 songRepository.getAllSongs(),
-            ) { setlists, songs -> setlists to songs }
-                .collect { (setlists, songs) ->
-                    state = state.copy(
-                        setlists = setlists,
-                        songs = songs,
-                        isLoading = false,
-                    )
-                }
+            ) { setlistsState, songsState ->
+                state = state.copy(
+                    setlists = setlistsState.data,
+                    songs = songsState.data,
+                    syncStatus = if (setlistsState.status == SyncStatus.SYNCED && songsState.status == SyncStatus.SYNCED) {
+                        SyncStatus.SYNCED
+                    } else {
+                        SyncStatus.LOCAL
+                    },
+                    isLoading = false,
+                )
+            }.collect {}
         }
     }
 

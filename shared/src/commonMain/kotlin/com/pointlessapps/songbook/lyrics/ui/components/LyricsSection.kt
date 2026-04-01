@@ -1,16 +1,19 @@
 package com.pointlessapps.songbook.lyrics.ui.components
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
@@ -25,88 +28,97 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing
 
-internal fun LazyListScope.lyricsSection(
-    section: Section,
+@Composable
+internal fun LyricsSections(
+    sections: List<Section>,
     textScale: Int,
     mode: LyricsMode,
+    modifier: Modifier = Modifier,
 ) {
     val textScaleFloat = textScale / 100f
 
-    if (section.name.isNotEmpty()) {
-        item {
-            SongbookText(
-                text = section.name,
-                textStyle = defaultSongbookTextStyle().copy(
-                    textColor = MaterialTheme.colorScheme.primary,
-                    typography = MaterialTheme.typography.labelSmall,
-                ),
-            )
-        }
-    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .then(modifier),
+        verticalArrangement = Arrangement.spacedBy(
+            space = MaterialTheme.spacing.small,
+            alignment = Alignment.Top,
+        ),
+    ) {
+        sections.forEach { section ->
+            if (section.name.isNotEmpty()) {
+                SongbookText(
+                    text = section.name,
+                    textStyle = defaultSongbookTextStyle().copy(
+                        textColor = MaterialTheme.colorScheme.primary,
+                        typography = MaterialTheme.typography.labelSmall,
+                    ),
+                )
+            }
 
-    if (mode == LyricsMode.SideBySide) {
-        item {
-            val lineTextStyle = defaultSongbookTextStyle().copy(
-                softWrap = false,
-                textColor = MaterialTheme.colorScheme.onSurface,
-                typography = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
-                ),
-            )
+            if (mode == LyricsMode.SideBySide) {
+                val lineTextStyle = defaultSongbookTextStyle().copy(
+                    softWrap = false,
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    typography = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
+                    ),
+                )
 
-            val chordChipStyle = defaultSongbookChipStyle().copy(
-                containerColor = MaterialTheme.colorScheme.primary,
-                labelColor = MaterialTheme.colorScheme.onPrimary,
-                outlineColor = Color.Transparent,
-                labelTypography = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
-                ),
-            )
+                val chordChipStyle = defaultSongbookChipStyle().copy(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                    outlineColor = Color.Transparent,
+                    labelTypography = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
+                    ),
+                )
 
-            SideBySideLyricsSection(
-                section = section,
-                lineTextStyle = lineTextStyle,
-                chordChipStyle = chordChipStyle,
-            )
-        }
-    } else {
-        items(section.lines) { line ->
-            val lineTextStyle = defaultSongbookTextStyle().copy(
-                softWrap = false,
-                textColor = MaterialTheme.colorScheme.onSurface,
-                typography = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
-                ),
-            )
-
-            val chordChipStyle = defaultSongbookChipStyle().copy(
-                containerColor = MaterialTheme.colorScheme.primary,
-                labelColor = MaterialTheme.colorScheme.onPrimary,
-                outlineColor = Color.Transparent,
-                labelTypography = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
-                ),
-            )
-
-            when (mode) {
-                LyricsMode.Inline -> InlineLyricsLine(
-                    line = line,
+                SideBySideLyricsSection(
+                    section = section,
                     lineTextStyle = lineTextStyle,
                     chordChipStyle = chordChipStyle,
                 )
+            } else {
+                section.lines.forEach { line ->
+                    val lineTextStyle = defaultSongbookTextStyle().copy(
+                        softWrap = false,
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                        typography = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
+                        ),
+                    )
 
-                LyricsMode.TextOnly -> TextOnlyLyricsLine(
-                    line = line,
-                    lineTextStyle = lineTextStyle,
-                )
+                    val chordChipStyle = defaultSongbookChipStyle().copy(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        labelColor = MaterialTheme.colorScheme.onPrimary,
+                        outlineColor = Color.Transparent,
+                        labelTypography = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
+                        ),
+                    )
 
-                LyricsMode.SideBySide -> Unit // Handled above
+                    when (mode) {
+                        LyricsMode.Inline -> InlineLyricsLine(
+                            line = line,
+                            lineTextStyle = lineTextStyle,
+                            chordChipStyle = chordChipStyle,
+                        )
+
+                        LyricsMode.TextOnly -> TextOnlyLyricsLine(
+                            line = line,
+                            lineTextStyle = lineTextStyle,
+                        )
+
+                        LyricsMode.SideBySide -> Unit // Handled above
+                    }
+                }
             }
-        }
-    }
 
-    item {
-        Spacer(Modifier.height(MaterialTheme.spacing.huge))
+            Spacer(Modifier.height(MaterialTheme.spacing.huge))
+        }
     }
 }
 
