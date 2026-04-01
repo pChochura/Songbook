@@ -13,7 +13,7 @@ import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
-import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.core.song.model.NewSong
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,11 +22,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 internal sealed interface ImportSongEvent {
+    data object NavigateBack : ImportSongEvent
     data class NavigateToLyrics(val songId: Long) : ImportSongEvent
 }
 
 internal data class ImportSongState(
-    val sections: List<Section> = emptyList(),
     val allSetlists: List<Setlist> = emptyList(),
     val selectedSetlists: List<Setlist> = emptyList(),
     val canImport: Boolean = false,
@@ -72,6 +72,20 @@ internal class ImportSongViewModel(
         }
     }
 
+    fun onImportSongClicked() {
+        viewModelScope.launch {
+            state = state.copy(isLoading = true)
+            songRepository.saveSong(
+                NewSong(
+                    title = titleTextFieldState.text.toString(),
+                    artist = artistTextFieldState.text.toString(),
+                    sections = computeSections(),
+                ),
+            )
+            eventChannel.send(ImportSongEvent.NavigateBack)
+        }
+    }
+
     fun onSetlistsSelected(setlists: List<Setlist>) {
         state = state.copy(
             selectedSetlists = setlists,
@@ -98,10 +112,7 @@ internal class ImportSongViewModel(
             titleTextFieldState.setTextAndPlaceCursorAtEnd(data.title.orEmpty())
             artistTextFieldState.setTextAndPlaceCursorAtEnd(data.author.orEmpty())
             lyricsTextFieldState.setTextAndPlaceCursorAtEnd(data.toLyrics())
-            state = state.copy(
-                sections = computeSections(),
-                isExtractingInProgress = false,
-            )
+            state = state.copy(isExtractingInProgress = false)
         }
     }
 

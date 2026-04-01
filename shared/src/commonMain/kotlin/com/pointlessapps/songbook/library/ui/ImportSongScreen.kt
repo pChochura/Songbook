@@ -62,6 +62,7 @@ import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookIcon
+import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.SongbookTextField
@@ -87,6 +88,7 @@ internal fun ImportSongScreen(
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
+            is ImportSongEvent.NavigateBack -> navigator.navigateBack()
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
         }
     }
@@ -204,7 +206,7 @@ internal fun ImportSongScreen(
                 SongbookButton(
                     modifier = Modifier.weight(1f),
                     label = stringResource(Res.string.common_import_song),
-                    onClick = { },
+                    onClick = viewModel::onImportSongClicked,
                     buttonStyle = defaultSongbookButtonStyle().copy(
                         enabled = state.canImport,
                         shape = CircleShape,
@@ -294,6 +296,8 @@ internal fun ImportSongScreen(
             onDismissRequest = viewModel::cancelExtraction,
         )
     }
+
+    SongbookLoader(state.isLoading)
 }
 
 @Composable

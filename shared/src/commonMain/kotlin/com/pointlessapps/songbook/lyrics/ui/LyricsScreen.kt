@@ -47,6 +47,7 @@ import com.pointlessapps.songbook.ui.PreviewSongLayout
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
+import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.theme.IconClose
@@ -213,4 +214,6 @@ internal fun LyricsScreen(
             onDismissRequest = { isConfirmDeleteDialogVisible = false },
         )
     }
+
+    SongbookLoader(state.isLoading)
 }
