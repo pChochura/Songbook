@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
+import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_back
 import com.pointlessapps.songbook.ui.PreviewSongLayout
@@ -42,7 +44,7 @@ internal fun PreviewSongScreen(
             artist = artist,
             sections = sections,
             textScale = textScale,
-            onTextScaleChanged = { textScale = it },
+            onTextScaleChanged = { textScale = it.coerceIn(MIN_ZOOM, MAX_ZOOM) },
             paddingValues = paddingValues,
         )
 

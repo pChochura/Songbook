@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.library.ui.components.dialogs
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,10 +23,10 @@ import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_cancel
+import com.pointlessapps.songbook.shared.common_enter_manually
 import com.pointlessapps.songbook.shared.common_from_gallery
 import com.pointlessapps.songbook.shared.common_scan_photo
 import com.pointlessapps.songbook.shared.common_take_photo
-import com.pointlessapps.songbook.shared.import_menu_rescan_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookButtonOrientation
 import com.pointlessapps.songbook.ui.components.SongbookDialog
@@ -45,11 +46,15 @@ import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.ui.camera.CameraMode
 import com.preat.peekaboo.ui.camera.PeekabooCamera
 import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun RescanDialog(
+internal fun ScanDialog(
+    description: StringResource,
+    showEnterManuallyButton: Boolean,
     onImageCaptured: (ByteArray?) -> Unit,
+    onEnterManuallyClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     var isCameraVisible by rememberSaveable { mutableStateOf(false) }
@@ -77,7 +82,7 @@ internal fun RescanDialog(
         ),
     ) {
         SongbookText(
-            text = stringResource(Res.string.import_menu_rescan_description),
+            text = stringResource(description),
             textStyle = defaultSongbookTextStyle().copy(
                 typography = MaterialTheme.typography.bodyMedium,
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -112,24 +117,44 @@ internal fun RescanDialog(
             )
         }
 
-        SongbookButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = DEFAULT_BORDER_WIDTH,
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                    shape = CircleShape,
+        Column(
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            if (showEnterManuallyButton) {
+                SongbookButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(Res.string.common_enter_manually),
+                    onClick = { onEnterManuallyClicked() },
+                    buttonStyle = defaultSongbookButtonStyle().copy(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        textStyle = defaultSongbookTextStyle().copy(
+                            textAlign = TextAlign.Center,
+                            textColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    ),
+                )
+            }
+
+            SongbookButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = DEFAULT_BORDER_WIDTH,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape,
+                    ),
+                label = stringResource(Res.string.common_cancel),
+                onClick = { onDismissRequest() },
+                buttonStyle = defaultSongbookButtonStyle().copy(
+                    containerColor = Color.Transparent,
+                    textStyle = defaultSongbookTextStyle().copy(
+                        textAlign = TextAlign.Center,
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 ),
-            label = stringResource(Res.string.common_cancel),
-            onClick = { onDismissRequest() },
-            buttonStyle = defaultSongbookButtonStyle().copy(
-                containerColor = Color.Transparent,
-                textStyle = defaultSongbookTextStyle().copy(
-                    textAlign = TextAlign.Center,
-                    textColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            ),
-        )
+            )
+        }
     }
 
     if (isCameraVisible) {

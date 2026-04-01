@@ -9,6 +9,8 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_tooltip">Tooltip</string>
     <string name="common_scan_photo">Scan a photo</string>
+    <string name="common_scan_photo_description">Scan lyrics and chords from a photo of the song or enter them manually</string>
+    <string name="common_enter_manually">Enter manually</string>
     <string name="common_from_gallery">From gallery</string>
     <string name="common_take_photo">Take a photo</string>
     <string name="common_close_fullscreen">Close fullscreen</string>

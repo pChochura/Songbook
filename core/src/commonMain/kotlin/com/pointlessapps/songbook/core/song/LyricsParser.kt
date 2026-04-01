@@ -15,11 +15,22 @@ object LyricsParser {
         val currentSectionChords = mutableListOf<Chord>()
 
         fun emitSection() {
+            if (currentSectionName.isEmpty() && currentSectionLyrics.isEmpty() && currentSectionChords.isEmpty()) {
+                return
+            }
+
+            val lyricsString = currentSectionLyrics.toString().trimEnd()
+            val leadingWhitespace = lyricsString.takeWhile { it.isWhitespace() }.length
+            val finalLyrics = lyricsString.substring(leadingWhitespace)
+            val finalChords = currentSectionChords.map {
+                it.copy(position = (it.position - leadingWhitespace).coerceAtLeast(0))
+            }
+
             sections.add(
                 Section(
                     name = currentSectionName,
-                    lyrics = currentSectionLyrics.toString(),
-                    chords = currentSectionChords,
+                    lyrics = finalLyrics,
+                    chords = finalChords,
                 ),
             )
 
@@ -32,7 +43,7 @@ object LyricsParser {
             if (sectionHeaderRegex.matches(line.trim())) {
                 emitSection()
                 currentSectionName = line.trim().removeSurrounding("[", "]")
-            } else {
+            } else if (line.isNotBlank()) {
                 var lineLyrics = line
                 val lineChords = mutableListOf<Chord>()
 

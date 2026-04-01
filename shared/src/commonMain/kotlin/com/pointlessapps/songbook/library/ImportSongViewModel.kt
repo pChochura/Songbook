@@ -8,15 +8,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
-import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
-import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
-import com.pointlessapps.songbook.model.SongData
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -29,8 +27,8 @@ internal data class ImportSongState(
     val allSetlists: List<Setlist> = emptyList(),
     val selectedSetlists: List<Setlist> = emptyList(),
     val canImport: Boolean = false,
+    val isExtractingFromPhoto: Boolean = false,
     val isLoading: Boolean = false,
-    val syncStatus: SyncStatus = SyncStatus.LOCAL,
 ) {
     val setlistsSelection = allSetlists.associateWith { it in selectedSetlists }
 }
@@ -54,14 +52,11 @@ internal class ImportSongViewModel(
     init {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
-            setlistRepository.getAllSetlists()
-                .collect {
-                    state = state.copy(
-                        allSetlists = it.data,
-                        syncStatus = it.status,
-                        isLoading = false,
-                    )
-                }
+            state = state.copy(
+                allSetlists = setlistRepository.getAllSetlists()
+                    .firstOrNull()?.data.orEmpty(),
+                isLoading = false,
+            )
         }
     }
 
@@ -72,32 +67,30 @@ internal class ImportSongViewModel(
     }
 
     fun onImageCaptured(bytes: ByteArray?) {
-        bytes?.let {
-            viewModelScope.launch {
-                val result = agent.extractSongData(it)
-                val data = result?.firstOrNull() ?: return@launch
-                val sectionTypeCount = mutableMapOf<SongData.Section.Type, Int>()
-                titleTextFieldState.setTextAndPlaceCursorAtEnd(data.title.orEmpty())
-                artistTextFieldState.setTextAndPlaceCursorAtEnd(data.author.orEmpty())
-                lyricsTextFieldState.setTextAndPlaceCursorAtEnd(
-                    data.sections.joinToString("\n") {
-                        "[${it.type.name}]\n${it.lines.joinToString("\n") { it.text }}"
-                    },
-                )
-                state = state.copy(
-                    sections = data.sections.map {
-                        Section(
-                            name = "${it.type.name} ${sectionTypeCount.getOrPut(it.type) { 0 } + 1}",
-                            lyrics = it.lines.joinToString("\n") { it.text },
-                            chords = it.chordsBeside.map { Chord(value = it, position = 0) },
-                        )
-                    },
-                )
+        if (bytes == null) {
+            // TODO show a snackbar
+            return
+        }
+
+        viewModelScope.launch {
+            state = state.copy(isExtractingFromPhoto = true)
+            val result = agent.extractSongData(bytes)
+            if (result == null) {
+                // TODO show a snackbar
+                state = state.copy(isExtractingFromPhoto = false)
+                return@launch
             }
+
+            val data = result.first()
+            titleTextFieldState.setTextAndPlaceCursorAtEnd(data.title.orEmpty())
+            artistTextFieldState.setTextAndPlaceCursorAtEnd(data.author.orEmpty())
+            lyricsTextFieldState.setTextAndPlaceCursorAtEnd(data.toLyrics())
+            state = state.copy(
+                sections = computeSections(),
+                isExtractingFromPhoto = false,
+            )
         }
     }
 
-    fun computeSections(): List<Section> {
-        return LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
-    }
+    fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
 }

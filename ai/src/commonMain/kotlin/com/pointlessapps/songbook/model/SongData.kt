@@ -45,6 +45,40 @@ data class SongData(
             val text: String,
             @SerialName("chords_above")
             val chordsAbove: List<String>,
-        )
+        ) {
+            fun toLyrics(): String {
+                if (chordsAbove.isEmpty()) return text
+                val words = text.split(" ")
+                if (words.isEmpty()) return chordsAbove.joinToString("") { "[$it]" }
+
+                val result = words.toMutableList()
+                chordsAbove.forEachIndexed { index, chord ->
+                    if (chord.isNotBlank()) {
+                        val wordIndex =
+                            (index * words.size / chordsAbove.size).coerceAtMost(words.size - 1)
+                        result[wordIndex] = "[$chord]${result[wordIndex]}"
+                    }
+                }
+                return result.joinToString(" ")
+            }
+        }
+
+        fun toLyrics(index: Int): String = buildString {
+            append("[$type $index]\n")
+            append(lines.joinToString("\n") { it.toLyrics() })
+            if (chordsBeside.isNotEmpty()) {
+                append("\n")
+                append(chordsBeside.joinToString(" ") { "[$it]" })
+            }
+        }
+    }
+
+    fun toLyrics(): String {
+        val sectionTypeCount = mutableMapOf<Section.Type, Int>()
+        return sections.joinToString("\n\n") { section ->
+            val count = sectionTypeCount.getOrPut(section.type) { 0 } + 1
+            sectionTypeCount[section.type] = count
+            section.toLyrics(count)
+        }
     }
 }

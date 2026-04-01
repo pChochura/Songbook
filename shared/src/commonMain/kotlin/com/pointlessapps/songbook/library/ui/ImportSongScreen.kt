@@ -39,12 +39,13 @@ import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomS
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.AddToSetlists
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.Preview
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.Rescan
-import com.pointlessapps.songbook.library.ui.components.dialogs.RescanDialog
+import com.pointlessapps.songbook.library.ui.components.dialogs.ScanDialog
 import com.pointlessapps.songbook.library.ui.components.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.library.ui.utils.ChordHighlightTransformation
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_cancel
 import com.pointlessapps.songbook.shared.common_import_song
+import com.pointlessapps.songbook.shared.common_scan_photo_description
 import com.pointlessapps.songbook.shared.common_tooltip
 import com.pointlessapps.songbook.shared.import_artist_label
 import com.pointlessapps.songbook.shared.import_artist_placeholder
@@ -52,6 +53,7 @@ import com.pointlessapps.songbook.shared.import_header_title
 import com.pointlessapps.songbook.shared.import_lyrics_label
 import com.pointlessapps.songbook.shared.import_lyrics_placeholder
 import com.pointlessapps.songbook.shared.import_lyrics_tip
+import com.pointlessapps.songbook.shared.import_menu_rescan_description
 import com.pointlessapps.songbook.shared.import_song_title_label
 import com.pointlessapps.songbook.shared.import_song_title_placeholder
 import com.pointlessapps.songbook.ui.ConfirmDiscardChangesDialog
@@ -80,6 +82,7 @@ internal fun ImportSongScreen(
     val navigator = LocalNavigator.current
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isDiscardChangesDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(true) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
@@ -222,6 +225,7 @@ internal fun ImportSongScreen(
                     isRescanDialogVisible = true
                     isBottomSheetVisible = false
                 }
+
                 Preview -> {
                     navigator.navigateToPreview(
                         title = viewModel.titleTextFieldState.text.toString(),
@@ -245,13 +249,30 @@ internal fun ImportSongScreen(
         )
     }
 
-    if (isRescanDialogVisible) {
-        RescanDialog(
+    if (isRescanDialogVisible || isScanDialogVisible) {
+        ScanDialog(
+            description = if (isScanDialogVisible) {
+                Res.string.common_scan_photo_description
+            } else {
+                Res.string.import_menu_rescan_description
+            },
+            showEnterManuallyButton = isScanDialogVisible,
             onImageCaptured = {
                 viewModel.onImageCaptured(it)
                 isRescanDialogVisible = false
+                isScanDialogVisible = false
             },
-            onDismissRequest = { isRescanDialogVisible = false },
+            onEnterManuallyClicked = {
+                isRescanDialogVisible = false
+                isScanDialogVisible = false
+            },
+            onDismissRequest = {
+                if (isScanDialogVisible) {
+                    navigator.navigateBack()
+                }
+                isRescanDialogVisible = false
+                isScanDialogVisible = false
+            },
         )
     }
 
