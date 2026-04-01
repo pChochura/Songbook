@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
@@ -13,7 +14,9 @@ import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -27,7 +30,7 @@ internal data class ImportSongState(
     val allSetlists: List<Setlist> = emptyList(),
     val selectedSetlists: List<Setlist> = emptyList(),
     val canImport: Boolean = false,
-    val isExtractingFromPhoto: Boolean = false,
+    val isExtractingInProgress: Boolean = false,
     val isLoading: Boolean = false,
 ) {
     val setlistsSelection = allSetlists.associateWith { it in selectedSetlists }
@@ -49,6 +52,8 @@ internal class ImportSongViewModel(
     private val eventChannel = Channel<ImportSongEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    private var extractionJob: Job? = null
+
     init {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
@@ -57,6 +62,13 @@ internal class ImportSongViewModel(
                     .firstOrNull()?.data.orEmpty(),
                 isLoading = false,
             )
+
+            snapshotFlow {
+                lyricsTextFieldState.text.isNotBlank() &&
+                        titleTextFieldState.text.isNotBlank()
+            }.distinctUntilChanged().collect {
+                state = state.copy(canImport = it)
+            }
         }
     }
 
@@ -72,12 +84,13 @@ internal class ImportSongViewModel(
             return
         }
 
-        viewModelScope.launch {
-            state = state.copy(isExtractingFromPhoto = true)
+        extractionJob?.cancel()
+        extractionJob = viewModelScope.launch {
+            state = state.copy(isExtractingInProgress = true)
             val result = agent.extractSongData(bytes)
             if (result == null) {
                 // TODO show a snackbar
-                state = state.copy(isExtractingFromPhoto = false)
+                state = state.copy(isExtractingInProgress = false)
                 return@launch
             }
 
@@ -87,9 +100,14 @@ internal class ImportSongViewModel(
             lyricsTextFieldState.setTextAndPlaceCursorAtEnd(data.toLyrics())
             state = state.copy(
                 sections = computeSections(),
-                isExtractingFromPhoto = false,
+                isExtractingInProgress = false,
             )
         }
+    }
+
+    fun cancelExtraction() {
+        extractionJob?.cancel()
+        state = state.copy(isExtractingInProgress = false)
     }
 
     fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())

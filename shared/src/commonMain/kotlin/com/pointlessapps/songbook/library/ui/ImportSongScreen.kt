@@ -39,6 +39,7 @@ import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomS
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.AddToSetlists
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.Preview
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.Rescan
+import com.pointlessapps.songbook.library.ui.components.dialogs.ExtractingInProgressDialog
 import com.pointlessapps.songbook.library.ui.components.dialogs.ScanDialog
 import com.pointlessapps.songbook.library.ui.components.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.library.ui.utils.ChordHighlightTransformation
@@ -80,9 +81,9 @@ internal fun ImportSongScreen(
 ) {
     val state = viewModel.state
     val navigator = LocalNavigator.current
+    var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(true) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isDiscardChangesDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(true) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
@@ -123,6 +124,7 @@ internal fun ImportSongScreen(
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             ) {
                 LabeledTextField(
+                    required = true,
                     label = stringResource(Res.string.import_song_title_label),
                     textFieldState = viewModel.titleTextFieldState,
                     placeholder = stringResource(Res.string.import_song_title_placeholder),
@@ -143,6 +145,7 @@ internal fun ImportSongScreen(
                 verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
             ) {
                 LabeledTextField(
+                    required = true,
                     label = stringResource(Res.string.import_lyrics_label),
                     textFieldState = viewModel.lyricsTextFieldState,
                     placeholder = stringResource(Res.string.import_lyrics_placeholder),
@@ -285,6 +288,12 @@ internal fun ImportSongScreen(
             onDismissRequest = { isDiscardChangesDialogVisible = false },
         )
     }
+
+    if (state.isExtractingInProgress) {
+        ExtractingInProgressDialog(
+            onDismissRequest = viewModel::cancelExtraction,
+        )
+    }
 }
 
 @Composable
@@ -293,6 +302,7 @@ private fun LabeledTextField(
     textFieldState: TextFieldState,
     placeholder: String,
     imeAction: ImeAction,
+    required: Boolean = false,
     outputTransformation: OutputTransformation? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -300,13 +310,28 @@ private fun LabeledTextField(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
     ) {
-        SongbookText(
-            text = label,
-            textStyle = defaultSongbookTextStyle().copy(
-                textColor = MaterialTheme.colorScheme.onSurface,
-                typography = MaterialTheme.typography.labelMedium,
-            ),
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
+        ) {
+            SongbookText(
+                text = label,
+                textStyle = defaultSongbookTextStyle().copy(
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    typography = MaterialTheme.typography.labelMedium,
+                ),
+            )
+
+            if (required) {
+                SongbookText(
+                    text = "*",
+                    textStyle = defaultSongbookTextStyle().copy(
+                        textColor = MaterialTheme.colorScheme.error,
+                        typography = MaterialTheme.typography.labelMedium,
+                    ),
+                )
+            }
+        }
         SongbookTextField(
             state = textFieldState,
             modifier = Modifier
