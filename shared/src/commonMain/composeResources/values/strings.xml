@@ -26,7 +26,7 @@
     <string name="common_broadcast_to_team">Broadcast to the team</string>
     <string name="common_broadcast_to_team_description">Send a notification to all the team members that the currently playing song is ready.</string>
     <string name="common_select_key_offset">Select a key offset</string>
-    <string name="common_select_key_offset_description">Change the key of all the chords in the song.</string>
+    <string name="common_select_key_offset_description">Transpose the song to a different key.</string>
 
     <!-- Library Screen -->
     <string name="library_header_title">Library</string>
