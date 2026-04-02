@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.core.di
 
 import com.pointlessapps.songbook.core.auth.di.authModule
 import com.pointlessapps.songbook.core.database.AppDatabase
+import com.pointlessapps.songbook.core.prefs.di.prefsModule
 import com.pointlessapps.songbook.core.setlist.di.setlistModule
 import com.pointlessapps.songbook.core.song.di.songModule
 import io.github.jan.supabase.SupabaseClient
@@ -34,4 +35,5 @@ val coreModule = module {
     includes(authModule)
     includes(songModule)
     includes(setlistModule)
+    includes(prefsModule)
 }

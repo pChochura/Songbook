@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,7 +43,7 @@ internal fun BottomBar(
     onActiveClicked: (Route) -> Unit,
     onLongClicked: (Route) -> Unit,
 ) {
-    val currentRoute = remember { currentRoute() }
+    val currentRoute = currentRoute()
 
     Row(
         modifier = Modifier

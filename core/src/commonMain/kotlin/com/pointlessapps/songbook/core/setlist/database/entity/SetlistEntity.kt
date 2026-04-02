@@ -3,6 +3,7 @@ package com.pointlessapps.songbook.core.setlist.database.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -17,6 +18,7 @@ internal data class SetlistEntity(
 @Entity(
     tableName = "setlist_songs",
     primaryKeys = ["setlistId", "songId"],
+    indices = [Index("setlistId"), Index("songId")],
     foreignKeys = [
         ForeignKey(
             entity = SetlistEntity::class,

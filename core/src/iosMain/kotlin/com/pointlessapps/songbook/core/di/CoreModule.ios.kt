@@ -1,9 +1,14 @@
 package com.pointlessapps.songbook.core.di
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.database.AppDatabaseConstructor
+import com.pointlessapps.songbook.core.utils.documentDirectory
+import okio.Path.Companion.toPath
 import org.koin.dsl.module
 import platform.Foundation.NSHomeDirectory
 
@@ -15,5 +20,11 @@ internal actual val platformModule = module {
             factory = { AppDatabaseConstructor.initialize() }
         ).setDriver(BundledSQLiteDriver())
             .build()
+    }
+
+    single<DataStore<Preferences>> {
+        PreferenceDataStoreFactory.createWithPath(
+            produceFile = { (documentDirectory() + "/songbook.preferences_pb").toPath() },
+        )
     }
 }

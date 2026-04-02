@@ -27,7 +27,6 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
@@ -51,11 +50,17 @@ kotlin {
             implementation(libs.supabase.postgres)
             implementation(libs.supabase.realtime)
 
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.prefs)
+
             implementation(libs.room.runtime)
+            implementation(libs.room.paging)
+            implementation(libs.paging.common)
             implementation(libs.sqlite.bundled)
         }
 
         androidMain.dependencies {
+            implementation(libs.koin.android)
             implementation(libs.ktor.client.okhttp)
         }
 
@@ -67,7 +72,6 @@ kotlin {
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
     add("kspIosArm64", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)
 }

@@ -30,7 +30,6 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
@@ -60,6 +59,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+            implementation(libs.paging.compose)
+            implementation(libs.paging.common)
 
             implementation(libs.peekaboo.ui)
             implementation(libs.peekaboo.image.picker)

@@ -34,7 +34,9 @@ internal sealed interface Route : NavKey {
     data class Lyrics(val songId: Long? = null) : Route
 
     @Serializable
-    data object Search : Route
+    data object Search : Route {
+        override val hasBottomBar = true
+    }
 
     @Serializable
     data object ImportSong : Route
