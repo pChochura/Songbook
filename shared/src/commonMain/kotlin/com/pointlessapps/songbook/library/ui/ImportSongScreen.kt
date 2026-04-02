@@ -88,6 +88,7 @@ internal fun ImportSongScreen(
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
+            is ImportSongEvent.DiscardChanges -> isDiscardChangesDialogVisible = true
             is ImportSongEvent.NavigateBack -> navigator.navigateBack()
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
         }
@@ -95,14 +96,14 @@ internal fun ImportSongScreen(
 
     NavigationBackHandler(
         state = rememberNavigationEventState(NavigationEventInfo.None),
-        onBackCompleted = { isDiscardChangesDialogVisible = true },
+        onBackCompleted = viewModel::onCancelClicked,
     )
 
     SongbookScaffoldLayout(
         topBar = @Composable {
             TopBar(
                 leftButton = TopBarButton.back(
-                    onClick = { isDiscardChangesDialogVisible = true },
+                    onClick = viewModel::onCancelClicked,
                 ),
                 rightButton = TopBarButton.menu(
                     onClick = { isBottomSheetVisible = true },
@@ -193,7 +194,7 @@ internal fun ImportSongScreen(
                             shape = CircleShape,
                         ),
                     label = stringResource(Res.string.common_cancel),
-                    onClick = { isDiscardChangesDialogVisible = true },
+                    onClick = viewModel::onCancelClicked,
                     buttonStyle = defaultSongbookButtonStyle().copy(
                         shape = CircleShape,
                         containerColor = Color.Transparent,
@@ -293,7 +294,7 @@ internal fun ImportSongScreen(
 
     if (state.isExtractingInProgress) {
         ExtractingInProgressDialog(
-            onDismissRequest = viewModel::cancelExtraction,
+            onDismissRequest = viewModel::onCancelExtractionClicked,
         )
     }
 

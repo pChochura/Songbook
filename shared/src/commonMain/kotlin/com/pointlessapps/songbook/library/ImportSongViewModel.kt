@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 internal sealed interface ImportSongEvent {
+    data object DiscardChanges : ImportSongEvent
     data object NavigateBack : ImportSongEvent
     data class NavigateToLyrics(val songId: Long) : ImportSongEvent
 }
@@ -86,6 +87,19 @@ internal class ImportSongViewModel(
         }
     }
 
+    fun onCancelClicked() {
+        if (
+            titleTextFieldState.text.isNotBlank() ||
+            artistTextFieldState.text.isNotBlank() ||
+            lyricsTextFieldState.text.isNotBlank() ||
+            state.selectedSetlists.isNotEmpty()
+        ) {
+            eventChannel.trySend(ImportSongEvent.DiscardChanges)
+        } else {
+            eventChannel.trySend(ImportSongEvent.NavigateBack)
+        }
+    }
+
     fun onSetlistsSelected(setlists: List<Setlist>) {
         state = state.copy(
             selectedSetlists = setlists,
@@ -116,7 +130,7 @@ internal class ImportSongViewModel(
         }
     }
 
-    fun cancelExtraction() {
+    fun onCancelExtractionClicked() {
         extractionJob?.cancel()
         state = state.copy(isExtractingInProgress = false)
     }
