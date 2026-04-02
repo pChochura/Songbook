@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_unknown
+import com.pointlessapps.songbook.shared.common_unnamed
 import com.pointlessapps.songbook.shared.library_add_to_favourites
 import com.pointlessapps.songbook.ui.components.SongbookCard
 import com.pointlessapps.songbook.ui.components.SongbookIcon
@@ -23,6 +25,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.IconFavouriteEmpty
 import com.pointlessapps.songbook.ui.theme.IconNote
 import com.pointlessapps.songbook.ui.theme.spacing
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun SongCard(song: Song, onClick: () -> Unit) {
@@ -63,14 +66,16 @@ internal fun SongCard(song: Song, onClick: () -> Unit) {
 
             Column {
                 SongbookText(
-                    text = song.title,
+                    text = song.title.takeIf { it.isNotEmpty() }
+                        ?: stringResource(Res.string.common_unnamed),
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurface,
                         typography = MaterialTheme.typography.titleMedium,
                     ),
                 )
                 SongbookText(
-                    text = song.artist,
+                    text = song.artist.takeIf { it.isNotEmpty() }
+                        ?: stringResource(Res.string.common_unknown),
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         typography = MaterialTheme.typography.bodySmall,
