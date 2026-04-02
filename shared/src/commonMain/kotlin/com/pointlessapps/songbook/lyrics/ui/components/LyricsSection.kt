@@ -37,6 +37,23 @@ internal fun LyricsSections(
 ) {
     val textScaleFloat = textScale / 100f
 
+    val lineTextStyle = defaultSongbookTextStyle().copy(
+        softWrap = false,
+        textColor = MaterialTheme.colorScheme.onSurface,
+        typography = MaterialTheme.typography.bodyLarge.copy(
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
+        ),
+    )
+
+    val chordChipStyle = defaultSongbookChipStyle().copy(
+        containerColor = MaterialTheme.colorScheme.primary,
+        labelColor = MaterialTheme.colorScheme.onPrimary,
+        outlineColor = Color.Transparent,
+        labelTypography = MaterialTheme.typography.labelLarge.copy(
+            fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
+        ),
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,62 +75,27 @@ internal fun LyricsSections(
                 )
             }
 
-            if (mode == LyricsMode.SideBySide) {
-                val lineTextStyle = defaultSongbookTextStyle().copy(
-                    softWrap = false,
-                    textColor = MaterialTheme.colorScheme.onSurface,
-                    typography = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
-                    ),
-                )
-
-                val chordChipStyle = defaultSongbookChipStyle().copy(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    labelColor = MaterialTheme.colorScheme.onPrimary,
-                    outlineColor = Color.Transparent,
-                    labelTypography = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
-                    ),
-                )
-
-                SideBySideLyricsSection(
+            when {
+                mode.shouldShowSideBySide() -> SideBySideLyricsSection(
                     section = section,
                     lineTextStyle = lineTextStyle,
                     chordChipStyle = chordChipStyle,
+                    shouldShowInline = mode.shouldShowInline(),
                 )
-            } else {
-                section.lines.forEach { line ->
-                    val lineTextStyle = defaultSongbookTextStyle().copy(
-                        softWrap = false,
-                        textColor = MaterialTheme.colorScheme.onSurface,
-                        typography = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat,
-                        ),
+
+                mode.shouldShowInline() -> section.lines.forEach { line ->
+                    InlineLyricsLine(
+                        line = line,
+                        lineTextStyle = lineTextStyle,
+                        chordChipStyle = chordChipStyle,
                     )
+                }
 
-                    val chordChipStyle = defaultSongbookChipStyle().copy(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        labelColor = MaterialTheme.colorScheme.onPrimary,
-                        outlineColor = Color.Transparent,
-                        labelTypography = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = MaterialTheme.typography.labelLarge.fontSize * textScaleFloat,
-                        ),
+                else -> section.lines.forEach { line ->
+                    TextOnlyLyricsLine(
+                        line = line,
+                        lineTextStyle = lineTextStyle,
                     )
-
-                    when (mode) {
-                        LyricsMode.Inline -> InlineLyricsLine(
-                            line = line,
-                            lineTextStyle = lineTextStyle,
-                            chordChipStyle = chordChipStyle,
-                        )
-
-                        LyricsMode.TextOnly -> TextOnlyLyricsLine(
-                            line = line,
-                            lineTextStyle = lineTextStyle,
-                        )
-
-                        LyricsMode.SideBySide -> Unit // Handled above
-                    }
                 }
             }
 
@@ -123,70 +105,11 @@ internal fun LyricsSections(
 }
 
 @Composable
-private fun InlineLyricsLine(
-    line: Section.Line,
-    lineTextStyle: SongbookTextStyle,
-    chordChipStyle: SongbookChipStyle,
-) {
-    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-    Layout(
-        modifier = Modifier.fillMaxWidth(),
-        content = {
-            SongbookText(
-                text = line.line,
-                onTextLayout = { textLayoutResult = it },
-                textStyle = lineTextStyle,
-            )
-            line.chords.forEach { chord ->
-                SongbookChip(
-                    label = chord.value,
-                    isSelected = false,
-                    onClick = {
-                        // TODO add chord explanation dialog
-                    },
-                    chipStyle = chordChipStyle,
-                )
-            }
-        },
-    ) { measurables, constraints ->
-        val textMeasurable = measurables[0]
-        val chordMeasurables = measurables.drop(1)
-
-        val textPlaceable = textMeasurable.measure(constraints)
-        val chordPlaceables = chordMeasurables.map {
-            it.measure(constraints.copy(minWidth = 0, minHeight = 0))
-        }
-
-        val maxChordHeight = chordPlaceables.maxOfOrNull { it.height } ?: 0
-        val totalHeight = textPlaceable.height + maxChordHeight
-
-        layout(textPlaceable.width, totalHeight) {
-            textPlaceable.placeRelative(0, maxChordHeight)
-            textLayoutResult?.let { layout ->
-                chordPlaceables.forEachIndexed { index, placeable ->
-                    val chord = line.chords[index]
-                    val lineIndex = layout.getLineForOffset(chord.position)
-                    val horizontalPosition = layout.getHorizontalPosition(
-                        offset = chord.position,
-                        usePrimaryDirection = true,
-                    )
-                    val verticalPosition = layout.getLineTop(lineIndex)
-
-                    placeable.placeRelative(
-                        x = horizontalPosition.toInt(),
-                        y = maxChordHeight + verticalPosition.toInt() - placeable.height,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun SideBySideLyricsSection(
     section: Section,
     lineTextStyle: SongbookTextStyle,
     chordChipStyle: SongbookChipStyle,
+    shouldShowInline: Boolean,
 ) {
     val lineSpacing = MaterialTheme.spacing.small
     val chordMargin = MaterialTheme.spacing.extraHuge
@@ -204,7 +127,18 @@ private fun SideBySideLyricsSection(
         modifier = Modifier.fillMaxWidth(),
         content = {
             section.lines.forEach { line ->
-                SongbookText(text = line.line, textStyle = lineTextStyle)
+                when {
+                    shouldShowInline -> InlineLyricsLine(
+                        line = line,
+                        lineTextStyle = lineTextStyle,
+                        chordChipStyle = chordChipStyle,
+                    )
+
+                    else -> TextOnlyLyricsLine(
+                        line = line,
+                        lineTextStyle = lineTextStyle,
+                    )
+                }
                 uniquePositions.forEach { pos ->
                     val chord = line.chords.find { it.position == pos }
                     if (chord != null) {
@@ -288,6 +222,66 @@ private fun SideBySideLyricsSection(
                 }
 
                 currentY += lineHeight + lineSpacing.roundToPx()
+            }
+        }
+    }
+}
+
+@Composable
+private fun InlineLyricsLine(
+    line: Section.Line,
+    lineTextStyle: SongbookTextStyle,
+    chordChipStyle: SongbookChipStyle,
+) {
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    Layout(
+        modifier = Modifier.fillMaxWidth(),
+        content = {
+            SongbookText(
+                text = line.line,
+                onTextLayout = { textLayoutResult = it },
+                textStyle = lineTextStyle,
+            )
+            line.chords.forEach { chord ->
+                SongbookChip(
+                    label = chord.value,
+                    isSelected = false,
+                    onClick = {
+                        // TODO add chord explanation dialog
+                    },
+                    chipStyle = chordChipStyle,
+                )
+            }
+        },
+    ) { measurables, constraints ->
+        val textMeasurable = measurables[0]
+        val chordMeasurables = measurables.drop(1)
+
+        val textPlaceable = textMeasurable.measure(constraints)
+        val chordPlaceables = chordMeasurables.map {
+            it.measure(constraints.copy(minWidth = 0, minHeight = 0))
+        }
+
+        val maxChordHeight = chordPlaceables.maxOfOrNull { it.height } ?: 0
+        val totalHeight = textPlaceable.height + maxChordHeight
+
+        layout(textPlaceable.width, totalHeight) {
+            textPlaceable.placeRelative(0, maxChordHeight)
+            textLayoutResult?.let { layout ->
+                chordPlaceables.forEachIndexed { index, placeable ->
+                    val chord = line.chords[index]
+                    val lineIndex = layout.getLineForOffset(chord.position)
+                    val horizontalPosition = layout.getHorizontalPosition(
+                        offset = chord.position,
+                        usePrimaryDirection = true,
+                    )
+                    val verticalPosition = layout.getLineTop(lineIndex)
+
+                    placeable.placeRelative(
+                        x = horizontalPosition.toInt(),
+                        y = maxChordHeight + verticalPosition.toInt() - placeable.height,
+                    )
+                }
             }
         }
     }

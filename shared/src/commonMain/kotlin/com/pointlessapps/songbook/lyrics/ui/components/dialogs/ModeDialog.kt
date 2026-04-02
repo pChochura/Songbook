@@ -26,12 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.lyrics.LyricsMode
+import com.pointlessapps.songbook.lyrics.LyricsMode.Both
 import com.pointlessapps.songbook.lyrics.LyricsMode.Inline
 import com.pointlessapps.songbook.lyrics.LyricsMode.SideBySide
 import com.pointlessapps.songbook.lyrics.LyricsMode.TextOnly
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_confirm
 import com.pointlessapps.songbook.shared.common_select_display_mode
+import com.pointlessapps.songbook.shared.lyrics_mode_both
+import com.pointlessapps.songbook.shared.lyrics_mode_both_description
 import com.pointlessapps.songbook.shared.lyrics_mode_inline
 import com.pointlessapps.songbook.shared.lyrics_mode_inline_description
 import com.pointlessapps.songbook.shared.lyrics_mode_side_by_side
@@ -105,6 +108,7 @@ internal fun ModeDialog(
                                 when (mode) {
                                     Inline -> Res.string.lyrics_mode_inline
                                     SideBySide -> Res.string.lyrics_mode_side_by_side
+                                    Both -> Res.string.lyrics_mode_both
                                     TextOnly -> Res.string.lyrics_mode_text_only
                                 },
                             ),
@@ -125,6 +129,7 @@ internal fun ModeDialog(
                                 when (mode) {
                                     Inline -> Res.string.lyrics_mode_inline_description
                                     SideBySide -> Res.string.lyrics_mode_side_by_side_description
+                                    Both -> Res.string.lyrics_mode_both_description
                                     TextOnly -> Res.string.lyrics_mode_text_only_description
                                 },
                             ),

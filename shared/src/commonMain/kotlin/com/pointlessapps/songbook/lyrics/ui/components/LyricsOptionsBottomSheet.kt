@@ -32,6 +32,7 @@ import com.pointlessapps.songbook.shared.lyrics_menu_show_queue
 import com.pointlessapps.songbook.shared.lyrics_menu_text_scale
 import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen
 import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen_description
+import com.pointlessapps.songbook.shared.lyrics_mode_both
 import com.pointlessapps.songbook.shared.lyrics_mode_inline
 import com.pointlessapps.songbook.shared.lyrics_mode_side_by_side
 import com.pointlessapps.songbook.shared.lyrics_mode_text_only
@@ -102,6 +103,7 @@ internal fun LyricsOptionsBottomSheet(
                         when (state.mode) {
                             LyricsMode.Inline -> Res.string.lyrics_mode_inline
                             LyricsMode.SideBySide -> Res.string.lyrics_mode_side_by_side
+                            LyricsMode.Both -> Res.string.lyrics_mode_both
                             LyricsMode.TextOnly -> Res.string.lyrics_mode_text_only
                         },
                     ),

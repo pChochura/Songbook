@@ -84,8 +84,10 @@
     <string name="lyrics_menu_broadcast_to_team_description">Send a notification to the team about the song</string>
     <string name="lyrics_mode_inline">Inline</string>
     <string name="lyrics_mode_side_by_side">Side by side</string>
+    <string name="lyrics_mode_both">Both</string>
     <string name="lyrics_mode_text_only">Text only</string>
     <string name="lyrics_mode_inline_description">All of the chords will be displayed above each line</string>
     <string name="lyrics_mode_side_by_side_description">The chords will be displayed to the side of the lyrics</string>
+    <string name="lyrics_mode_both_description">The chords will be displayed to the side of the lyrics and above each line</string>
     <string name="lyrics_mode_text_only_description">Only the text will be displayed</string>
 </resources>

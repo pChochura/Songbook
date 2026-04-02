@@ -13,13 +13,17 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 internal sealed interface LyricsEvent {
-    object NavigateBack : LyricsEvent
+    data object NavigateBack : LyricsEvent
 }
 
 internal enum class LyricsMode {
     Inline,
     SideBySide,
-    TextOnly,
+    Both,
+    TextOnly;
+
+    fun shouldShowInline() = this == Inline || this == Both
+    fun shouldShowSideBySide() = this == SideBySide || this == Both
 }
 
 internal data class LyricsState(
