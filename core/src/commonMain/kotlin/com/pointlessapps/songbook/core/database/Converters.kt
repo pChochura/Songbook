@@ -16,14 +16,4 @@ internal class Converters {
     fun toSectionList(value: String): List<Section> {
         return Json.decodeFromString(value)
     }
-
-    @TypeConverter
-    fun fromSongList(value: List<Song>): String {
-        return Json.encodeToString(value)
-    }
-
-    @TypeConverter
-    fun toSongList(value: String): List<Song> {
-        return Json.decodeFromString(value)
-    }
 }

@@ -7,13 +7,15 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import com.pointlessapps.songbook.core.database.dao.SetlistDao
 import com.pointlessapps.songbook.core.database.dao.SongDao
-import com.pointlessapps.songbook.core.database.entity.SetlistEntity
-import com.pointlessapps.songbook.core.database.entity.SongEntity
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
+import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 
 @Database(
     entities = [
         SongEntity::class,
         SetlistEntity::class,
+        SetlistSongEntity::class,
     ],
     version = 1,
 )
@@ -24,4 +26,7 @@ internal abstract class AppDatabase : RoomDatabase() {
     abstract fun setlistDao(): SetlistDao
 }
 
-internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinNoActualForExpect")
+internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
+    override fun initialize(): AppDatabase
+}

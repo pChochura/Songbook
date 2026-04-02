@@ -1,5 +1,8 @@
 package com.pointlessapps.songbook.library.ui
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,14 +15,17 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
+import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.library.ui.components.AddSongCard
@@ -27,16 +33,20 @@ import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.SongCard
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_app_name
+import com.pointlessapps.songbook.shared.common_syncing
 import com.pointlessapps.songbook.shared.library_setlists_section_title
 import com.pointlessapps.songbook.shared.library_songs_found
 import com.pointlessapps.songbook.shared.library_songs_section_title
 import com.pointlessapps.songbook.shared.library_sort_by_date
 import com.pointlessapps.songbook.ui.TopBar
+import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookChip
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.theme.IconSync
+import com.pointlessapps.songbook.ui.theme.IconSyncFailed
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -64,9 +74,20 @@ internal fun LibraryScreen(
 
     SongbookScaffoldLayout(
         topBar = @Composable {
+            val rotation = remember { Animatable(0f) }
+            LaunchedEffect(Unit) {
+                rotation.animateTo(360f, infiniteRepeatable(tween(3000)))
+            }
+
             TopBar(
                 leftButton = null,
-                rightButton = null,
+                rightButton = TopBarButton(
+                    enabled = false,
+                    icon = if (state.syncStatus == SyncStatus.LOCAL) IconSync else IconSyncFailed,
+                    tooltip = Res.string.common_syncing,
+                    onClick = {},
+                    modifier = Modifier.graphicsLayer { rotationZ = rotation.value },
+                ).takeIf { state.syncStatus == SyncStatus.LOCAL },
                 title = Res.string.common_app_name,
             )
         },

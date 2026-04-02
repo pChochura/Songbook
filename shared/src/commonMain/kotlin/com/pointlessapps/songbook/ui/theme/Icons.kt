@@ -49,6 +49,8 @@ import com.pointlessapps.songbook.shared.ic_settings
 import com.pointlessapps.songbook.shared.ic_share
 import com.pointlessapps.songbook.shared.ic_sort
 import com.pointlessapps.songbook.shared.ic_stats
+import com.pointlessapps.songbook.shared.ic_sync
+import com.pointlessapps.songbook.shared.ic_sync_failed
 import com.pointlessapps.songbook.shared.ic_tag
 import com.pointlessapps.songbook.shared.ic_text_size
 import com.pointlessapps.songbook.shared.ic_today
@@ -116,3 +118,5 @@ val IconFullscreen = Res.drawable.ic_fullscreen
 val IconScan = Res.drawable.ic_scan
 val IconImage = Res.drawable.ic_image
 val IconCamera = Res.drawable.ic_camera
+val IconSync = Res.drawable.ic_sync
+val IconSyncFailed = Res.drawable.ic_sync_failed

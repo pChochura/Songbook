@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.pointlessapps.songbook.core.database.entity.SongEntity
+import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

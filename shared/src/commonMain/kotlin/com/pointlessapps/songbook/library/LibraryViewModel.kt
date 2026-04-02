@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.auth.AuthRepository
+import com.pointlessapps.songbook.core.model.DataState
 import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
@@ -14,6 +15,7 @@ import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Song
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -48,12 +50,12 @@ internal class LibraryViewModel(
         if (openSearch) eventChannel.trySend(LibraryEvent.FocusSearch)
 
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
             authRepository.initialize()
             if (!authRepository.isSignedIn()) {
                 authRepository.signInAnonymously()
             }
 
+            state = state.copy(isLoading = true)
             combine(
                 setlistRepository.getAllSetlists(),
                 songRepository.getAllSongs(),
@@ -61,14 +63,13 @@ internal class LibraryViewModel(
                 state = state.copy(
                     setlists = setlistsState.data,
                     songs = songsState.data,
-                    syncStatus = if (setlistsState.status == SyncStatus.SYNCED && songsState.status == SyncStatus.SYNCED) {
-                        SyncStatus.SYNCED
-                    } else {
-                        SyncStatus.LOCAL
-                    },
+                    syncStatus = DataState.statusOf(
+                        setlistsState.status,
+                        songsState.status,
+                    ),
                     isLoading = false,
                 )
-            }.collect {}
+            }.collect()
         }
     }
 
