@@ -71,7 +71,8 @@ fun App(
                         if (it?.hasBottomBar == true) {
                             BottomBar(
                                 currentRoute = { it },
-                                onNavigateTo = {
+                                onNavigateTo = navigator::bottomNavigationTo,
+                                onActiveClicked = {
                                     // TODO
                                 },
                                 onLongClicked = {

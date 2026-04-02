@@ -93,12 +93,19 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
     val currentRoute: Route?
         get() = backStack.lastOrNull() as? Route
 
-    fun navigateBack() {
-        backStack.removeLastOrNull()
+    fun bottomNavigationTo(route: Route) {
+        when (route) {
+            is Route.Library -> {
+                backStack.subList(1, backStack.size).removeAll { it is Route.Library }
+                backStack.add(route)
+            }
+
+            else -> backStack.add(route)
+        }
     }
 
-    fun navigateToLibrary() {
-        backStack.add(Route.Library())
+    fun navigateBack() {
+        backStack.removeLastOrNull()
     }
 
     fun navigateToLyrics(songId: Long? = null) {

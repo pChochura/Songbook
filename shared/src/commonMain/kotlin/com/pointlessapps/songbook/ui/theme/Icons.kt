@@ -32,6 +32,7 @@ import com.pointlessapps.songbook.shared.ic_help
 import com.pointlessapps.songbook.shared.ic_image
 import com.pointlessapps.songbook.shared.ic_improve
 import com.pointlessapps.songbook.shared.ic_key
+import com.pointlessapps.songbook.shared.ic_library
 import com.pointlessapps.songbook.shared.ic_minus
 import com.pointlessapps.songbook.shared.ic_mode
 import com.pointlessapps.songbook.shared.ic_move
@@ -120,3 +121,4 @@ val IconImage = Res.drawable.ic_image
 val IconCamera = Res.drawable.ic_camera
 val IconSync = Res.drawable.ic_sync
 val IconSyncFailed = Res.drawable.ic_sync_failed
+val IconLibrary = Res.drawable.ic_library

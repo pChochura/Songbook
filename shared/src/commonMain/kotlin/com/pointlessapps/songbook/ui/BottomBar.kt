@@ -23,13 +23,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.library_header_title
+import com.pointlessapps.songbook.shared.navigation_library
+import com.pointlessapps.songbook.shared.navigation_search
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
-import com.pointlessapps.songbook.ui.theme.IconNote
+import com.pointlessapps.songbook.ui.theme.IconLibrary
 import com.pointlessapps.songbook.ui.theme.IconPlus
 import com.pointlessapps.songbook.ui.theme.IconSearch
 import com.pointlessapps.songbook.ui.theme.spacing
@@ -40,6 +41,7 @@ import org.jetbrains.compose.resources.stringResource
 internal fun BottomBar(
     currentRoute: () -> Route?,
     onNavigateTo: (Route) -> Unit,
+    onActiveClicked: (Route) -> Unit,
     onLongClicked: (Route) -> Unit,
 ) {
     val currentRoute = remember { currentRoute() }
@@ -59,27 +61,49 @@ internal fun BottomBar(
             BottomBarButton(
                 bottomBarButton = when {
                     currentRoute is Route.Library -> BottomBarButton.Active(
-                        icon = IconNote,
-                        title = stringResource(Res.string.library_header_title),
+                        icon = IconLibrary,
+                        title = stringResource(Res.string.navigation_library),
                     )
 
-                    else -> BottomBarButton.Empty(icon = IconNote)
+                    else -> BottomBarButton.Empty(icon = IconLibrary)
                 },
                 isEnabled = true,
-                onClicked = { onNavigateTo(Route.Library()) },
+                onClicked = {
+                    when (currentRoute) {
+                        is Route.Library -> onActiveClicked(currentRoute)
+                        else -> onNavigateTo(Route.Library())
+                    }
+                },
                 onLongClicked = { onLongClicked(Route.Library()) },
             )
             BottomBarButton(
-                bottomBarButton = BottomBarButton.Empty(icon = IconSearch),
+                bottomBarButton = when {
+                    currentRoute is Route.Search -> BottomBarButton.Active(
+                        icon = IconSearch,
+                        title = stringResource(Res.string.navigation_search),
+                    )
+
+                    else -> BottomBarButton.Empty(icon = IconSearch)
+                },
                 isEnabled = true,
-                onClicked = { onNavigateTo(Route.Search) },
+                onClicked = {
+                    when (currentRoute) {
+                        is Route.Search -> onActiveClicked(currentRoute)
+                        else -> onNavigateTo(Route.Search)
+                    }
+                },
                 onLongClicked = { onLongClicked(Route.Search) },
             )
         }
 
         BottomBarSupportingButton(
             icon = IconPlus,
-            onClicked = { onNavigateTo(Route.ImportSong) },
+            onClicked = {
+                when (currentRoute) {
+                    is Route.ImportSong -> onActiveClicked(currentRoute)
+                    else -> onNavigateTo(Route.ImportSong)
+                }
+            },
             onLongClicked = { onLongClicked(Route.ImportSong) },
         )
     }

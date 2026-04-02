@@ -29,6 +29,10 @@
     <string name="common_select_key_offset">Select a key offset</string>
     <string name="common_select_key_offset_description">Transpose the song to a different key.</string>
 
+    <!-- Bottom navigation -->
+    <string name="navigation_library">Library</string>
+    <string name="navigation_search">Search</string>
+
     <!-- Library Screen -->
     <string name="library_header_title">Library</string>
     <string name="library_songs_section_title">All Songs</string>
