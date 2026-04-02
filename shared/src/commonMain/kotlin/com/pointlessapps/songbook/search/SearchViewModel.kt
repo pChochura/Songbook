@@ -11,24 +11,39 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
+import com.pointlessapps.songbook.core.song.LyricsParser
+import com.pointlessapps.songbook.core.song.PublicLyricsRepository
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
+import com.pointlessapps.songbook.core.song.model.PublicLyrics
+import com.pointlessapps.songbook.core.song.model.Section
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 internal sealed interface SearchEvent {
     data object NavigateBack : SearchEvent
+    data class NavigateToPreview(
+        val title: String,
+        val artist: String,
+        val sections: List<Section>,
+    ) : SearchEvent
 }
 
 internal data class SearchState(
     val lastSearches: List<String> = emptyList(),
+    val publicLyrics: List<PublicLyrics> = emptyList(),
+    val isLoadingYourLibrary: Boolean = false,
+    val isLoadingPublicLyrics: Boolean = false,
     val isLoading: Boolean = false,
 )
 
@@ -36,6 +51,7 @@ internal data class SearchState(
 internal class SearchViewModel(
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
+    private val publicLyricsRepository: PublicLyricsRepository,
 ) : ViewModel() {
 
     val queryTextFieldState: TextFieldState = TextFieldState()
@@ -50,7 +66,10 @@ internal class SearchViewModel(
         queryTextFieldState.text
     }.distinctUntilChanged()
         .debounce(SEARCH_QUERY_DEBOUNCE)
+        .filter { it.isNotEmpty() }
+        .onEach { state = state.copy(isLoadingYourLibrary = true) }
         .flatMapLatest { songRepository.searchSongs(it.toString()) }
+        .onEach { state = state.copy(isLoadingYourLibrary = false) }
         .cachedIn(viewModelScope)
 
     init {
@@ -62,6 +81,26 @@ internal class SearchViewModel(
                     isLoading = false,
                 )
             }
+        }
+
+        viewModelScope.launch {
+            snapshotFlow { queryTextFieldState.text }
+                .distinctUntilChanged()
+                .debounce(SEARCH_QUERY_DEBOUNCE)
+                .filter { it.isNotEmpty() }
+                .onEach {
+                    state = state.copy(
+                        isLoadingPublicLyrics = true,
+                        publicLyrics = emptyList(),
+                    )
+                }
+                .flatMapLatest { publicLyricsRepository.searchPublicLyrics(it.toString()) }
+                .collectLatest {
+                    state = state.copy(
+                        isLoadingPublicLyrics = false,
+                        publicLyrics = it,
+                    )
+                }
         }
     }
 
@@ -82,6 +121,16 @@ internal class SearchViewModel(
 
     fun onLastSearchRemoveClicked(search: String) = viewModelScope.launch {
         prefsRepository.removeLastSearch(search)
+    }
+
+    fun onPublicLyricsClicked(lyrics: PublicLyrics) {
+        eventChannel.trySend(
+            SearchEvent.NavigateToPreview(
+                title = lyrics.trackName,
+                artist = lyrics.artistName,
+                sections = LyricsParser.parseLyrics(lyrics.plainLyrics),
+            ),
+        )
     }
 
     fun onImeAction() {

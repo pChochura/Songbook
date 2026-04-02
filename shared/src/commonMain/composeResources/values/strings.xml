@@ -95,4 +95,7 @@
     <string name="search_last_searches">Last searches</string>
     <string name="search_delete_the_last_search">Delete the last search</string>
     <string name="search_delete_the_last_search_description">Are you sure you want to delete the last search from history: %1$s</string>
+    <string name="search_your_library">Your library</string>
+    <string name="search_public_lyrics">Public lyrics</string>
+    <string name="lyrics_no_items_found">No items found</string>
 </resources>

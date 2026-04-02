@@ -9,6 +9,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -48,6 +50,8 @@ import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.search.SearchEvent
 import com.pointlessapps.songbook.search.SearchViewModel
+import com.pointlessapps.songbook.search.ui.components.EmptyListCard
+import com.pointlessapps.songbook.search.ui.components.PublicLyricsCard
 import com.pointlessapps.songbook.search.ui.components.SearchResultCard
 import com.pointlessapps.songbook.search.ui.components.dialogs.ConfirmRemoveLastSearchDialog
 import com.pointlessapps.songbook.shared.Res
@@ -56,9 +60,12 @@ import com.pointlessapps.songbook.shared.common_clear
 import com.pointlessapps.songbook.shared.common_remove
 import com.pointlessapps.songbook.shared.navigation_search
 import com.pointlessapps.songbook.shared.search_last_searches
+import com.pointlessapps.songbook.shared.search_public_lyrics
+import com.pointlessapps.songbook.shared.search_your_library
 import com.pointlessapps.songbook.ui.components.Position
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
+import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.SongbookTextField
@@ -78,20 +85,24 @@ import org.jetbrains.compose.resources.stringResource
 internal fun SearchScreen(
     viewModel: SearchViewModel,
 ) {
-    val state = viewModel.state
     val navigator = LocalNavigator.current
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()
     var confirmRemoveLastSearchDialogData by remember { mutableStateOf<String?>(null) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
-            SearchEvent.NavigateBack -> navigator.navigateBack()
+            is SearchEvent.NavigateBack -> navigator.navigateBack()
+            is SearchEvent.NavigateToPreview -> navigator.navigateToPreview(
+                title = event.title,
+                artist = event.artist,
+                sections = event.sections,
+            )
         }
     }
 
-    val shouldShowLastSearches by remember {
-        derivedStateOf { viewModel.queryTextFieldState.text.isEmpty() }
-    }
+    val shouldShowLastSearches by remember { derivedStateOf { viewModel.queryTextFieldState.text.isEmpty() } }
+    val shouldShowNoItemsYourLibrary by remember { derivedStateOf { searchResults.itemCount == 0 } }
+    val shouldShowNoItemsPublicLyrics by remember { derivedStateOf { viewModel.state.publicLyrics.isEmpty() } }
 
     SongbookScaffoldLayout(
         topBar = {
@@ -114,18 +125,10 @@ internal fun SearchScreen(
         ) {
             if (shouldShowLastSearches) {
                 item(key = "last_searches_header") {
-                    SongbookText(
-                        text = stringResource(Res.string.search_last_searches),
-                        textStyle = defaultSongbookTextStyle().copy(
-                            textColor = MaterialTheme.colorScheme.onSurface,
-                            typography = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                            ),
-                        ),
-                    )
+                    HeaderItem(stringResource(Res.string.search_last_searches))
                 }
 
-                items(state.lastSearches, key = { it }) { lastSearch ->
+                items(viewModel.state.lastSearches, key = { it }) { lastSearch ->
                     LastSearchItem(
                         modifier = Modifier.animateItem(),
                         lastSearch = lastSearch,
@@ -134,6 +137,27 @@ internal fun SearchScreen(
                     )
                 }
             } else {
+                item(key = "your_library_header") {
+                    HeaderItem(stringResource(Res.string.search_your_library))
+                }
+
+                if (viewModel.state.isLoadingYourLibrary) {
+                    item(key = "your_library_loading") {
+                        Box(
+                            modifier = Modifier
+                                .animateItem()
+                                .fillMaxWidth()
+                                .padding(MaterialTheme.spacing.large),
+                            contentAlignment = Alignment.Center,
+                            content = { CircularProgressIndicator() },
+                        )
+                    }
+                } else if (shouldShowNoItemsYourLibrary) {
+                    item(key = "your_library_no_items") {
+                        EmptyListCard(modifier = Modifier.animateItem().fillMaxWidth())
+                    }
+                }
+
                 items(
                     count = searchResults.itemCount,
                     key = searchResults.itemKey { it.id },
@@ -146,6 +170,35 @@ internal fun SearchScreen(
                             onClick = { navigator.navigateToLyrics(result.id) },
                         )
                     }
+                }
+
+                item(key = "public_lyrics_header") {
+                    HeaderItem(stringResource(Res.string.search_public_lyrics))
+                }
+
+                if (viewModel.state.isLoadingPublicLyrics) {
+                    item(key = "public_lyrics_loading") {
+                        Box(
+                            modifier = Modifier
+                                .animateItem()
+                                .fillMaxWidth()
+                                .padding(MaterialTheme.spacing.large),
+                            contentAlignment = Alignment.Center,
+                            content = { CircularProgressIndicator() },
+                        )
+                    }
+                } else if (shouldShowNoItemsPublicLyrics) {
+                    item(key = "public_lyrics_no_items") {
+                        EmptyListCard(modifier = Modifier.animateItem().fillMaxWidth())
+                    }
+                }
+
+                items(viewModel.state.publicLyrics, key = { it.id }) { publicLyrics ->
+                    PublicLyricsCard(
+                        modifier = Modifier.animateItem(),
+                        lyrics = publicLyrics,
+                        onClick = { viewModel.onPublicLyricsClicked(publicLyrics) },
+                    )
                 }
             }
         }
@@ -161,6 +214,8 @@ internal fun SearchScreen(
             onDismissRequest = { confirmRemoveLastSearchDialogData = null },
         )
     }
+
+    SongbookLoader(viewModel.state.isLoading)
 }
 
 @Composable
@@ -315,3 +370,16 @@ private fun SearchBar(
 
 private val SEARCH_BAR_ICON_SIZE = 24.dp
 private val LAST_SEARCHES_ICON_SIZE = 16.dp
+
+@Composable
+private fun HeaderItem(text: String) {
+    SongbookText(
+        text = text,
+        textStyle = defaultSongbookTextStyle().copy(
+            textColor = MaterialTheme.colorScheme.onSurface,
+            typography = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+            ),
+        ),
+    )
+}

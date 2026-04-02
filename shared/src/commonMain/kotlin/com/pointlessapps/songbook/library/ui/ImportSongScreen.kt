@@ -80,7 +80,6 @@ import org.jetbrains.compose.resources.stringResource
 internal fun ImportSongScreen(
     viewModel: ImportSongViewModel,
 ) {
-    val state = viewModel.state
     val navigator = LocalNavigator.current
     var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(true) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -209,7 +208,7 @@ internal fun ImportSongScreen(
                     label = stringResource(Res.string.common_import_song),
                     onClick = viewModel::onImportSongClicked,
                     buttonStyle = defaultSongbookButtonStyle().copy(
-                        enabled = state.canImport,
+                        enabled = viewModel.state.canImport,
                         shape = CircleShape,
                     ),
                 )
@@ -222,7 +221,7 @@ internal fun ImportSongScreen(
 
     ImportSongOptionsBottomSheet(
         show = isBottomSheetVisible,
-        state = state,
+        state = viewModel.state,
         onDismissRequest = { isBottomSheetVisible = false },
         onAction = {
             when (it) {
@@ -246,7 +245,7 @@ internal fun ImportSongScreen(
 
     if (isSetlistsDialogVisible) {
         SetlistsDialog(
-            setlists = state.setlistsSelection,
+            setlists = viewModel.state.setlistsSelection,
             onSetlistsSelected = {
                 viewModel.onSetlistsSelected(it)
                 isSetlistsDialogVisible = false
@@ -292,13 +291,13 @@ internal fun ImportSongScreen(
         )
     }
 
-    if (state.isExtractingInProgress) {
+    if (viewModel.state.isExtractingInProgress) {
         ExtractingInProgressDialog(
             onDismissRequest = viewModel::onCancelExtractionClicked,
         )
     }
 
-    SongbookLoader(state.isLoading)
+    SongbookLoader(viewModel.state.isLoading)
 }
 
 @Composable

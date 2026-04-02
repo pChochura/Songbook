@@ -59,7 +59,6 @@ import com.pointlessapps.songbook.utils.collectWithLifecycle
 internal fun LyricsScreen(
     viewModel: LyricsViewModel,
 ) {
-    val state = viewModel.state
     val navigator = LocalNavigator.current
     var isTopBarVisible by rememberSaveable { mutableStateOf(true) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -99,11 +98,11 @@ internal fun LyricsScreen(
     ) { paddingValues ->
         Box(Modifier.fillMaxSize()) {
             PreviewSongLayout(
-                title = state.title,
-                artist = state.artist,
-                sections = state.sections,
-                textScale = state.textScale,
-                mode = state.mode,
+                title = viewModel.state.title,
+                artist = viewModel.state.artist,
+                sections = viewModel.state.sections,
+                textScale = viewModel.state.textScale,
+                mode = viewModel.state.mode,
                 onTextScaleChanged = viewModel::onTextScaleChanged,
                 paddingValues = paddingValues,
             )
@@ -138,7 +137,7 @@ internal fun LyricsScreen(
 
     LyricsOptionsBottomSheet(
         show = isBottomSheetVisible,
-        state = state,
+        state = viewModel.state,
         onDismissRequest = { isBottomSheetVisible = false },
         onAction = {
             when (it) {
@@ -161,7 +160,7 @@ internal fun LyricsScreen(
 
     if (isModeDialogVisible) {
         ModeDialog(
-            mode = state.mode,
+            mode = viewModel.state.mode,
             onModeSelected = {
                 viewModel.onModeChanged(it)
                 isModeDialogVisible = false
@@ -172,7 +171,7 @@ internal fun LyricsScreen(
 
     if (isTextScaleDialogVisible) {
         TextScaleDialog(
-            textScale = state.textScale,
+            textScale = viewModel.state.textScale,
             minTextScale = MIN_ZOOM,
             maxTextScale = MAX_ZOOM,
             onTextScaleSelected = {
@@ -185,7 +184,7 @@ internal fun LyricsScreen(
 
     if (isKeyOffsetDialogVisible) {
         KeyOffsetDialog(
-            keyOffset = state.keyOffset,
+            keyOffset = viewModel.state.keyOffset,
             onKeyOffsetSelected = {
                 viewModel.onKeyOffsetChanged(it)
                 isKeyOffsetDialogVisible = false
@@ -215,5 +214,5 @@ internal fun LyricsScreen(
         )
     }
 
-    SongbookLoader(state.isLoading)
+    SongbookLoader(viewModel.state.isLoading)
 }

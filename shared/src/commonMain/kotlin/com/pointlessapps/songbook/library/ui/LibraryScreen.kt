@@ -56,7 +56,6 @@ import org.jetbrains.compose.resources.stringResource
 internal fun LibraryScreen(
     viewModel: LibraryViewModel,
 ) {
-    val state = viewModel.state
     val navigator = LocalNavigator.current
     val focusRequester = remember { FocusRequester() }
 
@@ -83,11 +82,11 @@ internal fun LibraryScreen(
                 leftButton = null,
                 rightButton = TopBarButton(
                     enabled = false,
-                    icon = if (state.syncStatus == SyncStatus.LOCAL) IconSync else IconSyncFailed,
+                    icon = if (viewModel.state.syncStatus == SyncStatus.LOCAL) IconSync else IconSyncFailed,
                     tooltip = Res.string.common_syncing,
                     onClick = {},
                     modifier = Modifier.graphicsLayer { rotationZ = rotation.value },
-                ).takeIf { state.syncStatus == SyncStatus.LOCAL },
+                ).takeIf { viewModel.state.syncStatus == SyncStatus.LOCAL },
                 title = Res.string.common_app_name,
             )
         },
@@ -114,7 +113,7 @@ internal fun LibraryScreen(
                 )
             }
 
-            items(state.setlists) { setlist ->
+            items(viewModel.state.setlists) { setlist ->
                 SetlistCard(
                     setlist = setlist,
                     onClick = {},
@@ -138,7 +137,7 @@ internal fun LibraryScreen(
                     SongbookChip(
                         label = stringResource(
                             Res.string.library_songs_found,
-                            state.songs.size,
+                            viewModel.state.songs.size,
                         ),
                         isSelected = false,
                         onClick = {},
@@ -157,7 +156,7 @@ internal fun LibraryScreen(
                 }
             }
 
-            items(state.songs, key = { it.id }) { song ->
+            items(viewModel.state.songs, key = { it.id }) { song ->
                 SongCard(
                     song = song,
                     onClick = { viewModel.onLyricsRequested(song.id) },
@@ -170,5 +169,5 @@ internal fun LibraryScreen(
         }
     }
 
-    SongbookLoader(state.isLoading)
+    SongbookLoader(viewModel.state.isLoading)
 }
