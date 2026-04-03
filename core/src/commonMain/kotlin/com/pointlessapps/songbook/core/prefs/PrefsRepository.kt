@@ -46,7 +46,9 @@ internal class PrefsRepositoryImpl(
         withContext(Dispatchers.IO) {
             dataStore.updateData {
                 it.toMutablePreferences().apply {
-                    val searches = get(lastSearchesKey).orEmpty().take(LAST_SEARCHES_NUMBER - 1)
+                    val searches = get(lastSearchesKey).orEmpty().let {
+                        it.drop(LAST_SEARCHES_NUMBER - it.size + 1)
+                    }
                     set(lastSearchesKey, (searches + search).toSet())
                 }
             }
