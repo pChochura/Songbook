@@ -3,7 +3,7 @@ package com.pointlessapps.songbook.core.prefs
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +18,8 @@ interface PrefsRepository {
     suspend fun addLastSearch(search: String)
     suspend fun removeLastSearch(search: String)
 
-    suspend fun getTextScale(): Float
-    suspend fun setTextScale(scale: Float)
+    suspend fun getTextScale(): Int
+    suspend fun setTextScale(scale: Int)
 
     suspend fun getMode(): String?
     suspend fun setMode(mode: String)
@@ -32,7 +32,7 @@ internal class PrefsRepositoryImpl(
     private val dataStore: DataStore<Preferences>,
 ) : PrefsRepository {
     private val lastSearchesKey = stringSetPreferencesKey("last_searches")
-    private val textScaleKey = floatPreferencesKey("text_scale")
+    private val textScaleKey = intPreferencesKey("text_scale")
     private val modeKey = stringPreferencesKey("mode")
     private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
 
@@ -66,11 +66,11 @@ internal class PrefsRepositoryImpl(
 
     override suspend fun getTextScale() = withContext(Dispatchers.IO) {
         dataStore.data.map { preferences ->
-            preferences[textScaleKey] ?: 1f
+            preferences[textScaleKey] ?: 100
         }.first()
     }
 
-    override suspend fun setTextScale(scale: Float) {
+    override suspend fun setTextScale(scale: Int) {
         withContext(Dispatchers.IO) {
             dataStore.updateData {
                 it.toMutablePreferences().apply {

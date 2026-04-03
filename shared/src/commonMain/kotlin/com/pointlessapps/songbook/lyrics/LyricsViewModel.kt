@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.model.SyncStatus
+import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
 import kotlinx.coroutines.channels.Channel
@@ -41,6 +42,7 @@ internal data class LyricsState(
 
 internal class LyricsViewModel(
     private val songId: Long,
+    private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
 ) : ViewModel() {
 
@@ -52,6 +54,11 @@ internal class LyricsViewModel(
 
     init {
         viewModelScope.launch {
+            state = state.copy(
+                textScale = prefsRepository.getTextScale(),
+                mode = prefsRepository.getMode()?.let(LyricsMode::valueOf) ?: LyricsMode.Inline,
+            )
+
             songRepository.getSongById(songId).collect { stateResult ->
                 stateResult.data?.let { song ->
                     state = state.copy(
@@ -67,6 +74,9 @@ internal class LyricsViewModel(
 
     fun onTextScaleChanged(textScale: Int) {
         state = state.copy(textScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
+        viewModelScope.launch {
+            prefsRepository.setTextScale(state.textScale)
+        }
     }
 
     fun onKeyOffsetChanged(keyOffset: Int) {
@@ -75,6 +85,9 @@ internal class LyricsViewModel(
 
     fun onModeChanged(mode: LyricsMode) {
         state = state.copy(mode = mode)
+        viewModelScope.launch {
+            prefsRepository.setMode(mode.name)
+        }
     }
 
     fun deleteSong() {
