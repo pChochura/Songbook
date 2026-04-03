@@ -42,6 +42,7 @@ internal sealed interface SearchEvent {
 internal data class SearchState(
     val lastSearches: List<String> = emptyList(),
     val publicLyrics: List<PublicLyrics> = emptyList(),
+    val showPublicLyrics: Boolean? = null,
     val isLoadingYourLibrary: Boolean = false,
     val isLoadingPublicLyrics: Boolean = false,
     val isLoading: Boolean = false,
@@ -84,7 +85,10 @@ internal class SearchViewModel(
         }
 
         viewModelScope.launch {
+            state = state.copy(showPublicLyrics = prefsRepository.getShowPublicLyrics())
+
             snapshotFlow { queryTextFieldState.text }
+                .filter { state.showPublicLyrics == true }
                 .distinctUntilChanged()
                 .debounce(SEARCH_QUERY_DEBOUNCE)
                 .filter { it.isNotEmpty() }
@@ -131,6 +135,20 @@ internal class SearchViewModel(
                 sections = LyricsParser.parseLyrics(lyrics.plainLyrics),
             ),
         )
+    }
+
+    fun onAllowPublicLyricsClicked() {
+        viewModelScope.launch {
+            prefsRepository.setShowPublicLyrics(true)
+            state = state.copy(showPublicLyrics = true)
+        }
+    }
+
+    fun onDenyPublicLyricsClicked() {
+        viewModelScope.launch {
+            prefsRepository.setShowPublicLyrics(false)
+            state = state.copy(showPublicLyrics = false)
+        }
     }
 
     fun onImeAction() {

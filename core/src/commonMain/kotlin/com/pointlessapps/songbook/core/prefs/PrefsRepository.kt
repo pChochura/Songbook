@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.core.prefs
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -22,6 +23,9 @@ interface PrefsRepository {
 
     suspend fun getMode(): String?
     suspend fun setMode(mode: String)
+
+    suspend fun getShowPublicLyrics(): Boolean?
+    suspend fun setShowPublicLyrics(show: Boolean)
 }
 
 internal class PrefsRepositoryImpl(
@@ -30,6 +34,7 @@ internal class PrefsRepositoryImpl(
     private val lastSearchesKey = stringSetPreferencesKey("last_searches")
     private val textScaleKey = floatPreferencesKey("text_scale")
     private val modeKey = stringPreferencesKey("mode")
+    private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
 
     override suspend fun getLastSearchesFlow() = withContext(Dispatchers.IO) {
         dataStore.data.map { preferences ->
@@ -86,6 +91,22 @@ internal class PrefsRepositoryImpl(
             dataStore.updateData {
                 it.toMutablePreferences().apply {
                     set(modeKey, mode)
+                }
+            }
+        }
+    }
+
+    override suspend fun getShowPublicLyrics() = withContext(Dispatchers.IO) {
+        dataStore.data.map { preferences ->
+            preferences[showPublicLyricsKey]
+        }.first()
+    }
+
+    override suspend fun setShowPublicLyrics(show: Boolean) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.toMutablePreferences().apply {
+                    set(showPublicLyricsKey, show)
                 }
             }
         }

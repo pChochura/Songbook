@@ -97,5 +97,12 @@
     <string name="search_delete_the_last_search_description">Are you sure you want to delete the last search from history: %1$s</string>
     <string name="search_your_library">Your library</string>
     <string name="search_public_lyrics">Public lyrics</string>
+    <string name="lyrics_what_is_public_lyrics">What is public lyrics?</string>
+    <string name="lyrics_what_is_public_lyrics_description">We use an Open Source dataset of lyrics published by users. We aren't responsible for the content of the dataset. Learn more at: </string>
+    <string name="lyrics_allow_public_lyrics_search_rationale">In order to show results from the web you need to allow public lyrics search.\nThe dataset is entirely built by users, so we can't be responsible for its content.</string>
+    <string name="lyrics_i_understand">I understand</string>
+    <string name="lyrics_turn_it_off">Turn it off</string>
+    <string name="lyrics_allow">Allow</string>
+    <string name="lyrics_deny">Deny</string>
     <string name="lyrics_no_items_found">No items found</string>
 </resources>
