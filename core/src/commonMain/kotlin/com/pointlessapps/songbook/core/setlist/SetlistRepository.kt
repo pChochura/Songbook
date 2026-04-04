@@ -33,7 +33,7 @@ import kotlin.random.Random
 import com.pointlessapps.songbook.core.song.database.mapper.toEntity as toSongEntity
 
 interface SetlistRepository {
-    fun getAllSetlists(): Flow<DataState<List<Setlist>>>
+    fun getAllSetlists(limit: Long = -1L): Flow<DataState<List<Setlist>>>
     fun getSetlistById(id: Long): Flow<DataState<Setlist?>>
 }
 
@@ -47,7 +47,7 @@ internal class SetlistRepositoryImpl(
     private val realtime = supabase.realtime
     private val table = supabase.from("setlists")
 
-    override fun getAllSetlists(): Flow<DataState<List<Setlist>>> = flow {
+    override fun getAllSetlists(limit: Long): Flow<DataState<List<Setlist>>> = flow {
         val channel = realtime.channel("setlists_all_${Random.nextLong()}")
         val setlistChanges = channel.postgresChangeFlow<PostgresAction>("public") {
             table = "setlists"
@@ -61,16 +61,16 @@ internal class SetlistRepositoryImpl(
             setlistSongsChanges,
             setlistChanges,
         ).map {
-            syncRemoteData()
+            syncRemoteData(limit)
             SyncStatus.SYNCED as SyncStatus?
         }.onStart {
             emit(null)
-            syncRemoteData()
+            syncRemoteData(limit)
             emit(SyncStatus.SYNCED)
         }.catch { emit(SyncStatus.REMOTE_FAILED) }
             .flowOn(Dispatchers.IO)
 
-        val localFlow = setlistDao.getAllSetlists()
+        val localFlow = setlistDao.getAllSetlists(limit)
             .map { it.map(SetlistWithSongs::toDomain) }
             .flowOn(Dispatchers.IO)
 
@@ -89,15 +89,16 @@ internal class SetlistRepositoryImpl(
         .map { DataState(it?.toDomain(), SyncStatus.LOCAL) }
         .flowOn(Dispatchers.IO)
 
-    private suspend fun syncRemoteData() {
-        val remoteData = fetchSetlistsWithSongs()
+    private suspend fun syncRemoteData(limit: Long) {
+        val remoteData = fetchSetlistsWithSongs(limit)
         songDao.insertSongs(remoteData.flatMap(Setlist::songs).map(Song::toSongEntity))
         setlistDao.insertSetlists(remoteData.map(Setlist::toEntity))
         setlistDao.insertSetlistSongs(remoteData.flatMap(Setlist::toSongEntities))
     }
 
-    private suspend fun fetchSetlistsWithSongs(): List<Setlist> = table
-        .select(Columns.raw("id, name, songs(*)")).decodeList<Setlist>()
+    private suspend fun fetchSetlistsWithSongs(limit: Long): List<Setlist> = table
+        .select(Columns.raw("id, name, songs(*)")) { limit(limit) }
+        .decodeList<Setlist>()
 
     private suspend fun fetchSetlistByIdWithSongs(id: Long): Setlist? = table
         .select(Columns.raw("id, name, songs(*)")) {

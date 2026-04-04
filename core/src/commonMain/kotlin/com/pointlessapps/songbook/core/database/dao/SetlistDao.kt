@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 internal interface SetlistDao {
     @Transaction
-    @Query("SELECT * FROM setlists")
-    fun getAllSetlists(): Flow<List<SetlistWithSongs>>
+    @Query("SELECT * FROM setlists LIMIT :limit")
+    fun getAllSetlists(limit: Long = -1L): Flow<List<SetlistWithSongs>>
 
     @Transaction
     @Query("SELECT * FROM setlists WHERE id = :id")

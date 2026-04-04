@@ -34,7 +34,7 @@ fun SongbookIconButton(
         contentDescription = tooltipLabel,
     ) {
         SongbookIcon(
-            modifier = modifier
+            modifier = Modifier
                 .clip(iconButtonStyle.shape)
                 .border(
                     width = ICON_BUTTON_BORDER_WIDTH,
@@ -57,7 +57,8 @@ fun SongbookIconButton(
                     enabled = iconButtonStyle.enabled,
                     onClick = onClick,
                     onLongClick = onLongClick,
-                ),
+                )
+                .then(modifier),
             icon = icon,
             iconStyle = defaultSongbookIconStyle().copy(
                 tint = if (iconButtonStyle.enabled) {

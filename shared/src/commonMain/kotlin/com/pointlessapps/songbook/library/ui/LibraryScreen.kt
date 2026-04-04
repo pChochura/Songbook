@@ -21,7 +21,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -37,7 +40,9 @@ import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.library.ui.components.AddSetlistCard
 import com.pointlessapps.songbook.library.ui.components.AddSongCard
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
+import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
+import com.pointlessapps.songbook.library.ui.components.dialogs.AddSetlistDialog
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_app_name
 import com.pointlessapps.songbook.shared.common_syncing
@@ -65,6 +70,7 @@ internal fun LibraryScreen(
 ) {
     val navigator = LocalNavigator.current
     val focusRequester = remember { FocusRequester() }
+    var isAddSetlistDialogVisible by remember { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
@@ -102,10 +108,9 @@ internal fun LibraryScreen(
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 120.dp),
             modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues.add(
-                vertical = MaterialTheme.spacing.huge,
-                horizontal = MaterialTheme.spacing.huge,
-            ).add(bottom = LocalBottomBarPadding.current.padding.value),
+            contentPadding = paddingValues
+                .add(MaterialTheme.spacing.huge)
+                .add(bottom = LocalBottomBarPadding.current.padding.value),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
@@ -145,7 +150,7 @@ internal fun LibraryScreen(
                 ) {
                     AddSetlistCard(
                         modifier = Modifier.fillMaxHeight(),
-                        onClick = viewModel::onAddSetlistClicked,
+                        onClick = { isAddSetlistDialogVisible = true },
                     )
 
                     viewModel.state.setlists.forEach { setlist ->
@@ -155,6 +160,11 @@ internal fun LibraryScreen(
                             onClick = {},
                         )
                     }
+
+                    ShowMoreButton(
+                        modifier = Modifier.fillMaxHeight(),
+                        onClick = {},
+                    )
                 }
             }
 
@@ -211,6 +221,16 @@ internal fun LibraryScreen(
                 )
             }
         }
+    }
+
+    if (isAddSetlistDialogVisible) {
+        AddSetlistDialog(
+            onConfirmClicked = {
+                isAddSetlistDialogVisible = false
+                viewModel.onAddSetlistClicked(it)
+            },
+            onDismissRequest = { isAddSetlistDialogVisible = false },
+        )
     }
 
     SongbookLoader(viewModel.state.isLoading)

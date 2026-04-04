@@ -57,7 +57,7 @@ internal class LibraryViewModel(
 
             state = state.copy(isLoading = true)
             combine(
-                setlistRepository.getAllSetlists(),
+                setlistRepository.getAllSetlists(limit = SETLISTS_LIMIT),
                 songRepository.getAllSongs(),
             ) { setlistsState, songsState ->
                 state = state.copy(
@@ -81,7 +81,11 @@ internal class LibraryViewModel(
         eventChannel.trySend(LibraryEvent.NavigateTo(Route.Lyrics(id)))
     }
 
-    fun onAddSetlistClicked() {
+    fun onAddSetlistClicked(name: String) {
 
+    }
+
+    private companion object {
+        const val SETLISTS_LIMIT = 5L
     }
 }

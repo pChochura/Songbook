@@ -12,6 +12,7 @@
     <string name="common_remove">Remove</string>
     <string name="common_tooltip">Tooltip</string>
     <string name="common_scan_photo">Scan a photo</string>
+    <string name="common_show_all">Show all</string>
     <string name="common_scan_photo_description">Scan lyrics and chords from a photo of the song or enter them manually</string>
     <string name="common_enter_manually">Enter manually</string>
     <string name="common_from_gallery">From gallery</string>
@@ -45,20 +46,20 @@
     <string name="library_setlist_songs">Songs: %1$d</string>
     <string name="library_songs_found">%1$d Found</string>
     <string name="library_sort_by_date">Sort by: Date Added</string>
-    <string name="library_add_song_title">Add New Song</string>
+    <string name="library_add_song_title">Add new song</string>
     <string name="library_add_song_subtitle">Import text or an image</string>
-    <string name="library_song_key_default">C Major</string>
-    <string name="library_song_bpm">%1$d BPM</string>
     <string name="library_add_to_favourites">Add to favourites</string>
     <string name="library_add_setlist">Add a setlist</string>
+    <string name="library_add_setlist_description">Create a setlist that will contain a set of songs with a specified order.</string>
+    <string name="library_add_setlist_placeholder">Setlist name</string>
 
     <!-- Import Song Screen -->
-    <string name="import_header_title">Add New Song</string>
-    <string name="import_song_title_label">Song Title</string>
+    <string name="import_header_title">Add new song</string>
+    <string name="import_song_title_label">Song title</string>
     <string name="import_song_title_placeholder">Title</string>
     <string name="import_artist_label">Artist</string>
     <string name="import_artist_placeholder">Artist</string>
-    <string name="import_lyrics_label">Song Lyrics</string>
+    <string name="import_lyrics_label">Song lyrics</string>
     <string name="import_lyrics_placeholder">Lyrics of the song...</string>
     <string name="import_lyrics_tip">Tip: Use [Chord] for inline chords or naming the sections.</string>
     <string name="import_menu_rescan">Rescan the photo</string>
