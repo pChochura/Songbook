@@ -36,6 +36,7 @@ internal sealed interface ImportSongEvent {
 }
 
 internal data class ImportSongState(
+    val songId: Long? = null,
     val allSetlists: List<Setlist> = emptyList(),
     val selectedSetlists: List<Setlist> = emptyList(),
     val canImport: Boolean = false,
@@ -82,7 +83,8 @@ internal class ImportSongViewModel(
         }
     }
 
-    fun setData(title: String?, artist: String?, lyrics: String?) {
+    fun setData(id: Long?, title: String?, artist: String?, lyrics: String?) {
+        state = state.copy(songId = id)
         titleTextFieldState.setTextAndPlaceCursorAtEnd(title.orEmpty())
         artistTextFieldState.setTextAndPlaceCursorAtEnd(artist.orEmpty())
         lyricsTextFieldState.setTextAndPlaceCursorAtEnd(lyrics.orEmpty())
@@ -93,6 +95,7 @@ internal class ImportSongViewModel(
             state = state.copy(isLoading = true)
             songRepository.saveSong(
                 NewSong(
+                    id = state.songId,
                     title = titleTextFieldState.text.toString(),
                     artist = artistTextFieldState.text.toString(),
                     sections = computeSections(),

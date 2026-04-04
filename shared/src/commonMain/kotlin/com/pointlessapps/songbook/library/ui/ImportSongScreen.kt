@@ -47,6 +47,7 @@ import com.pointlessapps.songbook.library.ui.utils.ChordHighlightTransformation
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_cancel
 import com.pointlessapps.songbook.shared.common_import_song
+import com.pointlessapps.songbook.shared.common_save_changes
 import com.pointlessapps.songbook.shared.common_scan_photo_description
 import com.pointlessapps.songbook.shared.common_tooltip
 import com.pointlessapps.songbook.shared.import_artist_label
@@ -79,6 +80,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ImportSongScreen(
+    id: Long?,
     title: String?,
     artist: String?,
     lyrics: String?,
@@ -102,11 +104,11 @@ internal fun ImportSongScreen(
         }
     }
 
-    LaunchedEffect(title, artist, lyrics) {
-        if (title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()) {
+    LaunchedEffect(id, title, artist, lyrics) {
+        if (id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()) {
             isScanDialogVisible = true
         }
-        viewModel.setData(title, artist, lyrics)
+        viewModel.setData(id, title, artist, lyrics)
     }
 
     NavigationBackHandler(
@@ -123,7 +125,11 @@ internal fun ImportSongScreen(
                 rightButton = TopBarButton.menu(
                     onClick = { isBottomSheetVisible = true },
                 ),
-                title = Res.string.import_header_title,
+                title = if (viewModel.state.songId == null) {
+                    Res.string.import_header_title
+                } else {
+                    Res.string.import_header_title_edit
+                },
             )
         },
     ) { paddingValues ->
@@ -221,7 +227,13 @@ internal fun ImportSongScreen(
 
                 SongbookButton(
                     modifier = Modifier.weight(1f),
-                    label = stringResource(Res.string.common_import_song),
+                    label = stringResource(
+                        if (viewModel.state.songId == null) {
+                            Res.string.common_import_song
+                        } else {
+                            Res.string.common_save_changes
+                        },
+                    ),
                     onClick = viewModel::onImportSongClicked,
                     buttonStyle = defaultSongbookButtonStyle().copy(
                         enabled = viewModel.state.canImport,

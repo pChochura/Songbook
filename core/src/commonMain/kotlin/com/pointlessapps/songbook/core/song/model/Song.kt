@@ -12,6 +12,7 @@ data class Song(
 
 @Serializable
 data class NewSong(
+    val id: Long? = null,
     val title: String,
     val artist: String,
     val sections: List<Section>,
@@ -40,6 +41,19 @@ data class Section(
                 Line(lineText, lineChords)
             }
         }
+
+    companion object {
+        fun List<Section>.toLyrics(): String = joinToString("\n\n") { section ->
+            val lines = section.lines.joinToString("\n") { line ->
+                val builder = StringBuilder(line.line)
+                line.chords.sortedByDescending { it.position }.forEach { chord ->
+                    builder.insert(chord.position, "[${chord.value}]")
+                }
+                builder.toString()
+            }
+            "[${section.name}]\n$lines"
+        }
+    }
 }
 
 @Serializable

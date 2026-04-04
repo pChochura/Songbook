@@ -20,6 +20,7 @@
     <string name="common_close_fullscreen">Close fullscreen</string>
     <string name="common_delete_the_song">Delete the song?</string>
     <string name="common_import_song">Import the song</string>
+    <string name="common_save_changes">Save changes</string>
     <string name="common_discard_changes">Discard changes</string>
     <string name="common_discard_changes_description">This action cannot be undone and will remove all the changes</string>
     <string name="common_delete_the_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
@@ -55,6 +56,7 @@
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Add new song</string>
+    <string name="import_header_title_edit">Edit the song</string>
     <string name="import_song_title_label">Song title</string>
     <string name="import_song_title_placeholder">Title</string>
     <string name="import_artist_label">Artist</string>

@@ -43,6 +43,7 @@ internal val libraryModule = module {
 
     navigation<Route.ImportSong> { route ->
         ImportSongScreen(
+            id = route.id,
             title = route.title,
             artist = route.artist,
             lyrics = route.lyrics,

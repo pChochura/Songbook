@@ -65,7 +65,15 @@ internal fun LyricsScreen(
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
-            LyricsEvent.NavigateBack -> navigator.navigateBack()
+            is LyricsEvent.NavigateBack -> navigator.navigateBack()
+            is LyricsEvent.NavigateToImportSong -> {
+                navigator.navigateToImportSong(
+                    id = event.songId,
+                    title = event.title,
+                    artist = event.artist,
+                    lyrics = event.lyrics,
+                )
+            }
         }
     }
 
@@ -141,7 +149,11 @@ internal fun LyricsScreen(
         onDismissRequest = { isBottomSheetVisible = false },
         onAction = {
             when (it) {
-                Edit -> TODO()
+                Edit -> {
+                    viewModel.onEditSongClicked()
+                    isBottomSheetVisible = false
+                }
+
                 Fullscreen -> {
                     isTopBarVisible = !isTopBarVisible
                     isBottomSheetVisible = false

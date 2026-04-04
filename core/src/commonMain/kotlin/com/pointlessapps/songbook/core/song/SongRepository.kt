@@ -81,7 +81,7 @@ internal class SongRepositoryImpl(
 
     override suspend fun saveSong(newSong: NewSong) {
         withContext(Dispatchers.IO) {
-            table.insert(newSong)
+            table.upsert(newSong)
         }
     }
 

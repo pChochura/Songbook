@@ -9,12 +9,19 @@ import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 internal sealed interface LyricsEvent {
     data object NavigateBack : LyricsEvent
+    data class NavigateToImportSong(
+        val songId: Long,
+        val title: String,
+        val artist: String,
+        val lyrics: String,
+    ) : LyricsEvent
 }
 
 internal enum class LyricsMode {
@@ -70,6 +77,17 @@ internal class LyricsViewModel(
                 }
             }
         }
+    }
+
+    fun onEditSongClicked() {
+        eventChannel.trySend(
+            LyricsEvent.NavigateToImportSong(
+                songId = songId,
+                title = state.title,
+                artist = state.artist,
+                lyrics = state.sections.toLyrics(),
+            ),
+        )
     }
 
     fun onTextScaleChanged(textScale: Int) {
