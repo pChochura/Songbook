@@ -30,6 +30,9 @@
     <string name="common_broadcast_to_team_description">Send a notification to all the team members that the currently playing song is ready.</string>
     <string name="common_select_key_offset">Select a key offset</string>
     <string name="common_select_key_offset_description">Transpose the song to a different key.</string>
+    <string name="common_camera_permission">Camera permission</string>
+    <string name="common_camera_permission_description">In order to use the camera you need to grant the permission in the app's settings.</string>
+    <string name="common_open_settings">Open settings</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Library</string>

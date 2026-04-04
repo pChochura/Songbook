@@ -5,6 +5,6 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
     <key>Privacy - Camera Usage Description</key>
-    <string>This app uses camera for imprting the songs using OCR.</string>
+    <string>This app uses camera for importing the songs using OCR.</string>
 </dict>
 </plist>

@@ -90,6 +90,11 @@ internal fun ImportSongScreen(
             is ImportSongEvent.DiscardChanges -> isDiscardChangesDialogVisible = true
             is ImportSongEvent.NavigateBack -> navigator.navigateBack()
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
+            is ImportSongEvent.NavigateToPreview -> navigator.navigateToPreview(
+                title = event.title,
+                artist = event.artist,
+                sections = event.sections,
+            )
         }
     }
 
@@ -232,11 +237,7 @@ internal fun ImportSongScreen(
                 }
 
                 Preview -> {
-                    navigator.navigateToPreview(
-                        title = viewModel.titleTextFieldState.text.toString(),
-                        artist = viewModel.artistTextFieldState.text.toString(),
-                        sections = viewModel.computeSections(),
-                    )
+                    viewModel.onPreviewClicked()
                     isBottomSheetVisible = false
                 }
             }
@@ -271,6 +272,7 @@ internal fun ImportSongScreen(
                 isRescanDialogVisible = false
                 isScanDialogVisible = false
             },
+            onOpenSettingsClicked = viewModel::onOpenSettingsClicked,
             onDismissRequest = {
                 if (isScanDialogVisible) {
                     navigator.navigateBack()

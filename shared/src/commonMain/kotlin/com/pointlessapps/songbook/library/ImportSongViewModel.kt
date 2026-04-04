@@ -9,11 +9,13 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
+import com.pointlessapps.songbook.core.app.AppRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.NewSong
+import com.pointlessapps.songbook.core.song.model.Section
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -25,6 +27,11 @@ internal sealed interface ImportSongEvent {
     data object DiscardChanges : ImportSongEvent
     data object NavigateBack : ImportSongEvent
     data class NavigateToLyrics(val songId: Long) : ImportSongEvent
+    data class NavigateToPreview(
+        val title: String,
+        val artist: String,
+        val sections: List<Section>,
+    ) : ImportSongEvent
 }
 
 internal data class ImportSongState(
@@ -41,6 +48,7 @@ internal class ImportSongViewModel(
     private val agent: Agent,
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
+    private val appRepository: AppRepository,
 ) : ViewModel() {
 
     val titleTextFieldState = TextFieldState("")
@@ -135,5 +143,19 @@ internal class ImportSongViewModel(
         state = state.copy(isExtractingInProgress = false)
     }
 
-    fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
+    fun onOpenSettingsClicked() {
+        appRepository.openAppSettings()
+    }
+
+    fun onPreviewClicked() {
+        eventChannel.trySend(
+            ImportSongEvent.NavigateToPreview(
+                title = titleTextFieldState.text.toString(),
+                artist = artistTextFieldState.text.toString(),
+                sections = computeSections(),
+            ),
+        )
+    }
+
+    private fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
 }

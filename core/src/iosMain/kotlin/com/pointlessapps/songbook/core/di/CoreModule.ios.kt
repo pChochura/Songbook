@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.pointlessapps.songbook.core.app.di.appModule
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.database.AppDatabaseConstructor
 import com.pointlessapps.songbook.core.utils.documentDirectory
@@ -17,7 +18,7 @@ internal actual val platformModule = module {
         val dbFilePath = NSHomeDirectory() + "/songbook.db"
         Room.databaseBuilder<AppDatabase>(
             name = dbFilePath,
-            factory = { AppDatabaseConstructor.initialize() }
+            factory = { AppDatabaseConstructor.initialize() },
         ).setDriver(BundledSQLiteDriver())
             .build()
     }
@@ -27,4 +28,6 @@ internal actual val platformModule = module {
             produceFile = { (documentDirectory() + "/songbook.preferences_pb").toPath() },
         )
     }
+
+    includes(appModule)
 }

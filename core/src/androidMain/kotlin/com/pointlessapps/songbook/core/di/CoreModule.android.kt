@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.pointlessapps.songbook.core.app.di.appModule
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.database.AppDatabaseConstructor
 import okio.Path.Companion.toPath
@@ -33,4 +34,6 @@ internal actual val platformModule = module {
             },
         )
     }
+
+    includes(appModule)
 }

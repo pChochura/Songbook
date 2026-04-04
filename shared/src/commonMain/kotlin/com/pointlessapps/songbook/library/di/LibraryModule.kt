@@ -31,6 +31,7 @@ internal val libraryModule = module {
             agent = get(named("Gemini")),
             setlistRepository = get(),
             songRepository = get(),
+            appRepository = get(),
         )
     }
 

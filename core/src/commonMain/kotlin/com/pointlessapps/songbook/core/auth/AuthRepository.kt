@@ -24,7 +24,7 @@ internal class AuthRepositoryImpl(
 
     private val auth = client.auth
 
-    override suspend fun initialize() {
+    override suspend fun initialize() = withContext(Dispatchers.Default) {
         auth.awaitInitialization()
     }
 

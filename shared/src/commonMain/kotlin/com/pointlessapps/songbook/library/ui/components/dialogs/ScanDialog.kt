@@ -3,9 +3,12 @@ package com.pointlessapps.songbook.library.ui.components.dialogs
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -33,6 +36,7 @@ import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookButtonTextStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
@@ -40,12 +44,14 @@ import com.pointlessapps.songbook.ui.theme.IconCamera
 import com.pointlessapps.songbook.ui.theme.IconImage
 import com.pointlessapps.songbook.ui.theme.IconScan
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.rememberPermissionRequester
 import com.preat.peekaboo.image.picker.FilterOptions
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.ui.camera.CameraMode
 import com.preat.peekaboo.ui.camera.PeekabooCamera
 import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -54,9 +60,12 @@ internal fun ScanDialog(
     description: StringResource,
     showEnterManuallyButton: Boolean,
     onImageCaptured: (ByteArray?) -> Unit,
+    onOpenSettingsClicked: () -> Unit,
     onEnterManuallyClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val permissionRequester = rememberPermissionRequester()
     var isCameraVisible by rememberSaveable { mutableStateOf(false) }
     val imagePickerLauncher = rememberImagePickerLauncher(
         selectionMode = SelectionMode.Single,
@@ -73,97 +82,114 @@ internal fun ScanDialog(
         onBackCompleted = { isCameraVisible = false },
     )
 
-    SongbookDialog(
-        onDismissRequest = onDismissRequest,
-        dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.common_scan_photo),
-            icon = IconScan,
-            dismissible = SongbookDialogDismissible.Both,
-        ),
-    ) {
-        SongbookText(
-            text = stringResource(description),
-            textStyle = defaultSongbookTextStyle().copy(
-                typography = MaterialTheme.typography.bodyMedium,
-                textColor = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
+    if (!isCameraVisible) {
+        SongbookDialog(
+            onDismissRequest = onDismissRequest,
+            dialogStyle = defaultSongbookDialogStyle().copy(
+                label = stringResource(Res.string.common_scan_photo),
+                icon = IconScan,
+                dismissible = SongbookDialogDismissible.Both,
             ),
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
         ) {
-            SongbookButton(
-                modifier = Modifier.weight(1f),
-                label = stringResource(Res.string.common_from_gallery),
-                onClick = { imagePickerLauncher.launch() },
-                buttonStyle = defaultSongbookButtonStyle().copy(
-                    orientation = SongbookButtonOrientation.Vertical,
-                    shape = MaterialTheme.shapes.medium,
-                    icon = IconImage,
+            SongbookText(
+                text = stringResource(description),
+                textStyle = defaultSongbookTextStyle().copy(
+                    typography = MaterialTheme.typography.bodyMedium,
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
                 ),
             )
-            SongbookButton(
-                modifier = Modifier.weight(1f),
-                label = stringResource(Res.string.common_take_photo),
-                onClick = { isCameraVisible = true },
-                buttonStyle = defaultSongbookButtonStyle().copy(
-                    orientation = SongbookButtonOrientation.Vertical,
-                    shape = MaterialTheme.shapes.medium,
-                    icon = IconCamera,
-                ),
-            )
-        }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (showEnterManuallyButton) {
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+            ) {
                 SongbookButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = stringResource(Res.string.common_enter_manually),
-                    onClick = { onEnterManuallyClicked() },
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    label = stringResource(Res.string.common_from_gallery),
+                    onClick = { imagePickerLauncher.launch() },
                     buttonStyle = defaultSongbookButtonStyle().copy(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        textStyle = defaultSongbookTextStyle().copy(
+                        orientation = SongbookButtonOrientation.Vertical,
+                        shape = MaterialTheme.shapes.medium,
+                        icon = IconImage,
+                        textStyle = defaultSongbookButtonTextStyle().copy(
                             textAlign = TextAlign.Center,
-                            textColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    ),
+                )
+                SongbookButton(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    label = stringResource(Res.string.common_take_photo),
+                    onClick = {
+                        coroutineScope.launch {
+                            permissionRequester.requestCameraPermission()
+                            isCameraVisible = true
+                        }
+                    },
+                    buttonStyle = defaultSongbookButtonStyle().copy(
+                        orientation = SongbookButtonOrientation.Vertical,
+                        shape = MaterialTheme.shapes.medium,
+                        icon = IconCamera,
+                        textStyle = defaultSongbookButtonTextStyle().copy(
+                            textAlign = TextAlign.Center,
                         ),
                     ),
                 )
             }
 
-            SongbookButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = DEFAULT_BORDER_WIDTH,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape,
-                    ),
-                label = stringResource(Res.string.common_cancel),
-                onClick = { onDismissRequest() },
-                buttonStyle = defaultSongbookButtonStyle().copy(
-                    containerColor = Color.Transparent,
-                    textStyle = defaultSongbookTextStyle().copy(
-                        textAlign = TextAlign.Center,
-                        textColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                ),
-            )
-        }
-    }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (showEnterManuallyButton) {
+                    SongbookButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = stringResource(Res.string.common_enter_manually),
+                        onClick = { onEnterManuallyClicked() },
+                        buttonStyle = defaultSongbookButtonStyle().copy(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            textStyle = defaultSongbookTextStyle().copy(
+                                textAlign = TextAlign.Center,
+                                textColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
+                        ),
+                    )
+                }
 
-    if (isCameraVisible) {
+                SongbookButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = DEFAULT_BORDER_WIDTH,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            shape = CircleShape,
+                        ),
+                    label = stringResource(Res.string.common_cancel),
+                    onClick = { onDismissRequest() },
+                    buttonStyle = defaultSongbookButtonStyle().copy(
+                        containerColor = Color.Transparent,
+                        textStyle = defaultSongbookTextStyle().copy(
+                            textAlign = TextAlign.Center,
+                            textColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    ),
+                )
+            }
+        }
+    } else {
         PeekabooCamera(
             state = rememberPeekabooCameraState(
                 initialCameraMode = CameraMode.Back,
                 onCapture = { onImageCaptured(it) },
             ),
             modifier = Modifier.fillMaxSize(),
+            permissionDeniedContent = {
+                CameraPermissionDeniedDialog(
+                    onOpenSettingsClicked = onOpenSettingsClicked,
+                    onDismissRequest = { isCameraVisible = false },
+                )
+            },
         )
     }
 }
