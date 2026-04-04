@@ -50,6 +50,7 @@
     <string name="library_song_key_default">C Major</string>
     <string name="library_song_bpm">%1$d BPM</string>
     <string name="library_add_to_favourites">Add to favourites</string>
+    <string name="library_add_setlist">Add a setlist</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Add New Song</string>

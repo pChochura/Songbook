@@ -22,8 +22,12 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun AddSongCard(onClick: () -> Unit) {
+internal fun AddSongCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     SongbookCard(
+        modifier = modifier,
         onClick = onClick,
         onLongClick = { },
         cardStyle = dashedSongbookCardStyle(),
