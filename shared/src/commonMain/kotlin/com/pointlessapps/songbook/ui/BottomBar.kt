@@ -100,10 +100,10 @@ internal fun BottomBar(
             onClicked = {
                 when (currentRoute) {
                     is Route.ImportSong -> onActiveClicked(currentRoute)
-                    else -> onNavigateTo(Route.ImportSong)
+                    else -> onNavigateTo(Route.ImportSong())
                 }
             },
-            onLongClicked = { onLongClicked(Route.ImportSong) },
+            onLongClicked = { onLongClicked(Route.ImportSong()) },
         )
     }
 }

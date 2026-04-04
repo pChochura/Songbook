@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -78,10 +79,13 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ImportSongScreen(
+    title: String?,
+    artist: String?,
+    lyrics: String?,
     viewModel: ImportSongViewModel,
 ) {
     val navigator = LocalNavigator.current
-    var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(true) }
+    var isScanDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isDiscardChangesDialogVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -96,6 +100,13 @@ internal fun ImportSongScreen(
                 sections = event.sections,
             )
         }
+    }
+
+    LaunchedEffect(title, artist, lyrics) {
+        if (title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()) {
+            isScanDialogVisible = true
+        }
+        viewModel.setData(title, artist, lyrics)
     }
 
     NavigationBackHandler(

@@ -10,18 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
+import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.search_i_understand
-import com.pointlessapps.songbook.shared.search_turn_it_off
-import com.pointlessapps.songbook.shared.search_what_is_public_lyrics
-import com.pointlessapps.songbook.shared.search_what_is_public_lyrics_description
+import com.pointlessapps.songbook.shared.common_cancel
+import com.pointlessapps.songbook.shared.common_import_song
+import com.pointlessapps.songbook.shared.search_import_public_lyrics
+import com.pointlessapps.songbook.shared.search_import_public_lyrics_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -30,40 +25,26 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
-import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.ui.theme.IconSave
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun PublicLyricsHelpDialog(
+internal fun ImportPublicLyricsDialog(
+    publicLyrics: PublicLyrics,
+    onConfirmClicked: () -> Unit,
     onDismissRequest: () -> Unit,
-    onDenyClicked: () -> Unit,
 ) {
     SongbookDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.search_what_is_public_lyrics),
-            icon = IconWarning,
-            dismissible = SongbookDialogDismissible.Both,
+            label = stringResource(Res.string.search_import_public_lyrics),
+            icon = IconSave,
+            dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {
         SongbookText(
-            text = buildAnnotatedString {
-                append(stringResource(Res.string.search_what_is_public_lyrics_description))
-                withLink(
-                    LinkAnnotation.Url(
-                        url = URL,
-                        styles = TextLinkStyles(
-                            style = SpanStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                textDecoration = TextDecoration.Underline,
-                            ),
-                        ),
-                    ),
-                ) {
-                    append(URL)
-                }
-            },
+            text = stringResource(Res.string.search_import_public_lyrics_description),
             textStyle = defaultSongbookTextStyle().copy(
                 typography = MaterialTheme.typography.bodyMedium,
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -77,8 +58,8 @@ internal fun PublicLyricsHelpDialog(
         ) {
             SongbookButton(
                 modifier = Modifier.fillMaxWidth(),
-                label = stringResource(Res.string.search_i_understand),
-                onClick = onDismissRequest,
+                label = stringResource(Res.string.common_import_song),
+                onClick = onConfirmClicked,
                 buttonStyle = defaultSongbookButtonStyle().copy(
                     containerColor = MaterialTheme.colorScheme.primary,
                     textStyle = defaultSongbookTextStyle().copy(
@@ -95,8 +76,8 @@ internal fun PublicLyricsHelpDialog(
                         color = MaterialTheme.colorScheme.outlineVariant,
                         shape = CircleShape,
                     ),
-                label = stringResource(Res.string.search_turn_it_off),
-                onClick = onDenyClicked,
+                label = stringResource(Res.string.common_cancel),
+                onClick = onDismissRequest,
                 buttonStyle = defaultSongbookButtonStyle().copy(
                     containerColor = Color.Transparent,
                     textStyle = defaultSongbookTextStyle().copy(
@@ -108,5 +89,3 @@ internal fun PublicLyricsHelpDialog(
         }
     }
 }
-
-private const val URL = "https://lrclib.net"

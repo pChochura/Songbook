@@ -63,7 +63,7 @@ internal fun LibraryScreen(
         when (event) {
             is LibraryEvent.NavigateTo -> when (val route = event.route) {
                 is Route.Lyrics -> navigator.navigateToLyrics(route.songId)
-                Route.ImportSong -> navigator.navigateToImportSong()
+                is Route.ImportSong -> navigator.navigateToImportSong()
                 else -> Unit
             }
 

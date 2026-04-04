@@ -32,6 +32,12 @@ import kotlinx.coroutines.launch
 
 internal sealed interface SearchEvent {
     data object NavigateBack : SearchEvent
+    data class NavigateToImportSong(
+        val title: String,
+        val artist: String,
+        val lyrics: String,
+    ) : SearchEvent
+
     data class NavigateToPreview(
         val title: String,
         val artist: String,
@@ -78,7 +84,7 @@ internal class SearchViewModel(
             state = state.copy(isLoading = true)
             prefsRepository.getLastSearchesFlow().collect { lastSearches ->
                 state = state.copy(
-                    lastSearches = lastSearches.toList().asReversed(),
+                    lastSearches = lastSearches.toList(),
                     isLoading = false,
                 )
             }
@@ -127,7 +133,8 @@ internal class SearchViewModel(
         prefsRepository.removeLastSearch(search)
     }
 
-    fun onPublicLyricsClicked(lyrics: PublicLyrics) {
+    fun onPublicLyricsPreviewClicked(lyrics: PublicLyrics) {
+        addLastSearch(queryTextFieldState.text.toString())
         eventChannel.trySend(
             SearchEvent.NavigateToPreview(
                 title = lyrics.trackName,
@@ -137,9 +144,21 @@ internal class SearchViewModel(
         )
     }
 
+    fun onPublicLyricsImportClicked(lyrics: PublicLyrics) {
+        addLastSearch(queryTextFieldState.text.toString())
+        eventChannel.trySend(
+            SearchEvent.NavigateToImportSong(
+                title = lyrics.trackName,
+                artist = lyrics.artistName,
+                lyrics = lyrics.plainLyrics,
+            ),
+        )
+    }
+
     fun onAllowPublicLyricsClicked() {
         viewModelScope.launch {
             prefsRepository.setShowPublicLyrics(true)
+            queryTextFieldState.setTextAndPlaceCursorAtEnd(queryTextFieldState.text.toString())
             state = state.copy(showPublicLyrics = true)
         }
     }

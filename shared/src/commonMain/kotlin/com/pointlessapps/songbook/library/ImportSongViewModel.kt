@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.library
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,6 +82,12 @@ internal class ImportSongViewModel(
         }
     }
 
+    fun setData(title: String?, artist: String?, lyrics: String?) {
+        titleTextFieldState.setTextAndPlaceCursorAtEnd(title.orEmpty())
+        artistTextFieldState.setTextAndPlaceCursorAtEnd(artist.orEmpty())
+        lyricsTextFieldState.setTextAndPlaceCursorAtEnd(lyrics.orEmpty())
+    }
+
     fun onImportSongClicked() {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
@@ -92,6 +99,7 @@ internal class ImportSongViewModel(
                 ),
             )
             eventChannel.send(ImportSongEvent.NavigateBack)
+            state = state.copy(isLoading = false)
         }
     }
 
@@ -102,6 +110,9 @@ internal class ImportSongViewModel(
             lyricsTextFieldState.text.isNotBlank() ||
             state.selectedSetlists.isNotEmpty()
         ) {
+            titleTextFieldState.clearText()
+            artistTextFieldState.clearText()
+            lyricsTextFieldState.clearText()
             eventChannel.trySend(ImportSongEvent.DiscardChanges)
         } else {
             eventChannel.trySend(ImportSongEvent.NavigateBack)

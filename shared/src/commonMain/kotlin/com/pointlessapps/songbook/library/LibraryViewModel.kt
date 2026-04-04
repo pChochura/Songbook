@@ -74,7 +74,7 @@ internal class LibraryViewModel(
     }
 
     fun onImportSongRequested() {
-        eventChannel.trySend(LibraryEvent.NavigateTo(Route.ImportSong))
+        eventChannel.trySend(LibraryEvent.NavigateTo(Route.ImportSong()))
     }
 
     fun onLyricsRequested(id: Long) {

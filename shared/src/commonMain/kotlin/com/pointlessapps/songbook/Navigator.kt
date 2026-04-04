@@ -39,7 +39,11 @@ internal sealed interface Route : NavKey {
     }
 
     @Serializable
-    data object ImportSong : Route
+    data class ImportSong(
+        val title: String? = null,
+        val artist: String? = null,
+        val lyrics: String? = null,
+    ) : Route
 
     @Serializable
     data class PreviewSong(
@@ -114,8 +118,8 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
         backStack.add(Route.Lyrics(songId))
     }
 
-    fun navigateToImportSong() {
-        backStack.add(Route.ImportSong)
+    fun navigateToImportSong(title: String? = null, artist: String? = null, lyrics: String? = null) {
+        backStack.add(Route.ImportSong(title, artist, lyrics))
     }
 
     fun navigateToPreview(title: String, artist: String, sections: List<Section>) {

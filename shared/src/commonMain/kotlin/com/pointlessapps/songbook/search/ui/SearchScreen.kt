@@ -51,24 +51,26 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
+import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.search.SearchEvent
 import com.pointlessapps.songbook.search.SearchViewModel
 import com.pointlessapps.songbook.search.ui.components.EmptyListCard
 import com.pointlessapps.songbook.search.ui.components.PublicLyricsCard
 import com.pointlessapps.songbook.search.ui.components.SearchResultCard
 import com.pointlessapps.songbook.search.ui.components.dialogs.ConfirmRemoveLastSearchDialog
+import com.pointlessapps.songbook.search.ui.components.dialogs.ImportPublicLyricsDialog
 import com.pointlessapps.songbook.search.ui.components.dialogs.PublicLyricsHelpDialog
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_back
 import com.pointlessapps.songbook.shared.common_clear
 import com.pointlessapps.songbook.shared.common_remove
-import com.pointlessapps.songbook.shared.lyrics_allow
-import com.pointlessapps.songbook.shared.lyrics_allow_public_lyrics_search_rationale
-import com.pointlessapps.songbook.shared.lyrics_deny
-import com.pointlessapps.songbook.shared.lyrics_what_is_public_lyrics
 import com.pointlessapps.songbook.shared.navigation_search
+import com.pointlessapps.songbook.shared.search_allow
+import com.pointlessapps.songbook.shared.search_allow_public_lyrics_search_rationale
+import com.pointlessapps.songbook.shared.search_deny
 import com.pointlessapps.songbook.shared.search_last_searches
 import com.pointlessapps.songbook.shared.search_public_lyrics
+import com.pointlessapps.songbook.shared.search_what_is_public_lyrics
 import com.pointlessapps.songbook.shared.search_your_library
 import com.pointlessapps.songbook.ui.components.Position
 import com.pointlessapps.songbook.ui.components.SongbookButton
@@ -102,10 +104,17 @@ internal fun SearchScreen(
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()
     var confirmRemoveLastSearchDialogData by remember { mutableStateOf<String?>(null) }
     var isPublicLyricsHelpDialogVisible by remember { mutableStateOf(false) }
+    var importPublicLyricsDialogData by remember { mutableStateOf<PublicLyrics?>(null) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
             is SearchEvent.NavigateBack -> navigator.navigateBack()
+            is SearchEvent.NavigateToImportSong -> navigator.navigateToImportSong(
+                title = event.title,
+                artist = event.artist,
+                lyrics = event.lyrics,
+            )
+
             is SearchEvent.NavigateToPreview -> navigator.navigateToPreview(
                 title = event.title,
                 artist = event.artist,
@@ -138,8 +147,13 @@ internal fun SearchScreen(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
         ) {
             if (shouldShowLastSearches) {
-                item(key = "last_searches_header") {
-                    HeaderItem(stringResource(Res.string.search_last_searches))
+                if (viewModel.state.lastSearches.isNotEmpty()) {
+                    item(key = "last_searches_header") {
+                        HeaderItem(
+                            modifier = Modifier.animateItem(),
+                            text = stringResource(Res.string.search_last_searches),
+                        )
+                    }
                 }
 
                 items(viewModel.state.lastSearches, key = { it }) { lastSearch ->
@@ -152,7 +166,10 @@ internal fun SearchScreen(
                 }
             } else {
                 item(key = "your_library_header") {
-                    HeaderItem(stringResource(Res.string.search_your_library))
+                    HeaderItem(
+                        modifier = Modifier.animateItem(),
+                        text = stringResource(Res.string.search_your_library),
+                    )
                 }
 
                 if (viewModel.state.isLoadingYourLibrary) {
@@ -189,14 +206,14 @@ internal fun SearchScreen(
                 if (viewModel.state.showPublicLyrics != false) {
                     item(key = "public_lyrics_header") {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.animateItem().fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             HeaderItem(stringResource(Res.string.search_public_lyrics))
                             SongbookIconButton(
                                 icon = IconHelp,
-                                tooltipLabel = Res.string.lyrics_what_is_public_lyrics,
+                                tooltipLabel = Res.string.search_what_is_public_lyrics,
                                 onClick = { isPublicLyricsHelpDialogVisible = true },
                                 iconButtonStyle = defaultSongbookIconButtonStyle().copy(
                                     containerColor = Color.Transparent,
@@ -230,7 +247,8 @@ internal fun SearchScreen(
                         PublicLyricsCard(
                             modifier = Modifier.animateItem(),
                             lyrics = publicLyrics,
-                            onClick = { viewModel.onPublicLyricsClicked(publicLyrics) },
+                            onClicked = { importPublicLyricsDialogData = publicLyrics },
+                            onPreviewClicked = { viewModel.onPublicLyricsPreviewClicked(publicLyrics) },
                         )
                     }
                 } else if (viewModel.state.showPublicLyrics == null) {
@@ -264,6 +282,17 @@ internal fun SearchScreen(
                 viewModel.onDenyPublicLyricsClicked()
                 isPublicLyricsHelpDialogVisible = false
             },
+        )
+    }
+
+    importPublicLyricsDialogData?.let {
+        ImportPublicLyricsDialog(
+            publicLyrics = it,
+            onConfirmClicked = {
+                importPublicLyricsDialogData = null
+                viewModel.onPublicLyricsImportClicked(it)
+            },
+            onDismissRequest = { importPublicLyricsDialogData = null },
         )
     }
 
@@ -421,8 +450,12 @@ private fun SearchBar(
 }
 
 @Composable
-private fun HeaderItem(text: String) {
+private fun HeaderItem(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
     SongbookText(
+        modifier = modifier,
         text = text,
         textStyle = defaultSongbookTextStyle().copy(
             textColor = MaterialTheme.colorScheme.onSurface,
@@ -462,7 +495,7 @@ private fun AllowPublicLyricsCard(
         )
 
         SongbookText(
-            text = stringResource(Res.string.lyrics_allow_public_lyrics_search_rationale),
+            text = stringResource(Res.string.search_allow_public_lyrics_search_rationale),
             textStyle = defaultSongbookTextStyle().copy(
                 typography = MaterialTheme.typography.bodyMedium,
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -481,7 +514,7 @@ private fun AllowPublicLyricsCard(
                     color = MaterialTheme.colorScheme.outlineVariant,
                     shape = CircleShape,
                 ),
-                label = stringResource(Res.string.lyrics_deny),
+                label = stringResource(Res.string.search_deny),
                 onClick = onDenyClicked,
                 buttonStyle = defaultSongbookButtonStyle().copy(
                     containerColor = Color.Transparent,
@@ -494,7 +527,7 @@ private fun AllowPublicLyricsCard(
 
             SongbookButton(
                 modifier = Modifier.weight(1f),
-                label = stringResource(Res.string.lyrics_allow),
+                label = stringResource(Res.string.search_allow),
                 onClick = onAllowClicked,
                 buttonStyle = defaultSongbookButtonStyle().copy(
                     containerColor = MaterialTheme.colorScheme.primary,

@@ -41,8 +41,11 @@ internal val libraryModule = module {
         )
     }
 
-    navigation<Route.ImportSong> {
+    navigation<Route.ImportSong> { route ->
         ImportSongScreen(
+            title = route.title,
+            artist = route.artist,
+            lyrics = route.lyrics,
             viewModel = koinViewModel(),
         )
     }
