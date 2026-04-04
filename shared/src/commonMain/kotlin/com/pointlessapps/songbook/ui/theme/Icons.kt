@@ -27,11 +27,13 @@ import com.pointlessapps.songbook.shared.ic_favourite_empty
 import com.pointlessapps.songbook.shared.ic_filter
 import com.pointlessapps.songbook.shared.ic_fold
 import com.pointlessapps.songbook.shared.ic_folder
+import com.pointlessapps.songbook.shared.ic_folders
 import com.pointlessapps.songbook.shared.ic_fullscreen
+import com.pointlessapps.songbook.shared.ic_gallery
 import com.pointlessapps.songbook.shared.ic_help
 import com.pointlessapps.songbook.shared.ic_history
-import com.pointlessapps.songbook.shared.ic_image
 import com.pointlessapps.songbook.shared.ic_improve
+import com.pointlessapps.songbook.shared.ic_info
 import com.pointlessapps.songbook.shared.ic_key
 import com.pointlessapps.songbook.shared.ic_library
 import com.pointlessapps.songbook.shared.ic_minus
@@ -118,9 +120,11 @@ val IconVoice = Res.drawable.ic_voice
 val IconKey = Res.drawable.ic_key
 val IconFullscreen = Res.drawable.ic_fullscreen
 val IconScan = Res.drawable.ic_scan
-val IconImage = Res.drawable.ic_image
+val IconGallery = Res.drawable.ic_gallery
 val IconCamera = Res.drawable.ic_camera
 val IconSync = Res.drawable.ic_sync
 val IconSyncFailed = Res.drawable.ic_sync_failed
 val IconLibrary = Res.drawable.ic_library
 val IconHistory = Res.drawable.ic_history
+val IconInfo = Res.drawable.ic_info
+val IconFolders = Res.drawable.ic_folders

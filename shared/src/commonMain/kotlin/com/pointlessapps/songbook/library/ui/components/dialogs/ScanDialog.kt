@@ -41,7 +41,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconCamera
-import com.pointlessapps.songbook.ui.theme.IconImage
+import com.pointlessapps.songbook.ui.theme.IconGallery
 import com.pointlessapps.songbook.ui.theme.IconScan
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.rememberPermissionRequester
@@ -112,7 +112,7 @@ internal fun ScanDialog(
                     buttonStyle = defaultSongbookButtonStyle().copy(
                         orientation = SongbookButtonOrientation.Vertical,
                         shape = MaterialTheme.shapes.medium,
-                        icon = IconImage,
+                        icon = IconGallery,
                         textStyle = defaultSongbookButtonTextStyle().copy(
                             textAlign = TextAlign.Center,
                         ),
