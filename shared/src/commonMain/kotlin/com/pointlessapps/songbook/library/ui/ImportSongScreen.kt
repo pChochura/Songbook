@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.library.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -22,11 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,6 +39,7 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.library.ImportSongEvent
 import com.pointlessapps.songbook.library.ImportSongViewModel
+import com.pointlessapps.songbook.library.ui.components.ChordSuggestionPopup
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheet
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.AddToSetlists
 import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.Preview
@@ -53,6 +57,7 @@ import com.pointlessapps.songbook.shared.common_tooltip
 import com.pointlessapps.songbook.shared.import_artist_label
 import com.pointlessapps.songbook.shared.import_artist_placeholder
 import com.pointlessapps.songbook.shared.import_header_title
+import com.pointlessapps.songbook.shared.import_header_title_edit
 import com.pointlessapps.songbook.shared.import_lyrics_label
 import com.pointlessapps.songbook.shared.import_lyrics_placeholder
 import com.pointlessapps.songbook.shared.import_lyrics_tip
@@ -87,7 +92,7 @@ internal fun ImportSongScreen(
     viewModel: ImportSongViewModel,
 ) {
     val navigator = LocalNavigator.current
-    var isScanDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(false) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isDiscardChangesDialogVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -176,6 +181,20 @@ internal fun ImportSongScreen(
                     modifier = Modifier.weight(1f),
                     outputTransformation = ChordHighlightTransformation,
                     imeAction = ImeAction.None,
+                    popupContent = { textLayoutResultCallback ->
+                        if (viewModel.state.isChordPopupVisible) {
+                            val cursorPosition = viewModel.lyricsTextFieldState.selection.end
+                            textLayoutResultCallback()?.let {
+                                val cursorRect = it.getCursorRect(cursorPosition)
+                                ChordSuggestionPopup(
+                                    cursorRect = cursorRect,
+                                    suggestions = viewModel.state.chordSuggestions,
+                                    onChordSelected = viewModel::onChordSelected,
+                                    onDismissRequest = viewModel::onDismissChordPopup,
+                                )
+                            }
+                        }
+                    },
                 )
 
                 Row(
@@ -334,6 +353,7 @@ private fun LabeledTextField(
     required: Boolean = false,
     outputTransformation: OutputTransformation? = null,
     modifier: Modifier = Modifier,
+    popupContent: @Composable ((() -> TextLayoutResult?) -> Unit)? = null,
 ) {
     Column(
         modifier = modifier,
@@ -361,30 +381,36 @@ private fun LabeledTextField(
                 )
             }
         }
-        SongbookTextField(
-            state = textFieldState,
-            modifier = Modifier
-                .fillMaxSize()
-                .border(
-                    width = DEFAULT_BORDER_WIDTH,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = MaterialTheme.shapes.small,
-                )
-                .padding(
-                    horizontal = MaterialTheme.spacing.medium,
-                    vertical = MaterialTheme.spacing.small,
+        Box {
+            var onTextLayoutCallback by remember { mutableStateOf<() -> TextLayoutResult?>({ null }) }
+
+            SongbookTextField(
+                state = textFieldState,
+                onTextLayout = { onTextLayoutCallback = it },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .border(
+                        width = DEFAULT_BORDER_WIDTH,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = MaterialTheme.shapes.small,
+                    )
+                    .padding(
+                        horizontal = MaterialTheme.spacing.medium,
+                        vertical = MaterialTheme.spacing.small,
+                    ),
+                textFieldStyle = defaultSongbookTextFieldStyle().copy(
+                    placeholder = placeholder,
+                    placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    outputTransformation = outputTransformation,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        autoCorrectEnabled = true,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = imeAction,
+                    ),
                 ),
-            textFieldStyle = defaultSongbookTextFieldStyle().copy(
-                placeholder = placeholder,
-                placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                outputTransformation = outputTransformation,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    autoCorrectEnabled = true,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = imeAction,
-                ),
-            ),
-        )
+            )
+            popupContent?.invoke(onTextLayoutCallback)
+        }
     }
 }

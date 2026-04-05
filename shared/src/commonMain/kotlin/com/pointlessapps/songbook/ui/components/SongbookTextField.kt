@@ -7,12 +7,8 @@ import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -21,38 +17,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
-
-@Composable
-fun SongbookTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    onImeAction: (() -> Unit)? = null,
-    textFieldStyle: SongbookTextFieldStyle = defaultSongbookTextFieldStyle(),
-) {
-    val state = rememberTextFieldState(value)
-
-    LaunchedEffect(value) {
-        if (state.text.toString() != value) {
-            state.setTextAndPlaceCursorAtEnd(value)
-        }
-    }
-
-    LaunchedEffect(state) {
-        snapshotFlow { state.text }.collect {
-            if (it.toString() != value) {
-                onValueChange(it.toString())
-            }
-        }
-    }
-
-    SongbookTextField(
-        state = state,
-        modifier = modifier,
-        onImeAction = onImeAction,
-        textFieldStyle = textFieldStyle,
-    )
-}
 
 @Composable
 fun SongbookTextField(

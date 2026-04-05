@@ -2,7 +2,7 @@ package com.pointlessapps.songbook.core.song
 
 import com.pointlessapps.songbook.core.song.model.ChordShape
 
-internal object ChordLibrary {
+object ChordLibrary {
     enum class Shape(val chordShape: ChordShape) {
         SHAPE_MAJOR_E(ChordShape("MAJOR_E", listOf(0, 2, 2, 1, 0, 0), 0)),
         SHAPE_MINOR_E(ChordShape("MINOR_E", listOf(0, 2, 2, 0, 0, 0), 0)),
@@ -31,14 +31,14 @@ internal object ChordLibrary {
         "5" to Shape.SHAPE_POWER_E,
 
         "dim" to Shape.SHAPE_DIM_A,
-        "°" to "DIM_A",
+        "°" to Shape.SHAPE_DIM_A,
 
         "dim7" to Shape.SHAPE_DIM7_A,
         "o7" to Shape.SHAPE_DIM7_A,
         "7dim" to Shape.SHAPE_DIM7_A,
 
         "aug" to Shape.SHAPE_AUG_A,
-        "+" to "AUG_A",
+        "+" to Shape.SHAPE_AUG_A,
 
         "sus2" to Shape.SHAPE_SUS2_A,
 
@@ -61,6 +61,10 @@ internal object ChordLibrary {
         listOf("E"), listOf("F"), listOf("F#", "Gb"), listOf("G"),
         listOf("G#", "Ab"), listOf("A"), listOf("A#", "Bb"), listOf("B"),
     )
+
+    val allChords = chromaticScale.flatten().flatMap { note ->
+        qualityToShape.keys.map { quality -> "$note$quality" }
+    }.distinct()
 
     // Starting notes for each string (Standard Tuning: E A D G B E)
     private val stringRoots = listOf(4, 9, 2, 7, 11, 4)

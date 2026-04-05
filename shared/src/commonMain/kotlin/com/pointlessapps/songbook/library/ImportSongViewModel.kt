@@ -13,12 +13,14 @@ import com.pointlessapps.songbook.Agent
 import com.pointlessapps.songbook.core.app.AppRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
+import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Section
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -39,11 +41,13 @@ internal data class ImportSongState(
     val songId: Long? = null,
     val allSetlists: List<Setlist> = emptyList(),
     val selectedSetlists: List<Setlist> = emptyList(),
+    val chordSuggestions: List<String> = emptyList(),
     val canImport: Boolean = false,
     val isExtractingInProgress: Boolean = false,
     val isLoading: Boolean = false,
 ) {
     val setlistsSelection = allSetlists.associateWith { it in selectedSetlists }
+    val isChordPopupVisible = chordSuggestions.isNotEmpty()
 }
 
 internal class ImportSongViewModel(
@@ -74,11 +78,33 @@ internal class ImportSongViewModel(
                 isLoading = false,
             )
 
+            combine(
+                snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged(),
+                snapshotFlow { titleTextFieldState.text }.distinctUntilChanged(),
+            ) { lyrics, title -> lyrics.isNotBlank() && title.isNotBlank() }
+                .distinctUntilChanged()
+                .collect { state = state.copy(canImport = it) }
+        }
+
+        viewModelScope.launch {
             snapshotFlow {
-                lyricsTextFieldState.text.isNotBlank() &&
-                        titleTextFieldState.text.isNotBlank()
-            }.distinctUntilChanged().collect {
-                state = state.copy(canImport = it)
+                lyricsTextFieldState.text to lyricsTextFieldState.selection
+            }.collect { (text, selection) ->
+                val cursorPosition = selection.end
+                val textBeforeCursor = text.substring(0, cursorPosition)
+                val lastOpenBracket = textBeforeCursor.lastIndexOf('[')
+                val lastCloseBracket = textBeforeCursor.lastIndexOf(']')
+
+                if (lastOpenBracket != -1 && lastOpenBracket > lastCloseBracket) {
+                    val typedChord = textBeforeCursor.substring(lastOpenBracket + 1)
+                    state = state.copy(
+                        chordSuggestions = ChordLibrary.allChords.filter {
+                            it.startsWith(typedChord, ignoreCase = true)
+                        }.take(MAX_CHORDS_SUGGESTIONS),
+                    )
+                } else {
+                    state = state.copy(chordSuggestions = emptyList())
+                }
             }
         }
     }
@@ -171,5 +197,28 @@ internal class ImportSongViewModel(
         )
     }
 
+    fun onChordSelected(chord: String) {
+        val text = lyricsTextFieldState.text.toString()
+        val selection = lyricsTextFieldState.selection
+        val cursorPosition = selection.end
+        val textBeforeCursor = text.substring(0, cursorPosition)
+        val lastOpenBracket = textBeforeCursor.lastIndexOf('[')
+
+        if (lastOpenBracket != -1) {
+            lyricsTextFieldState.edit {
+                replace(lastOpenBracket, cursorPosition, "[$chord]")
+            }
+        }
+        state = state.copy(chordSuggestions = emptyList())
+    }
+
+    fun onDismissChordPopup() {
+        state = state.copy(chordSuggestions = emptyList())
+    }
+
     private fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
+
+    private companion object {
+        const val MAX_CHORDS_SUGGESTIONS = 6
+    }
 }
