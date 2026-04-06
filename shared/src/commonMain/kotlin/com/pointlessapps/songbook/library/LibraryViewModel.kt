@@ -32,8 +32,6 @@ internal data class LibraryState(
 )
 
 internal class LibraryViewModel(
-    initialFilterLetter: String? = null,
-    openSearch: Boolean = false,
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val authRepository: AuthRepository,

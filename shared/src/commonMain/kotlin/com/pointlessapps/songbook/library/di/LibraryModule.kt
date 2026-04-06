@@ -16,22 +16,20 @@ import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 internal val libraryModule = module {
-    viewModel { params ->
+    viewModel {
         LibraryViewModel(
-            initialFilterLetter = params.getOrNull(),
-            openSearch = params.getOrNull() ?: false,
             setlistRepository = get(),
             songRepository = get(),
             authRepository = get(),
         )
     }
 
-    viewModel {
+    viewModel { (id: Long?, title: String?, artist: String?, lyrics: String?) ->
         ImportSongViewModel(
-            id = it.getOrNull(),
-            title = it.getOrNull(),
-            artist = it.getOrNull(),
-            lyrics = it.getOrNull(),
+            id = id,
+            title = title,
+            artist = artist,
+            lyrics = lyrics,
             agent = get(named("Gemini")),
             setlistRepository = get(),
             songRepository = get(),
@@ -39,11 +37,9 @@ internal val libraryModule = module {
         )
     }
 
-    navigation<Route.Library> { route ->
+    navigation<Route.Library> {
         LibraryScreen(
-            viewModel = koinViewModel(key = route.toString()) {
-                parametersOf(route.initialFilterLetter, route.openSearch)
-            },
+            viewModel = koinViewModel(),
         )
     }
 

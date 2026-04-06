@@ -23,10 +23,7 @@ internal sealed interface Route : NavKey {
         get() = false
 
     @Serializable
-    data class Library(
-        val initialFilterLetter: String? = null,
-        val openSearch: Boolean = false,
-    ) : Route {
+    data object Library : Route {
         override val hasBottomBar = true
     }
 

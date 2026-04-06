@@ -37,10 +37,7 @@ fun App(
     val songbookSnackbarHostState = rememberSongbookSnackbarHostState()
     val backstack: NavBackStack<NavKey> = rememberNavBackStack(
         configuration = navigationConfig,
-        Route.Library(
-            initialFilterLetter = initialFilterLetter,
-            openSearch = openSearch,
-        ),
+        Route.Library,
     )
     val navigator = Navigator(backstack)
     val bottomBarPadding = remember { BottomBarPadding() }

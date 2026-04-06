@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.library
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -147,9 +148,9 @@ internal class ImportSongViewModel(
     }
 
     fun onDiscardChangesClicked() {
-        titleTextFieldState.setTextAndPlaceCursorAtEnd("")
-        artistTextFieldState.setTextAndPlaceCursorAtEnd("")
-        lyricsTextFieldState.setTextAndPlaceCursorAtEnd("")
+        titleTextFieldState.clearText()
+        artistTextFieldState.clearText()
+        lyricsTextFieldState.clearText()
         eventChannel.trySend(ImportSongEvent.NavigateBack)
     }
 

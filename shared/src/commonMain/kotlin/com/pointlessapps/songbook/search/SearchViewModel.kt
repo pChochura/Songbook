@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.search
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -122,7 +123,7 @@ internal class SearchViewModel(
 
     fun onClearClicked() {
         addLastSearch(queryTextFieldState.text.toString())
-        queryTextFieldState.setTextAndPlaceCursorAtEnd("")
+        queryTextFieldState.clearText()
     }
 
     fun onLastSearchClicked(search: String) {

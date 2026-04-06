@@ -70,10 +70,10 @@ internal fun BottomBar(
                 onClicked = {
                     when (currentRoute) {
                         is Route.Library -> onActiveClicked(currentRoute)
-                        else -> onNavigateTo(Route.Library())
+                        else -> onNavigateTo(Route.Library)
                     }
                 },
-                onLongClicked = { onLongClicked(Route.Library()) },
+                onLongClicked = { onLongClicked(Route.Library) },
             )
             BottomBarButton(
                 bottomBarButton = when {
