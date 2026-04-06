@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.TextLayoutResult
+import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.lyrics.LyricsMode
 import com.pointlessapps.songbook.ui.components.SongbookChip
@@ -32,6 +33,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 internal fun LyricsSections(
     sections: List<Section>,
     textScale: Int,
+    keyOffset: Int,
     mode: LyricsMode,
     modifier: Modifier = Modifier,
 ) {
@@ -76,16 +78,18 @@ internal fun LyricsSections(
             }
 
             when {
-                mode.shouldShowSideBySide() -> SideBySideLyricsSection(
+                mode.shouldShowSideBySide -> SideBySideLyricsSection(
                     section = section,
+                    keyOffset = keyOffset,
                     lineTextStyle = lineTextStyle,
                     chordChipStyle = chordChipStyle,
-                    shouldShowInline = mode.shouldShowInline(),
+                    shouldShowInline = mode.shouldShowInline,
                 )
 
-                mode.shouldShowInline() -> section.lines.forEach { line ->
+                mode.shouldShowInline -> section.lines.forEach { line ->
                     InlineLyricsLine(
                         line = line,
+                        keyOffset = keyOffset,
                         lineTextStyle = lineTextStyle,
                         chordChipStyle = chordChipStyle,
                     )
@@ -107,6 +111,7 @@ internal fun LyricsSections(
 @Composable
 private fun SideBySideLyricsSection(
     section: Section,
+    keyOffset: Int,
     lineTextStyle: SongbookTextStyle,
     chordChipStyle: SongbookChipStyle,
     shouldShowInline: Boolean,
@@ -130,6 +135,7 @@ private fun SideBySideLyricsSection(
                 when {
                     shouldShowInline -> InlineLyricsLine(
                         line = line,
+                        keyOffset = keyOffset,
                         lineTextStyle = lineTextStyle,
                         chordChipStyle = chordChipStyle,
                     )
@@ -143,7 +149,7 @@ private fun SideBySideLyricsSection(
                     val chord = line.chords.find { it.position == pos }
                     if (chord != null) {
                         SongbookChip(
-                            label = chord.value,
+                            label = ChordLibrary.transpose(chord.value, keyOffset),
                             isSelected = false,
                             onClick = {
                                 // TODO add chord explanation dialog
@@ -230,6 +236,7 @@ private fun SideBySideLyricsSection(
 @Composable
 private fun InlineLyricsLine(
     line: Section.Line,
+    keyOffset: Int,
     lineTextStyle: SongbookTextStyle,
     chordChipStyle: SongbookChipStyle,
 ) {
@@ -244,7 +251,7 @@ private fun InlineLyricsLine(
             )
             line.chords.forEach { chord ->
                 SongbookChip(
-                    label = chord.value,
+                    label = ChordLibrary.transpose(chord.value, keyOffset),
                     isSelected = false,
                     onClick = {
                         // TODO add chord explanation dialog

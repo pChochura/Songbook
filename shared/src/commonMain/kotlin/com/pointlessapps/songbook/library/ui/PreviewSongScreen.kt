@@ -35,6 +35,7 @@ internal fun PreviewSongScreen(
 ) {
     val navigator = LocalNavigator.current
     var textScale by remember { mutableIntStateOf(100) }
+    var keyOffset by remember { mutableIntStateOf(0) }
 
     SongbookScaffoldLayout(
         topBar = @Composable { Spacer(Modifier.statusBarsPadding()) },
@@ -44,6 +45,7 @@ internal fun PreviewSongScreen(
             artist = artist,
             sections = sections,
             textScale = textScale,
+            keyOffset = keyOffset,
             onTextScaleChanged = { textScale = it.coerceIn(MIN_ZOOM, MAX_ZOOM) },
             paddingValues = paddingValues,
         )

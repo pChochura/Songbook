@@ -69,6 +69,34 @@ object ChordLibrary {
     // Starting notes for each string (Standard Tuning: E A D G B E)
     private val stringRoots = listOf(4, 9, 2, 7, 11, 4)
 
+    private val rootNoteRegex = Regex("^([A-G][#b]?)")
+
+    fun transpose(chord: String, offset: Int): String {
+        if (offset == 0) return chord
+
+        val parts = chord.split("/")
+        val transposedRoot = transposeNote(parts[0], offset)
+        val transposedBass = if (parts.size > 1) "/${transposeNote(parts[1], offset)}" else ""
+
+        return "$transposedRoot$transposedBass"
+    }
+
+    private fun transposeNote(note: String, offset: Int): String {
+        val match = rootNoteRegex.find(note) ?: return note
+        val root = match.groupValues[1]
+        val suffix = note.substring(root.length)
+
+        val index = chromaticScale.indexOfFirst { it.contains(root) }
+        if (index == -1) return note
+
+        var newIndex = (index + offset) % 12
+        while (newIndex < 0) newIndex += 12
+
+        val newRoot = chromaticScale[newIndex].first()
+
+        return "$newRoot$suffix"
+    }
+
     fun getBaseFret(note: String, rootString: Int): Int {
         val targetIdx = chromaticScale.indexOfFirst { it.contains(note) }
         val stringIdx = stringRoots[rootString]

@@ -31,6 +31,7 @@ internal fun PreviewSongLayout(
     artist: String,
     sections: List<Section>,
     textScale: Int,
+    keyOffset: Int,
     onTextScaleChanged: (Int) -> Unit,
     mode: LyricsMode = LyricsMode.Inline,
     paddingValues: PaddingValues = PaddingValues(),
@@ -74,6 +75,7 @@ internal fun PreviewSongLayout(
                 LyricsSections(
                     sections = sections,
                     textScale = textScale,
+                    keyOffset = keyOffset,
                     mode = mode,
                     modifier = Modifier.padding(
                         horizontal = MaterialTheme.spacing.huge,

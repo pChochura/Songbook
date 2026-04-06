@@ -110,6 +110,7 @@ internal fun LyricsScreen(
                 artist = viewModel.state.artist,
                 sections = viewModel.state.sections,
                 textScale = viewModel.state.textScale,
+                keyOffset = viewModel.state.keyOffset,
                 mode = viewModel.state.mode,
                 onTextScaleChanged = viewModel::onTextScaleChanged,
                 paddingValues = paddingValues,

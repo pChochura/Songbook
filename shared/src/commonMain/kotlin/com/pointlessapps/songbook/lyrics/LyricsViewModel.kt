@@ -30,8 +30,8 @@ internal enum class LyricsMode {
     Both,
     TextOnly;
 
-    fun shouldShowInline() = this == Inline || this == Both
-    fun shouldShowSideBySide() = this == SideBySide || this == Both
+    val shouldShowInline get() = this == Inline || this == Both
+    val shouldShowSideBySide get() = this == SideBySide || this == Both
 }
 
 internal data class LyricsState(
