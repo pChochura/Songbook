@@ -1,8 +1,5 @@
 package com.pointlessapps.songbook.lyrics
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.model.SyncStatus
@@ -11,7 +8,13 @@ import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal sealed interface LyricsEvent {
@@ -53,28 +56,49 @@ internal class LyricsViewModel(
     private val songRepository: SongRepository,
 ) : ViewModel() {
 
-    var state by mutableStateOf(LyricsState(songId = songId))
-        private set
+    private data class LyricsTransientState(
+        val textScale: Int = 100,
+        val mode: LyricsMode = LyricsMode.Inline,
+        val keyOffset: Int = 0,
+        val isLoading: Boolean = false,
+    )
+
+    private val _transientState = MutableStateFlow(LyricsTransientState())
+
+    val state: StateFlow<LyricsState> = combine(
+        songRepository.getSongById(songId),
+        _transientState,
+    ) { songResult, transient ->
+        val song = songResult.data
+        LyricsState(
+            songId = songId,
+            title = song?.title ?: "",
+            artist = song?.artist ?: "",
+            sections = song?.sections ?: emptyList(),
+            syncStatus = songResult.status,
+            textScale = transient.textScale,
+            mode = transient.mode,
+            keyOffset = transient.keyOffset,
+            isLoading = transient.isLoading,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = LyricsState(songId = songId, isLoading = true),
+    )
 
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
 
     init {
         viewModelScope.launch {
-            state = state.copy(
-                textScale = prefsRepository.getTextScale(),
-                mode = prefsRepository.getMode()?.let(LyricsMode::valueOf) ?: LyricsMode.Inline,
-            )
-
-            songRepository.getSongById(songId).collect { stateResult ->
-                stateResult.data?.let { song ->
-                    state = state.copy(
-                        title = song.title,
-                        artist = song.artist,
-                        syncStatus = stateResult.status,
-                        sections = song.sections,
-                    )
-                }
+            val textScale = prefsRepository.getTextScale()
+            val mode = prefsRepository.getMode()?.let(LyricsMode::valueOf) ?: LyricsMode.Inline
+            _transientState.update {
+                it.copy(
+                    textScale = textScale,
+                    mode = mode,
+                )
             }
         }
     }
@@ -83,26 +107,27 @@ internal class LyricsViewModel(
         eventChannel.trySend(
             LyricsEvent.NavigateToImportSong(
                 songId = songId,
-                title = state.title,
-                artist = state.artist,
-                lyrics = state.sections.toLyrics(),
+                title = state.value.title,
+                artist = state.value.artist,
+                lyrics = state.value.sections.toLyrics(),
             ),
         )
     }
 
     fun onTextScaleChanged(textScale: Int) {
-        state = state.copy(textScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
+        val newScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM)
+        _transientState.update { it.copy(textScale = newScale) }
         viewModelScope.launch {
-            prefsRepository.setTextScale(state.textScale)
+            prefsRepository.setTextScale(newScale)
         }
     }
 
     fun onKeyOffsetChanged(keyOffset: Int) {
-        state = state.copy(keyOffset = keyOffset)
+        _transientState.update { it.copy(keyOffset = keyOffset) }
     }
 
     fun onModeChanged(mode: LyricsMode) {
-        state = state.copy(mode = mode)
+        _transientState.update { it.copy(mode = mode) }
         viewModelScope.launch {
             prefsRepository.setMode(mode.name)
         }
@@ -110,7 +135,7 @@ internal class LyricsViewModel(
 
     fun deleteSong() {
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
+            _transientState.update { it.copy(isLoading = true) }
             songRepository.deleteSong(songId)
             eventChannel.send(LyricsEvent.NavigateBack)
         }

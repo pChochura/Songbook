@@ -3,9 +3,6 @@ package com.pointlessapps.songbook.library
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,10 +18,14 @@ import com.pointlessapps.songbook.core.song.model.Section
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal sealed interface ImportSongEvent {
@@ -52,7 +53,7 @@ internal data class ImportSongState(
 }
 
 internal class ImportSongViewModel(
-    id: Long?,
+    private val id: Long?,
     title: String?,
     artist: String?,
     lyrics: String?,
@@ -62,12 +63,39 @@ internal class ImportSongViewModel(
     private val appRepository: AppRepository,
 ) : ViewModel() {
 
+    private data class ImportSongTransientState(
+        val selectedSetlists: List<Setlist> = emptyList(),
+        val chordSuggestions: List<String> = emptyList(),
+        val isExtractingInProgress: Boolean = false,
+        val isLoading: Boolean = false,
+    )
+
     val titleTextFieldState = TextFieldState(title.orEmpty())
     val artistTextFieldState = TextFieldState(artist.orEmpty())
     val lyricsTextFieldState = TextFieldState(lyrics.orEmpty())
 
-    var state by mutableStateOf(ImportSongState(songId = id))
-        private set
+    private val _transientState = MutableStateFlow(ImportSongTransientState())
+
+    val state: StateFlow<ImportSongState> = combine(
+        setlistRepository.getAllSetlists(),
+        snapshotFlow { titleTextFieldState.text }.distinctUntilChanged(),
+        snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged(),
+        _transientState,
+    ) { allSetlists, titleText, lyricsText, transient ->
+        ImportSongState(
+            songId = id,
+            allSetlists = allSetlists.data,
+            selectedSetlists = transient.selectedSetlists,
+            chordSuggestions = transient.chordSuggestions,
+            canImport = titleText.isNotBlank() && lyricsText.isNotBlank(),
+            isExtractingInProgress = transient.isExtractingInProgress,
+            isLoading = transient.isLoading,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = ImportSongState(songId = id, isLoading = true),
+    )
 
     private val eventChannel = Channel<ImportSongEvent>(BUFFERED)
     val events = eventChannel.receiveAsFlow()
@@ -77,22 +105,6 @@ internal class ImportSongViewModel(
     init {
         if (id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()) {
             eventChannel.trySend(ImportSongEvent.ShowScanDialog)
-        }
-
-        viewModelScope.launch {
-            state = state.copy(isLoading = true)
-            state = state.copy(
-                allSetlists = setlistRepository.getAllSetlists()
-                    .firstOrNull()?.data.orEmpty(),
-                isLoading = false,
-            )
-
-            combine(
-                snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged(),
-                snapshotFlow { titleTextFieldState.text }.distinctUntilChanged(),
-            ) { lyrics, title -> lyrics.isNotBlank() && title.isNotBlank() }
-                .distinctUntilChanged()
-                .collect { state = state.copy(canImport = it) }
         }
 
         viewModelScope.launch {
@@ -106,13 +118,12 @@ internal class ImportSongViewModel(
 
                 if (lastOpenBracket != -1 && lastOpenBracket > lastCloseBracket) {
                     val typedChord = textBeforeCursor.substring(lastOpenBracket + 1)
-                    state = state.copy(
-                        chordSuggestions = ChordLibrary.allChords.filter {
-                            it.startsWith(typedChord, ignoreCase = true)
-                        }.take(MAX_CHORDS_SUGGESTIONS),
-                    )
+                    val suggestions = ChordLibrary.allChords.filter {
+                        it.startsWith(typedChord, ignoreCase = true)
+                    }.take(MAX_CHORDS_SUGGESTIONS)
+                    _transientState.update { it.copy(chordSuggestions = suggestions) }
                 } else {
-                    state = state.copy(chordSuggestions = emptyList())
+                    _transientState.update { it.copy(chordSuggestions = emptyList()) }
                 }
             }
         }
@@ -120,17 +131,17 @@ internal class ImportSongViewModel(
 
     fun onImportSongClicked() {
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
+            _transientState.update { it.copy(isLoading = true) }
             songRepository.saveSong(
                 NewSong(
-                    id = state.songId,
+                    id = state.value.songId,
                     title = titleTextFieldState.text.toString(),
                     artist = artistTextFieldState.text.toString(),
                     sections = computeSections(),
                 ),
             )
             eventChannel.send(ImportSongEvent.NavigateBack)
-            state = state.copy(isLoading = false)
+            _transientState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -139,7 +150,7 @@ internal class ImportSongViewModel(
             titleTextFieldState.text.isNotBlank() ||
             artistTextFieldState.text.isNotBlank() ||
             lyricsTextFieldState.text.isNotBlank() ||
-            state.selectedSetlists.isNotEmpty()
+            state.value.selectedSetlists.isNotEmpty()
         ) {
             eventChannel.trySend(ImportSongEvent.DiscardChanges)
         } else {
@@ -155,9 +166,9 @@ internal class ImportSongViewModel(
     }
 
     fun onSetlistsSelected(setlists: List<Setlist>) {
-        state = state.copy(
-            selectedSetlists = setlists,
-        )
+        _transientState.update {
+            it.copy(selectedSetlists = setlists)
+        }
     }
 
     fun onImageCaptured(bytes: ByteArray?) {
@@ -168,11 +179,11 @@ internal class ImportSongViewModel(
 
         extractionJob?.cancel()
         extractionJob = viewModelScope.launch {
-            state = state.copy(isExtractingInProgress = true)
+            _transientState.update { it.copy(isExtractingInProgress = true) }
             val result = agent.extractSongData(bytes)
             if (result == null) {
                 // TODO show a snackbar
-                state = state.copy(isExtractingInProgress = false)
+                _transientState.update { it.copy(isExtractingInProgress = false) }
                 return@launch
             }
 
@@ -180,13 +191,13 @@ internal class ImportSongViewModel(
             titleTextFieldState.setTextAndPlaceCursorAtEnd(data.title.orEmpty())
             artistTextFieldState.setTextAndPlaceCursorAtEnd(data.author.orEmpty())
             lyricsTextFieldState.setTextAndPlaceCursorAtEnd(data.toLyrics())
-            state = state.copy(isExtractingInProgress = false)
+            _transientState.update { it.copy(isExtractingInProgress = false) }
         }
     }
 
     fun onCancelExtractionClicked() {
         extractionJob?.cancel()
-        state = state.copy(isExtractingInProgress = false)
+        _transientState.update { it.copy(isExtractingInProgress = false) }
     }
 
     fun onOpenSettingsClicked() {
@@ -215,11 +226,11 @@ internal class ImportSongViewModel(
                 replace(lastOpenBracket, cursorPosition, "[$chord]")
             }
         }
-        state = state.copy(chordSuggestions = emptyList())
+        _transientState.update { it.copy(chordSuggestions = emptyList()) }
     }
 
     fun onDismissChordPopup() {
-        state = state.copy(chordSuggestions = emptyList())
+        _transientState.update { it.copy(chordSuggestions = emptyList()) }
     }
 
     private fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())

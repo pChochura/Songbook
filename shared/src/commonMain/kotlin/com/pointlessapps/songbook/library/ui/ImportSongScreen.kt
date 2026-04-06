@@ -32,6 +32,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
@@ -87,6 +88,7 @@ internal fun ImportSongScreen(
     viewModel: ImportSongViewModel,
 ) {
     val navigator = LocalNavigator.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
     var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(false) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isDiscardChangesDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -119,7 +121,7 @@ internal fun ImportSongScreen(
                 rightButton = TopBarButton.menu(
                     onClick = { isBottomSheetVisible = true },
                 ),
-                title = if (viewModel.state.songId == null) {
+                title = if (state.songId == null) {
                     Res.string.import_header_title
                 } else {
                     Res.string.import_header_title_edit
@@ -160,7 +162,7 @@ internal fun ImportSongScreen(
 
             SongLyricsTextField(
                 lyricsTextFieldState = viewModel.lyricsTextFieldState,
-                chordSuggestions = viewModel.state.chordSuggestions,
+                chordSuggestions = state.chordSuggestions,
                 onChordSelected = viewModel::onChordSelected,
                 onDismissChordPopup = viewModel::onDismissChordPopup,
                 modifier = Modifier.weight(1f),
@@ -192,7 +194,7 @@ internal fun ImportSongScreen(
                 SongbookButton(
                     modifier = Modifier.weight(1f),
                     label = stringResource(
-                        if (viewModel.state.songId == null) {
+                        if (state.songId == null) {
                             Res.string.common_import_song
                         } else {
                             Res.string.common_save_changes
@@ -200,7 +202,7 @@ internal fun ImportSongScreen(
                     ),
                     onClick = viewModel::onImportSongClicked,
                     buttonStyle = defaultSongbookButtonStyle().copy(
-                        enabled = viewModel.state.canImport,
+                        enabled = state.canImport,
                         shape = CircleShape,
                     ),
                 )
@@ -213,7 +215,7 @@ internal fun ImportSongScreen(
 
     ImportSongOptionsBottomSheet(
         show = isBottomSheetVisible,
-        state = viewModel.state,
+        state = state,
         onDismissRequest = { isBottomSheetVisible = false },
         onAction = {
             when (it) {
@@ -233,7 +235,7 @@ internal fun ImportSongScreen(
 
     if (isSetlistsDialogVisible) {
         SetlistsDialog(
-            setlists = viewModel.state.setlistsSelection,
+            setlists = state.setlistsSelection,
             onSetlistsSelected = {
                 viewModel.onSetlistsSelected(it)
                 isSetlistsDialogVisible = false
@@ -280,13 +282,13 @@ internal fun ImportSongScreen(
         )
     }
 
-    if (viewModel.state.isExtractingInProgress) {
+    if (state.isExtractingInProgress) {
         ExtractingInProgressDialog(
             onDismissRequest = viewModel::onCancelExtractionClicked,
         )
     }
 
-    SongbookLoader(viewModel.state.isLoading)
+    SongbookLoader(state.isLoading)
 }
 
 @Composable

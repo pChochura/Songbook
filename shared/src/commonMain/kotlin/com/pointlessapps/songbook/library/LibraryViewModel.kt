@@ -1,8 +1,5 @@
 package com.pointlessapps.songbook.library
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
@@ -13,12 +10,16 @@ import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Song
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
 
 internal sealed interface LibraryEvent {
     data class NavigateTo(val route: Route) : LibraryEvent
@@ -37,36 +38,36 @@ internal class LibraryViewModel(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    var state by mutableStateOf(LibraryState())
-        private set
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val state: StateFlow<LibraryState> = flow {
+        authRepository.initialize()
+        if (!authRepository.isSignedIn()) {
+            authRepository.signInAnonymously()
+        }
+        emit(Unit)
+    }.flatMapLatest {
+        combine(
+            setlistRepository.getAllSetlists(limit = SETLISTS_LIMIT),
+            songRepository.getAllSongs(),
+        ) { setlistsState, songsState ->
+            LibraryState(
+                setlists = setlistsState.data,
+                songs = songsState.data,
+                syncStatus = DataState.statusOf(
+                    setlistsState.status,
+                    songsState.status,
+                ),
+                isLoading = false,
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = LibraryState(isLoading = true),
+    )
 
     private val eventChannel = Channel<LibraryEvent>(BUFFERED)
     val events = eventChannel.receiveAsFlow()
-
-    init {
-        viewModelScope.launch {
-            authRepository.initialize()
-            if (!authRepository.isSignedIn()) {
-                authRepository.signInAnonymously()
-            }
-
-            state = state.copy(isLoading = true)
-            combine(
-                setlistRepository.getAllSetlists(limit = SETLISTS_LIMIT),
-                songRepository.getAllSongs(),
-            ) { setlistsState, songsState ->
-                state = state.copy(
-                    setlists = setlistsState.data,
-                    songs = songsState.data,
-                    syncStatus = DataState.statusOf(
-                        setlistsState.status,
-                        songsState.status,
-                    ),
-                    isLoading = false,
-                )
-            }.collect()
-        }
-    }
 
     fun onImportSongClicked() {
         eventChannel.trySend(LibraryEvent.NavigateTo(Route.ImportSong()))

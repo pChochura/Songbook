@@ -47,6 +47,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.pointlessapps.songbook.LocalBottomBarPadding
@@ -76,7 +77,6 @@ import com.pointlessapps.songbook.ui.components.Position
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
-import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.SongbookTextField
@@ -101,6 +101,7 @@ internal fun SearchScreen(
     viewModel: SearchViewModel,
 ) {
     val navigator = LocalNavigator.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()
     var confirmRemoveLastSearchDialogData by remember { mutableStateOf<String?>(null) }
     var isPublicLyricsHelpDialogVisible by remember { mutableStateOf(false) }
@@ -125,7 +126,7 @@ internal fun SearchScreen(
 
     val shouldShowLastSearches by remember { derivedStateOf { viewModel.queryTextFieldState.text.isEmpty() } }
     val shouldShowNoItemsYourLibrary by remember { derivedStateOf { searchResults.itemCount == 0 } }
-    val shouldShowNoItemsPublicLyrics by remember { derivedStateOf { viewModel.state.publicLyrics.isEmpty() } }
+    val shouldShowNoItemsPublicLyrics by remember { derivedStateOf { state.publicLyrics.isEmpty() } }
 
     SongbookScaffoldLayout(
         topBar = {
@@ -147,7 +148,7 @@ internal fun SearchScreen(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
         ) {
             if (shouldShowLastSearches) {
-                if (viewModel.state.lastSearches.isNotEmpty()) {
+                if (state.lastSearches.isNotEmpty()) {
                     item(key = "last_searches_header") {
                         HeaderItem(
                             modifier = Modifier.animateItem(),
@@ -156,7 +157,7 @@ internal fun SearchScreen(
                     }
                 }
 
-                items(viewModel.state.lastSearches, key = { it }) { lastSearch ->
+                items(state.lastSearches, key = { it }) { lastSearch ->
                     LastSearchItem(
                         modifier = Modifier.animateItem(),
                         lastSearch = lastSearch,
@@ -172,7 +173,7 @@ internal fun SearchScreen(
                     )
                 }
 
-                if (viewModel.state.isLoadingYourLibrary) {
+                if (state.isLoadingYourLibrary) {
                     item(key = "your_library_loading") {
                         Box(
                             modifier = Modifier
@@ -203,7 +204,7 @@ internal fun SearchScreen(
                     }
                 }
 
-                if (viewModel.state.showPublicLyrics != false) {
+                if (state.showPublicLyrics != false) {
                     item(key = "public_lyrics_header") {
                         Row(
                             modifier = Modifier.animateItem().fillMaxWidth(),
@@ -225,8 +226,8 @@ internal fun SearchScreen(
                     }
                 }
 
-                if (viewModel.state.showPublicLyrics == true) {
-                    if (viewModel.state.isLoadingPublicLyrics) {
+                if (state.showPublicLyrics == true) {
+                    if (state.isLoadingPublicLyrics) {
                         item(key = "public_lyrics_loading") {
                             Box(
                                 modifier = Modifier
@@ -243,7 +244,7 @@ internal fun SearchScreen(
                         }
                     }
 
-                    items(viewModel.state.publicLyrics, key = { it.id }) { publicLyrics ->
+                    items(state.publicLyrics, key = { it.id }) { publicLyrics ->
                         PublicLyricsCard(
                             modifier = Modifier.animateItem(),
                             lyrics = publicLyrics,
@@ -251,7 +252,7 @@ internal fun SearchScreen(
                             onPreviewClicked = { viewModel.onPublicLyricsPreviewClicked(publicLyrics) },
                         )
                     }
-                } else if (viewModel.state.showPublicLyrics == null) {
+                } else if (state.showPublicLyrics == null) {
                     item(key = "public_lyrics_allow") {
                         AllowPublicLyricsCard(
                             modifier = Modifier.animateItem(),
@@ -295,8 +296,6 @@ internal fun SearchScreen(
             onDismissRequest = { importPublicLyricsDialogData = null },
         )
     }
-
-    SongbookLoader(viewModel.state.isLoading)
 }
 
 @Composable

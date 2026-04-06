@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
@@ -70,6 +71,7 @@ internal fun LibraryScreen(
     viewModel: LibraryViewModel,
 ) {
     val navigator = LocalNavigator.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
@@ -92,11 +94,11 @@ internal fun LibraryScreen(
                 leftButton = null,
                 rightButton = TopBarButton(
                     enabled = false,
-                    icon = if (viewModel.state.syncStatus == SyncStatus.LOCAL) IconSync else IconSyncFailed,
+                    icon = if (state.syncStatus == SyncStatus.LOCAL) IconSync else IconSyncFailed,
                     tooltip = Res.string.common_syncing,
                     onClick = {},
                     modifier = Modifier.graphicsLayer { rotationZ = rotation.value },
-                ).takeIf { viewModel.state.syncStatus == SyncStatus.LOCAL },
+                ).takeIf { state.syncStatus == SyncStatus.LOCAL },
                 title = Res.string.common_app_name,
             )
         },
@@ -123,19 +125,19 @@ internal fun LibraryScreen(
 
             item(key = "setlists", span = { GridItemSpan(maxLineSpan) }) {
                 SetlistsRow(
-                    setlists = viewModel.state.setlists,
+                    setlists = state.setlists,
                     onAddSetlistClicked = viewModel::onAddSetlistClicked,
                 )
             }
 
             item(key = "all_songs_header", span = { GridItemSpan(maxLineSpan) }) {
                 AllSongsHeader(
-                    numberOfSongs = viewModel.state.songs.size,
+                    numberOfSongs = state.songs.size,
                     modifier = Modifier.animateItem(),
                 )
             }
 
-            items(viewModel.state.songs, key = { it.id }) { song ->
+            items(state.songs, key = { it.id }) { song ->
                 SongCard(
                     modifier = Modifier.animateItem(),
                     song = song,
@@ -152,7 +154,7 @@ internal fun LibraryScreen(
         }
     }
 
-    SongbookLoader(viewModel.state.isLoading)
+    SongbookLoader(state.isLoading)
 }
 
 @Composable
