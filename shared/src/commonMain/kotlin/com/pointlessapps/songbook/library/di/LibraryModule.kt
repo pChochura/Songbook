@@ -28,6 +28,10 @@ internal val libraryModule = module {
 
     viewModel {
         ImportSongViewModel(
+            id = it.getOrNull(),
+            title = it.getOrNull(),
+            artist = it.getOrNull(),
+            lyrics = it.getOrNull(),
             agent = get(named("Gemini")),
             setlistRepository = get(),
             songRepository = get(),
@@ -37,17 +41,17 @@ internal val libraryModule = module {
 
     navigation<Route.Library> { route ->
         LibraryScreen(
-            viewModel = koinViewModel { parametersOf(route.initialFilterLetter, route.openSearch) },
+            viewModel = koinViewModel(key = route.toString()) {
+                parametersOf(route.initialFilterLetter, route.openSearch)
+            },
         )
     }
 
     navigation<Route.ImportSong> { route ->
         ImportSongScreen(
-            id = route.id,
-            title = route.title,
-            artist = route.artist,
-            lyrics = route.lyrics,
-            viewModel = koinViewModel(),
+            viewModel = koinViewModel(key = route.toString()) {
+                parametersOf(route.id, route.title, route.artist, route.lyrics)
+            },
         )
     }
 

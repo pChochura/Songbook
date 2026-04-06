@@ -20,7 +20,6 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,10 +84,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ImportSongScreen(
-    id: Long?,
-    title: String?,
-    artist: String?,
-    lyrics: String?,
     viewModel: ImportSongViewModel,
 ) {
     val navigator = LocalNavigator.current
@@ -98,6 +93,7 @@ internal fun ImportSongScreen(
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
+            is ImportSongEvent.ShowScanDialog -> isScanDialogVisible = true
             is ImportSongEvent.DiscardChanges -> isDiscardChangesDialogVisible = true
             is ImportSongEvent.NavigateBack -> navigator.navigateBack()
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
@@ -107,13 +103,6 @@ internal fun ImportSongScreen(
                 sections = event.sections,
             )
         }
-    }
-
-    LaunchedEffect(id, title, artist, lyrics) {
-        if (id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()) {
-            isScanDialogVisible = true
-        }
-        viewModel.setData(id, title, artist, lyrics)
     }
 
     NavigationBackHandler(
@@ -169,57 +158,13 @@ internal fun ImportSongScreen(
                 )
             }
 
-            Column(
+            SongLyricsTextField(
+                lyricsTextFieldState = viewModel.lyricsTextFieldState,
+                chordSuggestions = viewModel.state.chordSuggestions,
+                onChordSelected = viewModel::onChordSelected,
+                onDismissChordPopup = viewModel::onDismissChordPopup,
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-            ) {
-                LabeledTextField(
-                    required = true,
-                    label = stringResource(Res.string.import_lyrics_label),
-                    textFieldState = viewModel.lyricsTextFieldState,
-                    placeholder = stringResource(Res.string.import_lyrics_placeholder),
-                    modifier = Modifier.weight(1f),
-                    outputTransformation = ChordHighlightTransformation,
-                    imeAction = ImeAction.None,
-                    popupContent = { textLayoutResultCallback ->
-                        if (viewModel.state.isChordPopupVisible) {
-                            val cursorPosition = viewModel.lyricsTextFieldState.selection.end
-                            textLayoutResultCallback()?.let {
-                                val cursorRect = it.getCursorRect(cursorPosition)
-                                ChordSuggestionPopup(
-                                    cursorRect = cursorRect,
-                                    suggestions = viewModel.state.chordSuggestions,
-                                    onChordSelected = viewModel::onChordSelected,
-                                    onDismissRequest = viewModel::onDismissChordPopup,
-                                )
-                            }
-                        }
-                    },
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-                ) {
-                    SongbookIcon(
-                        icon = IconHelp,
-                        contentDescription = stringResource(Res.string.common_tooltip),
-                        iconStyle = defaultSongbookIconStyle().copy(
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    )
-
-                    SongbookText(
-                        text = stringResource(Res.string.import_lyrics_tip),
-                        modifier = Modifier.weight(1f),
-                        textStyle = defaultSongbookTextStyle().copy(
-                            typography = MaterialTheme.typography.bodySmall,
-                            textColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    )
-                }
-            }
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -329,7 +274,7 @@ internal fun ImportSongScreen(
         ConfirmDiscardChangesDialog(
             onConfirmClicked = {
                 isDiscardChangesDialogVisible = false
-                navigator.navigateBack()
+                viewModel.onDiscardChangesClicked()
             },
             onDismissRequest = { isDiscardChangesDialogVisible = false },
         )
@@ -342,6 +287,65 @@ internal fun ImportSongScreen(
     }
 
     SongbookLoader(viewModel.state.isLoading)
+}
+
+@Composable
+private fun SongLyricsTextField(
+    lyricsTextFieldState: TextFieldState,
+    chordSuggestions: List<String>,
+    onChordSelected: (String) -> Unit,
+    onDismissChordPopup: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+    ) {
+        LabeledTextField(
+            required = true,
+            label = stringResource(Res.string.import_lyrics_label),
+            textFieldState = lyricsTextFieldState,
+            placeholder = stringResource(Res.string.import_lyrics_placeholder),
+            modifier = Modifier.weight(1f),
+            outputTransformation = ChordHighlightTransformation,
+            imeAction = ImeAction.None,
+            popupContent = { textLayoutResultCallback ->
+                val cursorPosition = lyricsTextFieldState.selection.end
+                textLayoutResultCallback()?.let {
+                    val cursorRect = it.getCursorRect(cursorPosition)
+                    ChordSuggestionPopup(
+                        cursorRect = cursorRect,
+                        suggestions = chordSuggestions,
+                        onChordSelected = onChordSelected,
+                        onDismissRequest = onDismissChordPopup,
+                    )
+                }
+            },
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+        ) {
+            SongbookIcon(
+                icon = IconHelp,
+                contentDescription = stringResource(Res.string.common_tooltip),
+                iconStyle = defaultSongbookIconStyle().copy(
+                    tint = MaterialTheme.colorScheme.onSurface,
+                ),
+            )
+
+            SongbookText(
+                text = stringResource(Res.string.import_lyrics_tip),
+                modifier = Modifier.weight(1f),
+                textStyle = defaultSongbookTextStyle().copy(
+                    typography = MaterialTheme.typography.bodySmall,
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            )
+        }
+    }
 }
 
 @Composable
@@ -386,7 +390,11 @@ private fun LabeledTextField(
 
             SongbookTextField(
                 state = textFieldState,
-                onTextLayout = { onTextLayoutCallback = it },
+                onTextLayout = {
+                    if (onTextLayoutCallback() == null) {
+                        onTextLayoutCallback = it
+                    }
+                },
                 modifier = Modifier
                     .fillMaxSize()
                     .border(

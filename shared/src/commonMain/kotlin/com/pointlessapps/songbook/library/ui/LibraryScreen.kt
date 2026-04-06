@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
@@ -27,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
@@ -35,6 +35,7 @@ import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.model.SyncStatus
+import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.library.ui.components.AddSetlistCard
@@ -69,8 +70,6 @@ internal fun LibraryScreen(
     viewModel: LibraryViewModel,
 ) {
     val navigator = LocalNavigator.current
-    val focusRequester = remember { FocusRequester() }
-    var isAddSetlistDialogVisible by remember { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
@@ -79,8 +78,6 @@ internal fun LibraryScreen(
                 is Route.ImportSong -> navigator.navigateToImportSong()
                 else -> Unit
             }
-
-            LibraryEvent.FocusSearch -> focusRequester.requestFocus()
         }
     }
 
@@ -104,7 +101,6 @@ internal fun LibraryScreen(
             )
         },
     ) { paddingValues ->
-        val horizontalPadding = MaterialTheme.spacing.huge
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 120.dp),
             modifier = Modifier.fillMaxSize(),
@@ -126,84 +122,17 @@ internal fun LibraryScreen(
             }
 
             item(key = "setlists", span = { GridItemSpan(maxLineSpan) }) {
-                Row(
-                    modifier = Modifier
-                        .animateItem()
-                        .height(IntrinsicSize.Max)
-                        .layout { measurable, constraints ->
-                            val paddingPx = horizontalPadding.roundToPx()
-                            val expandedWidth = constraints.maxWidth + 2 * paddingPx
-                            val placeable = measurable.measure(
-                                constraints.copy(
-                                    maxWidth = expandedWidth,
-                                    minWidth = expandedWidth,
-                                ),
-                            )
-                            layout(placeable.width - 2 * paddingPx, placeable.height) {
-                                placeable.place(-paddingPx, 0)
-                            }
-                        }
-                        .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = horizontalPadding),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-                ) {
-                    AddSetlistCard(
-                        modifier = Modifier.fillMaxHeight(),
-                        onClick = { isAddSetlistDialogVisible = true },
-                    )
-
-                    viewModel.state.setlists.forEach { setlist ->
-                        SetlistCard(
-                            modifier = Modifier.fillMaxHeight(),
-                            setlist = setlist,
-                            onClick = {},
-                        )
-                    }
-
-                    ShowMoreButton(
-                        modifier = Modifier.fillMaxHeight(),
-                        onClick = {},
-                    )
-                }
+                SetlistsRow(
+                    setlists = viewModel.state.setlists,
+                    onAddSetlistClicked = viewModel::onAddSetlistClicked,
+                )
             }
 
             item(key = "all_songs_header", span = { GridItemSpan(maxLineSpan) }) {
-                Row(
-                    modifier = Modifier
-                        .animateItem()
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    SongbookText(
-                        text = stringResource(Res.string.library_songs_section_title),
-                        textStyle = defaultSongbookTextStyle().copy(
-                            textColor = MaterialTheme.colorScheme.onSurface,
-                            typography = MaterialTheme.typography.titleLarge,
-                        ),
-                    )
-
-                    SongbookChip(
-                        label = stringResource(
-                            Res.string.library_songs_found,
-                            viewModel.state.songs.size,
-                        ),
-                        isSelected = false,
-                        onClick = {},
-                    )
-
-                    SongbookText(
-                        modifier = Modifier
-                            .weight(1f)
-                            .wrapContentWidth(Alignment.End),
-                        text = stringResource(Res.string.library_sort_by_date),
-                        textStyle = defaultSongbookTextStyle().copy(
-                            textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            typography = MaterialTheme.typography.labelMedium,
-                        ),
-                    )
-                }
+                AllSongsHeader(
+                    numberOfSongs = viewModel.state.songs.size,
+                    modifier = Modifier.animateItem(),
+                )
             }
 
             items(viewModel.state.songs, key = { it.id }) { song ->
@@ -223,15 +152,102 @@ internal fun LibraryScreen(
         }
     }
 
+    SongbookLoader(viewModel.state.isLoading)
+}
+
+@Composable
+private fun LazyGridItemScope.SetlistsRow(
+    setlists: List<Setlist>,
+    onAddSetlistClicked: (String) -> Unit,
+) {
+    var isAddSetlistDialogVisible by remember { mutableStateOf(false) }
+    val horizontalPadding = MaterialTheme.spacing.huge
+
+    Row(
+        modifier = Modifier
+            .animateItem()
+            .height(IntrinsicSize.Max)
+            .layout { measurable, constraints ->
+                val paddingPx = horizontalPadding.roundToPx()
+                val expandedWidth = constraints.maxWidth + 2 * paddingPx
+                val placeable = measurable.measure(
+                    constraints.copy(
+                        maxWidth = expandedWidth,
+                        minWidth = expandedWidth,
+                    ),
+                )
+                layout(placeable.width - 2 * paddingPx, placeable.height) {
+                    placeable.place(-paddingPx, 0)
+                }
+            }
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = horizontalPadding),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+    ) {
+        AddSetlistCard(
+            modifier = Modifier.fillMaxHeight(),
+            onClick = { isAddSetlistDialogVisible = true },
+        )
+
+        setlists.forEach { setlist ->
+            SetlistCard(
+                modifier = Modifier.fillMaxHeight(),
+                setlist = setlist,
+                onClick = {},
+            )
+        }
+
+        ShowMoreButton(
+            modifier = Modifier.fillMaxHeight(),
+            onClick = {},
+        )
+    }
+
     if (isAddSetlistDialogVisible) {
         AddSetlistDialog(
             onConfirmClicked = {
                 isAddSetlistDialogVisible = false
-                viewModel.onAddSetlistClicked(it)
+                onAddSetlistClicked(it)
             },
             onDismissRequest = { isAddSetlistDialogVisible = false },
         )
     }
+}
 
-    SongbookLoader(viewModel.state.isLoading)
+@Composable
+private fun AllSongsHeader(
+    numberOfSongs: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SongbookText(
+            text = stringResource(Res.string.library_songs_section_title),
+            textStyle = defaultSongbookTextStyle().copy(
+                textColor = MaterialTheme.colorScheme.onSurface,
+                typography = MaterialTheme.typography.titleLarge,
+            ),
+        )
+
+        SongbookChip(
+            label = stringResource(Res.string.library_songs_found, numberOfSongs),
+            isSelected = false,
+            onClick = {},
+        )
+
+        SongbookText(
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(Alignment.End),
+            text = stringResource(Res.string.library_sort_by_date),
+            textStyle = defaultSongbookTextStyle().copy(
+                textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                typography = MaterialTheme.typography.labelMedium,
+            ),
+        )
+    }
 }

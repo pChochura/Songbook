@@ -34,11 +34,11 @@ internal fun AddSongCard(
     ) {
         Column(
             modifier = Modifier.padding(MaterialTheme.spacing.large),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(
-                space = MaterialTheme.spacing.medium,
+                space = MaterialTheme.spacing.extraSmall,
                 alignment = Alignment.CenterVertically,
             ),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             SongbookIcon(
                 icon = IconPlus,
@@ -46,6 +46,7 @@ internal fun AddSongCard(
                     tint = MaterialTheme.colorScheme.primary,
                 ),
             )
+
             SongbookText(
                 text = stringResource(Res.string.library_add_song_title),
                 textStyle = defaultSongbookTextStyle().copy(

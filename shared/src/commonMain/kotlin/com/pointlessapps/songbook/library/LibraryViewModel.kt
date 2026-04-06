@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 
 internal sealed interface LibraryEvent {
     data class NavigateTo(val route: Route) : LibraryEvent
-    data object FocusSearch : LibraryEvent
 }
 
 internal data class LibraryState(
@@ -47,8 +46,6 @@ internal class LibraryViewModel(
     val events = eventChannel.receiveAsFlow()
 
     init {
-        if (openSearch) eventChannel.trySend(LibraryEvent.FocusSearch)
-
         viewModelScope.launch {
             authRepository.initialize()
             if (!authRepository.isSignedIn()) {

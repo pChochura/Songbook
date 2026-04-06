@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.library.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,12 +40,13 @@ internal fun ChordSuggestionPopup(
             modifier = Modifier.background(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = MaterialTheme.shapes.small,
-            ),
+            ).animateContentSize(),
             contentPadding = PaddingValues(horizontal = MaterialTheme.spacing.small),
         ) {
             items(suggestions, key = { it }) { chord ->
                 SongbookText(
                     modifier = Modifier
+                        .animateItem()
                         .fillMaxHeight()
                         .clickable(
                             onClick = { onChordSelected(chord) },
@@ -52,7 +54,7 @@ internal fun ChordSuggestionPopup(
                         )
                         .padding(
                             vertical = MaterialTheme.spacing.small,
-                            horizontal = MaterialTheme.spacing.medium,
+                            horizontal = MaterialTheme.spacing.small,
                         ),
                     text = chord,
                     textStyle = defaultSongbookTextStyle().copy(

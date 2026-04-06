@@ -1,7 +1,6 @@
 package com.pointlessapps.songbook.library
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +19,7 @@ import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Section
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 internal sealed interface ImportSongEvent {
+    data object ShowScanDialog : ImportSongEvent
     data object DiscardChanges : ImportSongEvent
     data object NavigateBack : ImportSongEvent
     data class NavigateToLyrics(val songId: Long) : ImportSongEvent
@@ -47,29 +48,36 @@ internal data class ImportSongState(
     val isLoading: Boolean = false,
 ) {
     val setlistsSelection = allSetlists.associateWith { it in selectedSetlists }
-    val isChordPopupVisible = chordSuggestions.isNotEmpty()
 }
 
 internal class ImportSongViewModel(
+    id: Long?,
+    title: String?,
+    artist: String?,
+    lyrics: String?,
     private val agent: Agent,
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val appRepository: AppRepository,
 ) : ViewModel() {
 
-    val titleTextFieldState = TextFieldState("")
-    val artistTextFieldState = TextFieldState("")
-    val lyricsTextFieldState = TextFieldState("")
+    val titleTextFieldState = TextFieldState(title.orEmpty())
+    val artistTextFieldState = TextFieldState(artist.orEmpty())
+    val lyricsTextFieldState = TextFieldState(lyrics.orEmpty())
 
-    var state by mutableStateOf(ImportSongState())
+    var state by mutableStateOf(ImportSongState(songId = id))
         private set
 
-    private val eventChannel = Channel<ImportSongEvent>()
+    private val eventChannel = Channel<ImportSongEvent>(BUFFERED)
     val events = eventChannel.receiveAsFlow()
 
     private var extractionJob: Job? = null
 
     init {
+        if (id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()) {
+            eventChannel.trySend(ImportSongEvent.ShowScanDialog)
+        }
+
         viewModelScope.launch {
             state = state.copy(isLoading = true)
             state = state.copy(
@@ -109,13 +117,6 @@ internal class ImportSongViewModel(
         }
     }
 
-    fun setData(id: Long?, title: String?, artist: String?, lyrics: String?) {
-        state = state.copy(songId = id)
-        titleTextFieldState.setTextAndPlaceCursorAtEnd(title.orEmpty())
-        artistTextFieldState.setTextAndPlaceCursorAtEnd(artist.orEmpty())
-        lyricsTextFieldState.setTextAndPlaceCursorAtEnd(lyrics.orEmpty())
-    }
-
     fun onImportSongClicked() {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
@@ -139,13 +140,17 @@ internal class ImportSongViewModel(
             lyricsTextFieldState.text.isNotBlank() ||
             state.selectedSetlists.isNotEmpty()
         ) {
-            titleTextFieldState.clearText()
-            artistTextFieldState.clearText()
-            lyricsTextFieldState.clearText()
             eventChannel.trySend(ImportSongEvent.DiscardChanges)
         } else {
             eventChannel.trySend(ImportSongEvent.NavigateBack)
         }
+    }
+
+    fun onDiscardChangesClicked() {
+        titleTextFieldState.setTextAndPlaceCursorAtEnd("")
+        artistTextFieldState.setTextAndPlaceCursorAtEnd("")
+        lyricsTextFieldState.setTextAndPlaceCursorAtEnd("")
+        eventChannel.trySend(ImportSongEvent.NavigateBack)
     }
 
     fun onSetlistsSelected(setlists: List<Setlist>) {
