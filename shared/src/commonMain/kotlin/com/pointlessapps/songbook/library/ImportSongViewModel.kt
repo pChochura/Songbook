@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal sealed interface ImportSongEvent {
-    data object ShowScanDialog : ImportSongEvent
     data object DiscardChanges : ImportSongEvent
     data object NavigateBack : ImportSongEvent
     data class NavigateToLyrics(val songId: Long) : ImportSongEvent
@@ -53,7 +52,7 @@ internal data class ImportSongState(
 }
 
 internal class ImportSongViewModel(
-    private val id: Long?,
+    id: Long?,
     title: String?,
     artist: String?,
     lyrics: String?,
@@ -62,6 +61,9 @@ internal class ImportSongViewModel(
     private val songRepository: SongRepository,
     private val appRepository: AppRepository,
 ) : ViewModel() {
+
+    val showScanDialog: Boolean =
+        id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()
 
     private data class ImportSongTransientState(
         val selectedSetlists: List<Setlist> = emptyList(),
@@ -103,10 +105,6 @@ internal class ImportSongViewModel(
     private var extractionJob: Job? = null
 
     init {
-        if (id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()) {
-            eventChannel.trySend(ImportSongEvent.ShowScanDialog)
-        }
-
         viewModelScope.launch {
             snapshotFlow {
                 lyricsTextFieldState.text to lyricsTextFieldState.selection

@@ -89,13 +89,12 @@ internal fun ImportSongScreen(
 ) {
     val navigator = LocalNavigator.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(false) }
+    var isScanDialogVisible by rememberSaveable(Unit) { mutableStateOf(viewModel.showScanDialog) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isDiscardChangesDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
-            is ImportSongEvent.ShowScanDialog -> isScanDialogVisible = true
             is ImportSongEvent.DiscardChanges -> isDiscardChangesDialogVisible = true
             is ImportSongEvent.NavigateBack -> navigator.navigateBack()
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
