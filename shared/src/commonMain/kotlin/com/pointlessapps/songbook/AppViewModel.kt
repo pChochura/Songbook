@@ -40,7 +40,7 @@ class AppViewModel(
             withContext(Dispatchers.IO) {
                 chordLibrary.initialize(
                     Json.decodeFromString(
-                        Res.readBytes(ChordLibrary.CHORD_JSON).decodeToString(),
+                        Res.readBytes(CHORD_JSON).decodeToString(),
                     ),
                 )
             }
@@ -60,4 +60,8 @@ class AppViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = AppState(),
         )
+
+    private companion object {
+        const val CHORD_JSON = "files/chords.json"
+    }
 }

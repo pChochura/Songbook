@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
-import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
@@ -57,7 +56,6 @@ internal class LyricsViewModel(
     private val songId: Long,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
-    private val chordLibrary: ChordLibrary,
 ) : ViewModel() {
 
     private data class LyricsTransientState(
@@ -104,8 +102,6 @@ internal class LyricsViewModel(
             ),
         )
     }
-
-    fun onTransposeChord(chord: String) = chordLibrary.transpose(chord, state.value.keyOffset)
 
     fun onTextScaleChanged(textScale: Int) {
         val newScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM)

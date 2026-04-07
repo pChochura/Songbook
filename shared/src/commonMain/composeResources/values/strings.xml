@@ -8,6 +8,7 @@
     <string name="common_menu">Menu</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_dismiss">Dismiss</string>
     <string name="common_clear">Clear</string>
     <string name="common_remove">Remove</string>
     <string name="common_tooltip">Tooltip</string>
@@ -28,6 +29,8 @@
     <string name="common_select_text_scale">Select the text scale</string>
     <string name="common_decrement">Decrement</string>
     <string name="common_increment">Increment</string>
+    <string name="common_previous">Previous</string>
+    <string name="common_next">Next</string>
     <string name="common_broadcast_to_team">Broadcast to the team</string>
     <string name="common_broadcast_to_team_description">Send a notification to all the team members that the currently playing song is ready.</string>
     <string name="common_select_key_offset">Select a key offset</string>
@@ -35,6 +38,10 @@
     <string name="common_camera_permission">Camera permission</string>
     <string name="common_camera_permission_description">In order to use the camera you need to grant the permission in the app's settings.</string>
     <string name="common_open_settings">Open settings</string>
+    <string name="common_chord_details">Chord details</string>
+
+    <!-- Errors -->
+    <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Library</string>

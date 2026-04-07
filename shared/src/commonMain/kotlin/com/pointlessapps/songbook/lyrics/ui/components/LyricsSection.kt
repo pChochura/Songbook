@@ -33,8 +33,9 @@ import com.pointlessapps.songbook.ui.theme.spacing
 internal fun LyricsSections(
     sections: List<Section>,
     textScale: Int,
-    keyOffset: Int,
     mode: LyricsMode,
+    keyOffset: Int,
+    onChordClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val textScaleFloat = textScale / 100f
@@ -84,6 +85,7 @@ internal fun LyricsSections(
                     lineTextStyle = lineTextStyle,
                     chordChipStyle = chordChipStyle,
                     shouldShowInline = mode.shouldShowInline,
+                    onChordClicked = onChordClicked,
                 )
 
                 mode.shouldShowInline -> section.lines.forEach { line ->
@@ -92,6 +94,7 @@ internal fun LyricsSections(
                         keyOffset = keyOffset,
                         lineTextStyle = lineTextStyle,
                         chordChipStyle = chordChipStyle,
+                        onChordClicked = onChordClicked,
                     )
                 }
 
@@ -115,6 +118,7 @@ private fun SideBySideLyricsSection(
     lineTextStyle: SongbookTextStyle,
     chordChipStyle: SongbookChipStyle,
     shouldShowInline: Boolean,
+    onChordClicked: (String) -> Unit,
 ) {
     val lineSpacing = MaterialTheme.spacing.small
     val chordMargin = MaterialTheme.spacing.extraHuge
@@ -138,6 +142,7 @@ private fun SideBySideLyricsSection(
                         keyOffset = keyOffset,
                         lineTextStyle = lineTextStyle,
                         chordChipStyle = chordChipStyle,
+                        onChordClicked = onChordClicked,
                     )
 
                     else -> TextOnlyLyricsLine(
@@ -151,9 +156,7 @@ private fun SideBySideLyricsSection(
                         SongbookChip(
                             label = ChordLibrary.transpose(chord.value, keyOffset),
                             isSelected = false,
-                            onClick = {
-                                // TODO add chord explanation dialog
-                            },
+                            onClick = { onChordClicked(chord.value) },
                             chipStyle = chordChipStyle,
                         )
                     } else {
@@ -239,6 +242,7 @@ private fun InlineLyricsLine(
     keyOffset: Int,
     lineTextStyle: SongbookTextStyle,
     chordChipStyle: SongbookChipStyle,
+    onChordClicked: (String) -> Unit,
 ) {
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
     Layout(
@@ -253,9 +257,7 @@ private fun InlineLyricsLine(
                 SongbookChip(
                     label = ChordLibrary.transpose(chord.value, keyOffset),
                     isSelected = false,
-                    onClick = {
-                        // TODO add chord explanation dialog
-                    },
+                    onClick = { onChordClicked(chord.value) },
                     chipStyle = chordChipStyle,
                 )
             }

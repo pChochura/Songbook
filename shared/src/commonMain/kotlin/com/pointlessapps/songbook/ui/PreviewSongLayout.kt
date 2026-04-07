@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,6 +40,7 @@ internal fun PreviewSongLayout(
     mode: LyricsMode = LyricsMode.Inline,
     paddingValues: PaddingValues = PaddingValues(),
 ) {
+    var chordDetailsDialogData by rememberSaveable { mutableStateOf<String?>(null) }
     val transformableState = rememberTransformableState { zoomChange, _, _ ->
         onTextScaleChanged((textScale * zoomChange).roundToInt())
     }
@@ -73,13 +78,14 @@ internal fun PreviewSongLayout(
 
             item(key = "sections") {
                 LyricsSections(
+                    modifier = Modifier.padding(
+                        horizontal = MaterialTheme.spacing.huge,
+                    ),
                     sections = sections,
                     textScale = textScale,
                     keyOffset = keyOffset,
                     mode = mode,
-                    modifier = Modifier.padding(
-                        horizontal = MaterialTheme.spacing.huge,
-                    ),
+                    onChordClicked = { chordDetailsDialogData = it },
                 )
             }
         }
@@ -88,6 +94,14 @@ internal fun PreviewSongLayout(
             show = transformableState.isTransformInProgress,
             textScale = textScale,
             modifier = Modifier.align(Alignment.Center),
+        )
+    }
+
+    chordDetailsDialogData?.let { chord ->
+        ChordDetailsDialog(
+            chord = chord,
+            keyOffset = keyOffset,
+            onDismissRequest = { chordDetailsDialogData = null },
         )
     }
 }

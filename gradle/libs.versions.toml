@@ -11,7 +11,6 @@ kotlin-serialization = "1.10.0"
 kotlin-coroutines = "1.10.2"
 
 # Compose
-compose-ui-tooling-preview = "1.11.0-beta02"
 compose-multiplatform = "1.10.3"
 compose-multiplatform-lifecycle = "2.10.0"
 compose-multiplatform-material3 = "1.9.0"
@@ -60,7 +59,8 @@ compose-mp-foundation = { module = "org.jetbrains.compose.foundation:foundation"
 compose-mp-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-multiplatform-material3" }
 compose-mp-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
 compose-mp-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui-tooling-preview" }
+compose-mp-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-multiplatform" }
+compose-mp-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
 
 # Koin
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }

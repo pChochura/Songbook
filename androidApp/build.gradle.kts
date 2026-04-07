@@ -55,8 +55,8 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.koin.android)
 
-    implementation(libs.compose.ui.tooling.preview)
-
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+
+    debugImplementation(libs.compose.mp.ui.tooling)
 }

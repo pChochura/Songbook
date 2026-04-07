@@ -46,6 +46,7 @@ kotlin {
             implementation(libs.compose.mp.material3)
             implementation(libs.compose.mp.ui)
             implementation(libs.compose.mp.components.resources)
+            implementation(libs.compose.mp.ui.tooling.preview)
 
             implementation(libs.kotlinx.serialization.json)
 
@@ -68,6 +69,10 @@ kotlin {
 
             implementation(projects.core)
             implementation(projects.ai)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.compose.mp.ui.tooling)
         }
     }
 }

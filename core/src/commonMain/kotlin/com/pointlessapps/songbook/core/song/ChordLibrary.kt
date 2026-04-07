@@ -1,108 +1,89 @@
 package com.pointlessapps.songbook.core.song
 
-import com.pointlessapps.songbook.core.song.model.ChordShape
+import com.pointlessapps.songbook.core.song.model.ChordPosition
+import com.pointlessapps.songbook.core.song.model.ChordsData
 
-object ChordLibrary {
-    enum class Shape(val chordShape: ChordShape) {
-        SHAPE_MAJOR_E(ChordShape("MAJOR_E", listOf(0, 2, 2, 1, 0, 0), 0)),
-        SHAPE_MINOR_E(ChordShape("MINOR_E", listOf(0, 2, 2, 0, 0, 0), 0)),
-        SHAPE_DOM7_E(ChordShape("DOM7_E", listOf(0, 2, 0, 1, 0, 0), 0)),
-        SHAPE_POWER_E(ChordShape("POWER_E", listOf(0, 2, 2, null, null, null), 0)),
-        SHAPE_DIM_A(ChordShape("DIM_A", listOf(null, 0, 1, 2, 1, null), 1)),
-        SHAPE_DIM7_A(ChordShape("DIM7_A", listOf(null, 0, 1, 0, 1, null), 1)),
-        SHAPE_AUG_A(ChordShape("AUG_A", listOf(null, 0, 2, 1, 1, null), 1)),
-        SHAPE_SUS2_A(ChordShape("SUS2_A", listOf(null, 0, 2, 2, 3, null), 1)),
-        SHAPE_SUS4_E(ChordShape("SUS4_E", listOf(0, 2, 2, 2, 0, 0), 0)),
-        SHAPE_MAJ7_A(ChordShape("MAJ7_A", listOf(null, 0, 2, 1, 2, 0), 1)),
-        SHAPE_MIN7_E(ChordShape("MIN7_E", listOf(0, 2, 0, 0, 0, 0), 0)),
-        SHAPE_7SUS4_E(ChordShape("7SUS4_E", listOf(0, 2, 0, 2, 0, 0), 0)),
+class ChordLibrary {
+
+    private lateinit var data: ChordsData
+
+    fun initialize(data: ChordsData) {
+        if (!::data.isInitialized) {
+            this.data = data
+        }
     }
 
-    private val qualityToShape = mapOf(
-        "" to Shape.SHAPE_MAJOR_E,
-        "M" to Shape.SHAPE_MAJOR_E,
-        "maj" to Shape.SHAPE_MAJOR_E,
-
-        "m" to Shape.SHAPE_MINOR_E,
-        "min" to Shape.SHAPE_MINOR_E,
-
-        "7" to Shape.SHAPE_DOM7_E,
-
-        "5" to Shape.SHAPE_POWER_E,
-
-        "dim" to Shape.SHAPE_DIM_A,
-        "°" to Shape.SHAPE_DIM_A,
-
-        "dim7" to Shape.SHAPE_DIM7_A,
-        "o7" to Shape.SHAPE_DIM7_A,
-        "7dim" to Shape.SHAPE_DIM7_A,
-
-        "aug" to Shape.SHAPE_AUG_A,
-        "+" to Shape.SHAPE_AUG_A,
-
-        "sus2" to Shape.SHAPE_SUS2_A,
-
-        "sus" to Shape.SHAPE_SUS4_E,
-        "sus4" to Shape.SHAPE_SUS4_E,
-
-        "maj7" to Shape.SHAPE_MAJ7_A,
-        "M7" to Shape.SHAPE_MAJ7_A,
-
-        "m7" to Shape.SHAPE_MIN7_E,
-        "min7" to Shape.SHAPE_MIN7_E,
-        "-7" to Shape.SHAPE_MIN7_E,
-
-        "7sus4" to Shape.SHAPE_7SUS4_E,
-        "7sus" to Shape.SHAPE_7SUS4_E,
-    )
-
-    private val chromaticScale = listOf(
-        listOf("C"), listOf("C#", "Db"), listOf("D"), listOf("D#", "Eb"),
-        listOf("E"), listOf("F"), listOf("F#", "Gb"), listOf("G"),
-        listOf("G#", "Ab"), listOf("A"), listOf("A#", "Bb"), listOf("B"),
-    )
-
-    val allChords = chromaticScale.flatten().flatMap { note ->
-        qualityToShape.keys.map { quality -> "$note$quality" }
-    }.distinct()
-
-    // Starting notes for each string (Standard Tuning: E A D G B E)
-    private val stringRoots = listOf(4, 9, 2, 7, 11, 4)
-
-    private val rootNoteRegex = Regex("^([A-G][#b]?)")
-
-    fun transpose(chord: String, offset: Int): String {
-        if (offset == 0) return chord
-
-        val parts = chord.split("/")
-        val transposedRoot = transposeNote(parts[0], offset)
-        val transposedBass = if (parts.size > 1) "/${transposeNote(parts[1], offset)}" else ""
-
-        return "$transposedRoot$transposedBass"
-    }
-
-    private fun transposeNote(note: String, offset: Int): String {
-        val match = rootNoteRegex.find(note) ?: return note
+    fun getChordPositions(chordName: String): List<ChordPosition> {
+        val match = rootNoteRegex.find(chordName) ?: return emptyList()
         val root = match.groupValues[1]
-        val suffix = note.substring(root.length)
+        val suffix = chordName.substring(root.length)
 
-        val index = chromaticScale.indexOfFirst { it.contains(root) }
-        if (index == -1) return note
+        val mapKey = rootToMapKey[root] ?: return emptyList()
+        val internalSuffix = commonSuffixToInternal[suffix] ?: suffix
 
-        var newIndex = (index + offset) % 12
-        while (newIndex < 0) newIndex += 12
-
-        val newRoot = chromaticScale[newIndex].first()
-
-        return "$newRoot$suffix"
+        return data.chords[mapKey]?.get(internalSuffix) ?: emptyList()
     }
 
-    fun getBaseFret(note: String, rootString: Int): Int {
-        val targetIdx = chromaticScale.indexOfFirst { it.contains(note) }
-        val stringIdx = stringRoots[rootString]
+    companion object {
+        private val rootNoteRegex = Regex("^([A-G][#b]?)")
 
-        var fret = targetIdx - stringIdx
-        while (fret < 0) fret += 12
-        return fret
+        private val chromaticScale = listOf(
+            listOf("C"), listOf("C#", "Db"), listOf("D"), listOf("D#", "Eb"),
+            listOf("E"), listOf("F"), listOf("F#", "Gb"), listOf("G"),
+            listOf("G#", "Ab"), listOf("A"), listOf("A#", "Bb"), listOf("B"),
+        )
+
+        private val rootToMapKey = mapOf(
+            "C" to "C", "C#" to "Csharp", "Db" to "Csharp",
+            "D" to "D", "D#" to "Eb", "Eb" to "Eb",
+            "E" to "E", "F" to "F", "F#" to "Fsharp", "Gb" to "Fsharp",
+            "G" to "G", "G#" to "Ab", "Ab" to "Ab",
+            "A" to "A", "A#" to "Bb", "Bb" to "Bb",
+            "B" to "B",
+        )
+
+        private val commonSuffixToInternal = mapOf(
+            "" to "major", "M" to "major", "maj" to "major",
+            "m" to "minor", "min" to "minor", "-" to "minor",
+            "7" to "7",
+            "maj7" to "maj7", "M7" to "maj7",
+            "m7" to "m7", "min7" to "m7", "-7" to "m7",
+            "sus2" to "sus2", "sus4" to "sus4", "sus" to "sus4",
+            "dim" to "dim", "dim7" to "dim7",
+            "aug" to "aug", "+" to "aug",
+            "5" to "5", "6" to "6", "9" to "9",
+            "add9" to "add9", "madd9" to "madd9",
+        )
+
+        val allChords: List<String>
+            get() = chromaticScale.flatten().flatMap { note ->
+                commonSuffixToInternal.keys.map { suffix -> "$note$suffix" }
+            }.distinct()
+
+        private fun transposeNote(note: String, offset: Int): String {
+            val match = rootNoteRegex.find(note) ?: return note
+            val root = match.groupValues[1]
+            val suffix = note.substring(root.length)
+
+            val index = chromaticScale.indexOfFirst { it.contains(root) }
+            if (index == -1) return note
+
+            var newIndex = (index + offset) % 12
+            while (newIndex < 0) newIndex += 12
+
+            val newRoot = chromaticScale[newIndex].first()
+
+            return "$newRoot$suffix"
+        }
+
+        fun transpose(chord: String, offset: Int): String {
+            if (offset == 0) return chord
+
+            val parts = chord.split("/")
+            val transposedRoot = transposeNote(parts[0], offset)
+            val transposedBass = if (parts.size > 1) "/${transposeNote(parts[1], offset)}" else ""
+
+            return "$transposedRoot$transposedBass"
+        }
     }
 }

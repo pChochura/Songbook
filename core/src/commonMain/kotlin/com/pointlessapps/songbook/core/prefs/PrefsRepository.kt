@@ -19,10 +19,10 @@ interface PrefsRepository {
     suspend fun addLastSearch(search: String)
     suspend fun removeLastSearch(search: String)
 
-    suspend fun getTextScale(): Int
+    fun getTextScaleFlow(): Flow<Int>
     suspend fun setTextScale(scale: Int)
 
-    suspend fun getMode(): String?
+    fun getModeFlow(): Flow<String?>
     suspend fun setMode(mode: String)
 
     suspend fun getShowPublicLyrics(): Boolean?
@@ -63,11 +63,9 @@ internal class PrefsRepositoryImpl(
         }
     }
 
-    override suspend fun getTextScale() = withContext(Dispatchers.IO) {
-        dataStore.data.map { preferences ->
-            preferences[textScaleKey] ?: 100
-        }.first()
-    }
+    override fun getTextScaleFlow() = dataStore.data.map { preferences ->
+        preferences[textScaleKey] ?: 100
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun setTextScale(scale: Int) {
         withContext(Dispatchers.IO) {
@@ -79,11 +77,9 @@ internal class PrefsRepositoryImpl(
         }
     }
 
-    override suspend fun getMode() = withContext(Dispatchers.IO) {
-        dataStore.data.map { preferences ->
-            preferences[modeKey]
-        }.first()
-    }
+    override fun getModeFlow() = dataStore.data.map { preferences ->
+        preferences[modeKey]
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun setMode(mode: String) {
         withContext(Dispatchers.IO) {
