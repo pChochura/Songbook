@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_unknown
@@ -76,6 +77,8 @@ internal fun SongCard(
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurface,
                         typography = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        textOverflow = TextOverflow.Ellipsis,
                     ),
                 )
                 SongbookText(
@@ -84,6 +87,8 @@ internal fun SongCard(
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         typography = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        textOverflow = TextOverflow.Ellipsis,
                     ),
                 )
             }
