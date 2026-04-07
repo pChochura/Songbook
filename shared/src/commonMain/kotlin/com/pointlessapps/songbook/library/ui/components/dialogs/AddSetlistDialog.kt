@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,7 +50,6 @@ internal fun AddSetlistDialog(
     onDismissRequest: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
     val nameTextFieldState = rememberTextFieldState()
     val isConfirmEnabled by remember { derivedStateOf { nameTextFieldState.text.isNotEmpty() } }
 
@@ -101,6 +99,7 @@ internal fun AddSetlistDialog(
                     imeAction = ImeAction.Done,
                 ),
             ),
+            onImeAction = { onConfirmClicked(nameTextFieldState.text.toString()) },
         )
 
         Column(
