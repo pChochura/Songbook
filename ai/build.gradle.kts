@@ -16,7 +16,7 @@ kotlin {
         compileSdk = libs.versions.sdk.compile.get().toInt()
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
@@ -41,6 +41,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.androidx.annotation)
         }
 
         iosMain.dependencies {

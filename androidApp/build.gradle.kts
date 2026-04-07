@@ -22,7 +22,11 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+        }
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
         }
     }
     compileOptions {

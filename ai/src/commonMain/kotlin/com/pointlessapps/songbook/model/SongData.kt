@@ -1,8 +1,10 @@
 package com.pointlessapps.songbook.model
 
+import com.pointlessapps.songbook.utils.Keep
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Keep
 @Serializable
 data class SongData(
     @SerialName("title")
@@ -12,6 +14,7 @@ data class SongData(
     @SerialName("sections")
     val sections: List<Section>,
 ) {
+    @Keep
     @Serializable
     data class Section(
         @SerialName("type")
@@ -21,6 +24,7 @@ data class SongData(
         @SerialName("lines")
         val lines: List<Line>,
     ) {
+        @Keep
         @Serializable
         enum class Type {
             @SerialName("verse")
@@ -39,6 +43,7 @@ data class SongData(
             Intro
         }
 
+        @Keep
         @Serializable
         data class Line(
             @SerialName("text")

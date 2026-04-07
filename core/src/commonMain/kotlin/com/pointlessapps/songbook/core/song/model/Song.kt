@@ -1,7 +1,9 @@
 package com.pointlessapps.songbook.core.song.model
 
+import com.pointlessapps.songbook.core.utils.Keep
 import kotlinx.serialization.Serializable
 
+@Keep
 @Serializable
 data class Song(
     val id: Long,
@@ -10,6 +12,7 @@ data class Song(
     val sections: List<Section>,
 )
 
+@Keep
 @Serializable
 data class NewSong(
     val id: Long? = null,
@@ -18,6 +21,7 @@ data class NewSong(
     val sections: List<Section>,
 )
 
+@Keep
 @Serializable
 data class Section(
     val name: String,
@@ -56,6 +60,7 @@ data class Section(
     }
 }
 
+@Keep
 @Serializable
 data class Chord(
     val value: String,

@@ -12,29 +12,35 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.core.utils.Keep
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.navigation3.koinEntryProvider
 import org.koin.core.annotation.KoinExperimentalAPI
 
+@Keep
 internal sealed interface Route : NavKey {
     val hasBottomBar: Boolean
         get() = false
 
+    @Keep
     @Serializable
     data object Library : Route {
         override val hasBottomBar = true
     }
 
+    @Keep
     @Serializable
     data class Lyrics(val songId: Long? = null) : Route
 
+    @Keep
     @Serializable
     data object Search : Route {
         override val hasBottomBar = true
     }
 
+    @Keep
     @Serializable
     data class ImportSong(
         val id: Long? = null,
@@ -43,6 +49,7 @@ internal sealed interface Route : NavKey {
         val lyrics: String? = null,
     ) : Route
 
+    @Keep
     @Serializable
     data class PreviewSong(
         val title: String,

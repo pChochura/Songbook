@@ -1,8 +1,10 @@
 package com.pointlessapps.songbook.model
 
+import com.pointlessapps.songbook.utils.Keep
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Keep
 @Serializable
 internal data class G4fRequestBody(
     @SerialName("model")
@@ -14,6 +16,7 @@ internal data class G4fRequestBody(
     @SerialName("images")
     val images: List<List<String>>? = null,
 ) {
+    @Keep
     @Serializable
     data class Message(
         @SerialName("role")

@@ -25,6 +25,7 @@ androidx-room = "2.8.4"
 androidx-sqlite = "2.6.2"
 androidx-paging = "3.4.2"
 androidx-datastore = "1.2.1"
+androidx-annotation = "1.9.1"
 
 # Koin
 koin = "4.2.0"
@@ -33,7 +34,7 @@ koin = "4.2.0"
 ktor = "3.4.2"
 
 # Supabase
-supabase = "3.4.1"
+supabase = "3.5.0"
 
 # Misc
 peekaboo = "0.5.2"
@@ -51,6 +52,7 @@ androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.li
 androidx-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "androidx-navigation3" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "androidx-datastore" }
 androidx-datastore-prefs = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 
 # Compose
 compose-mp-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
