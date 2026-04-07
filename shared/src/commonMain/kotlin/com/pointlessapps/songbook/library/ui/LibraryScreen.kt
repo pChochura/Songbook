@@ -55,7 +55,6 @@ import com.pointlessapps.songbook.shared.library_sort_by_date
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookChip
-import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
@@ -153,8 +152,6 @@ internal fun LibraryScreen(
             }
         }
     }
-
-    SongbookLoader(state.isLoading)
 }
 
 @Composable

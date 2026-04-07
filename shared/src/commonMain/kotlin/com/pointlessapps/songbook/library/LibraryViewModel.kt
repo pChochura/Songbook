@@ -3,7 +3,6 @@ package com.pointlessapps.songbook.library
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Route
-import com.pointlessapps.songbook.core.auth.AuthRepository
 import com.pointlessapps.songbook.core.model.DataState
 import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
@@ -16,8 +15,6 @@ import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 
@@ -28,42 +25,31 @@ internal sealed interface LibraryEvent {
 internal data class LibraryState(
     val setlists: List<Setlist> = emptyList(),
     val songs: List<Song> = emptyList(),
-    val isLoading: Boolean = false,
     val syncStatus: SyncStatus = SyncStatus.LOCAL,
 )
 
 internal class LibraryViewModel(
-    private val setlistRepository: SetlistRepository,
-    private val songRepository: SongRepository,
-    private val authRepository: AuthRepository,
+    setlistRepository: SetlistRepository,
+    songRepository: SongRepository,
 ) : ViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val state: StateFlow<LibraryState> = flow {
-        authRepository.initialize()
-        if (!authRepository.isSignedIn()) {
-            authRepository.signInAnonymously()
-        }
-        emit(Unit)
-    }.flatMapLatest {
-        combine(
-            setlistRepository.getAllSetlists(limit = SETLISTS_LIMIT),
-            songRepository.getAllSongs(),
-        ) { setlistsState, songsState ->
-            LibraryState(
-                setlists = setlistsState.data,
-                songs = songsState.data,
-                syncStatus = DataState.statusOf(
-                    setlistsState.status,
-                    songsState.status,
-                ),
-                isLoading = false,
-            )
-        }
+    val state: StateFlow<LibraryState> = combine(
+        setlistRepository.getAllSetlists(limit = SETLISTS_LIMIT),
+        songRepository.getAllSongs(),
+    ) { setlistsState, songsState ->
+        LibraryState(
+            setlists = setlistsState.data,
+            songs = songsState.data,
+            syncStatus = DataState.statusOf(
+                setlistsState.status,
+                songsState.status,
+            ),
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = LibraryState(isLoading = true),
+        initialValue = LibraryState(),
     )
 
     private val eventChannel = Channel<LibraryEvent>(BUFFERED)

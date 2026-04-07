@@ -20,7 +20,6 @@ internal val libraryModule = module {
         LibraryViewModel(
             setlistRepository = get(),
             songRepository = get(),
-            authRepository = get(),
         )
     }
 
