@@ -87,7 +87,8 @@
     <string name="lyrics_menu_key_offset">Key offset</string>
     <string name="lyrics_menu_toggle_fullscreen">Toggle fullscreen</string>
     <string name="lyrics_menu_toggle_fullscreen_description">Toggle the distraction-free view of the lyrics</string>
-    <string name="lyrics_menu_mode">Mode</string>
+    <string name="lyrics_menu_wrap_mode">Wrap mode</string>
+    <string name="lyrics_menu_display_mode">Display mode</string>
     <string name="lyrics_menu_edit">Edit</string>
     <string name="lyrics_menu_add_to_setlist">Add to setlist</string>
     <string name="lyrics_menu_show_queue">Show queue</string>
@@ -95,14 +96,18 @@
     <string name="lyrics_menu_delete_description">The song will be moved to the trash</string>
     <string name="lyrics_menu_broadcast_to_team">Broadcast to the team</string>
     <string name="lyrics_menu_broadcast_to_team_description">Send a notification to the team about the song</string>
-    <string name="lyrics_mode_inline">Inline</string>
-    <string name="lyrics_mode_side_by_side">Side by side</string>
-    <string name="lyrics_mode_both">Both</string>
-    <string name="lyrics_mode_text_only">Text only</string>
-    <string name="lyrics_mode_inline_description">All of the chords will be displayed above each line</string>
-    <string name="lyrics_mode_side_by_side_description">The chords will be displayed to the side of the lyrics</string>
-    <string name="lyrics_mode_both_description">The chords will be displayed to the side of the lyrics and above each line</string>
-    <string name="lyrics_mode_text_only_description">Only the text will be displayed</string>
+    <string name="lyrics_wrap_mode_wrap">Wrap</string>
+    <string name="lyrics_wrap_mode_wrap_description">The text will be wrapped onto a new line if it doesn't fit</string>
+    <string name="lyrics_wrap_mode_no_wrap">No wrap</string>
+    <string name="lyrics_wrap_mode_no_wrap_description">The screen will scroll if the text doesn't fit</string>
+    <string name="lyrics_display_mode_inline">Inline</string>
+    <string name="lyrics_display_mode_inline_description">All of the chords will be displayed above each line</string>
+    <string name="lyrics_display_mode_side_by_side">Side by side</string>
+    <string name="lyrics_display_mode_side_by_side_description">The chords will be displayed to the side of the lyrics</string>
+    <string name="lyrics_display_mode_both">Both</string>
+    <string name="lyrics_display_mode_both_description">The chords will be displayed to the side of the lyrics and above each line</string>
+    <string name="lyrics_display_mode_text_only">Text only</string>
+    <string name="lyrics_display_mode_text_only_description">Only the text will be displayed</string>
 
     <!-- Search Screen -->
     <string name="search_placeholder">Search titles, artists and lyrics...</string>

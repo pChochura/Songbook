@@ -17,38 +17,43 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import com.pointlessapps.songbook.lyrics.LyricsMode
+import com.pointlessapps.songbook.lyrics.DisplayMode
 import com.pointlessapps.songbook.lyrics.LyricsState
+import com.pointlessapps.songbook.lyrics.WrapMode
 import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.lyrics_display_mode_both
+import com.pointlessapps.songbook.shared.lyrics_display_mode_inline
+import com.pointlessapps.songbook.shared.lyrics_display_mode_side_by_side
+import com.pointlessapps.songbook.shared.lyrics_display_mode_text_only
 import com.pointlessapps.songbook.shared.lyrics_menu_add_to_setlist
 import com.pointlessapps.songbook.shared.lyrics_menu_broadcast_to_team
 import com.pointlessapps.songbook.shared.lyrics_menu_broadcast_to_team_description
 import com.pointlessapps.songbook.shared.lyrics_menu_delete
 import com.pointlessapps.songbook.shared.lyrics_menu_delete_description
+import com.pointlessapps.songbook.shared.lyrics_menu_display_mode
 import com.pointlessapps.songbook.shared.lyrics_menu_edit
 import com.pointlessapps.songbook.shared.lyrics_menu_key_offset
-import com.pointlessapps.songbook.shared.lyrics_menu_mode
 import com.pointlessapps.songbook.shared.lyrics_menu_show_queue
 import com.pointlessapps.songbook.shared.lyrics_menu_text_scale
 import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen
 import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen_description
-import com.pointlessapps.songbook.shared.lyrics_mode_both
-import com.pointlessapps.songbook.shared.lyrics_mode_inline
-import com.pointlessapps.songbook.shared.lyrics_mode_side_by_side
-import com.pointlessapps.songbook.shared.lyrics_mode_text_only
+import com.pointlessapps.songbook.shared.lyrics_menu_wrap_mode
+import com.pointlessapps.songbook.shared.lyrics_wrap_mode_no_wrap
+import com.pointlessapps.songbook.shared.lyrics_wrap_mode_wrap
 import com.pointlessapps.songbook.ui.OptionsBottomSheet
 import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.IconAddFolder
 import com.pointlessapps.songbook.ui.theme.IconDelete
+import com.pointlessapps.songbook.ui.theme.IconDisplayMode
 import com.pointlessapps.songbook.ui.theme.IconEdit
 import com.pointlessapps.songbook.ui.theme.IconFullscreen
 import com.pointlessapps.songbook.ui.theme.IconKey
-import com.pointlessapps.songbook.ui.theme.IconMode
 import com.pointlessapps.songbook.ui.theme.IconQueue
 import com.pointlessapps.songbook.ui.theme.IconTextSize
 import com.pointlessapps.songbook.ui.theme.IconVoice
+import com.pointlessapps.songbook.ui.theme.IconWrapMode
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
@@ -97,17 +102,28 @@ internal fun LyricsOptionsBottomSheet(
                     onClick = { onAction(LyricsOptionsBottomSheetAction.Fullscreen) },
                 ),
                 OptionsBottomSheetItem.new(
-                    icon = IconMode,
-                    label = Res.string.lyrics_menu_mode,
+                    icon = IconWrapMode,
+                    label = Res.string.lyrics_menu_wrap_mode,
                     description = stringResource(
-                        when (state.mode) {
-                            LyricsMode.Inline -> Res.string.lyrics_mode_inline
-                            LyricsMode.SideBySide -> Res.string.lyrics_mode_side_by_side
-                            LyricsMode.Both -> Res.string.lyrics_mode_both
-                            LyricsMode.TextOnly -> Res.string.lyrics_mode_text_only
+                        when (state.wrapMode) {
+                            WrapMode.Wrap -> Res.string.lyrics_wrap_mode_wrap
+                            WrapMode.NoWrap -> Res.string.lyrics_wrap_mode_no_wrap
                         },
                     ),
-                    onClick = { onAction(LyricsOptionsBottomSheetAction.Mode) },
+                    onClick = { onAction(LyricsOptionsBottomSheetAction.WrapMode) },
+                ),
+                OptionsBottomSheetItem.new(
+                    icon = IconDisplayMode,
+                    label = Res.string.lyrics_menu_display_mode,
+                    description = stringResource(
+                        when (state.displayMode) {
+                            DisplayMode.Inline -> Res.string.lyrics_display_mode_inline
+                            DisplayMode.SideBySide -> Res.string.lyrics_display_mode_side_by_side
+                            DisplayMode.Both -> Res.string.lyrics_display_mode_both
+                            DisplayMode.TextOnly -> Res.string.lyrics_display_mode_text_only
+                        },
+                    ),
+                    onClick = { onAction(LyricsOptionsBottomSheetAction.DisplayMode) },
                 ),
                 OptionsBottomSheetItem.new(
                     icon = IconTextSize,
@@ -185,5 +201,5 @@ private fun LyricsOptionsBottomSheetHeader(title: String, artist: String) {
 }
 
 internal enum class LyricsOptionsBottomSheetAction {
-    Edit, Fullscreen, Mode, TextScale, KeyOffset, AddToSetlist, ShowQueue, Broadcast, Delete
+    Edit, Fullscreen, WrapMode, DisplayMode, TextScale, KeyOffset, AddToSetlist, ShowQueue, Broadcast, Delete
 }

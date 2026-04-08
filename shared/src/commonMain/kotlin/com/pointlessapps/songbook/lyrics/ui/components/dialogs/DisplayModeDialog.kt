@@ -25,22 +25,22 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.lyrics.LyricsMode
-import com.pointlessapps.songbook.lyrics.LyricsMode.Both
-import com.pointlessapps.songbook.lyrics.LyricsMode.Inline
-import com.pointlessapps.songbook.lyrics.LyricsMode.SideBySide
-import com.pointlessapps.songbook.lyrics.LyricsMode.TextOnly
+import com.pointlessapps.songbook.lyrics.DisplayMode
+import com.pointlessapps.songbook.lyrics.DisplayMode.Both
+import com.pointlessapps.songbook.lyrics.DisplayMode.Inline
+import com.pointlessapps.songbook.lyrics.DisplayMode.SideBySide
+import com.pointlessapps.songbook.lyrics.DisplayMode.TextOnly
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_confirm
 import com.pointlessapps.songbook.shared.common_select_display_mode
-import com.pointlessapps.songbook.shared.lyrics_mode_both
-import com.pointlessapps.songbook.shared.lyrics_mode_both_description
-import com.pointlessapps.songbook.shared.lyrics_mode_inline
-import com.pointlessapps.songbook.shared.lyrics_mode_inline_description
-import com.pointlessapps.songbook.shared.lyrics_mode_side_by_side
-import com.pointlessapps.songbook.shared.lyrics_mode_side_by_side_description
-import com.pointlessapps.songbook.shared.lyrics_mode_text_only
-import com.pointlessapps.songbook.shared.lyrics_mode_text_only_description
+import com.pointlessapps.songbook.shared.lyrics_display_mode_both
+import com.pointlessapps.songbook.shared.lyrics_display_mode_both_description
+import com.pointlessapps.songbook.shared.lyrics_display_mode_inline
+import com.pointlessapps.songbook.shared.lyrics_display_mode_inline_description
+import com.pointlessapps.songbook.shared.lyrics_display_mode_side_by_side
+import com.pointlessapps.songbook.shared.lyrics_display_mode_side_by_side_description
+import com.pointlessapps.songbook.shared.lyrics_display_mode_text_only
+import com.pointlessapps.songbook.shared.lyrics_display_mode_text_only_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -50,15 +50,15 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.theme.IconDisplayMode
 import com.pointlessapps.songbook.ui.theme.IconDone
-import com.pointlessapps.songbook.ui.theme.IconMode
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun ModeDialog(
-    mode: LyricsMode,
-    onModeSelected: (LyricsMode) -> Unit,
+internal fun DisplayModeDialog(
+    mode: DisplayMode,
+    onModeSelected: (DisplayMode) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     var currentlySelectedMode by rememberSaveable { mutableStateOf(mode) }
@@ -67,7 +67,7 @@ internal fun ModeDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
             label = stringResource(Res.string.common_select_display_mode),
-            icon = IconMode,
+            icon = IconDisplayMode,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {
@@ -76,7 +76,7 @@ internal fun ModeDialog(
                 .clip(MaterialTheme.shapes.medium)
                 .weight(1f, fill = false),
         ) {
-            itemsIndexed(LyricsMode.entries) { index, mode ->
+            itemsIndexed(DisplayMode.entries) { index, mode ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -106,10 +106,10 @@ internal fun ModeDialog(
                             modifier = Modifier.height(ICON_SIZE),
                             text = stringResource(
                                 when (mode) {
-                                    Inline -> Res.string.lyrics_mode_inline
-                                    SideBySide -> Res.string.lyrics_mode_side_by_side
-                                    Both -> Res.string.lyrics_mode_both
-                                    TextOnly -> Res.string.lyrics_mode_text_only
+                                    Inline -> Res.string.lyrics_display_mode_inline
+                                    SideBySide -> Res.string.lyrics_display_mode_side_by_side
+                                    Both -> Res.string.lyrics_display_mode_both
+                                    TextOnly -> Res.string.lyrics_display_mode_text_only
                                 },
                             ),
                             textStyle = defaultSongbookTextStyle().copy(
@@ -127,10 +127,10 @@ internal fun ModeDialog(
                         SongbookText(
                             text = stringResource(
                                 when (mode) {
-                                    Inline -> Res.string.lyrics_mode_inline_description
-                                    SideBySide -> Res.string.lyrics_mode_side_by_side_description
-                                    Both -> Res.string.lyrics_mode_both_description
-                                    TextOnly -> Res.string.lyrics_mode_text_only_description
+                                    Inline -> Res.string.lyrics_display_mode_inline_description
+                                    SideBySide -> Res.string.lyrics_display_mode_side_by_side_description
+                                    Both -> Res.string.lyrics_display_mode_both_description
+                                    TextOnly -> Res.string.lyrics_display_mode_text_only_description
                                 },
                             ),
                             textStyle = defaultSongbookTextStyle().copy(

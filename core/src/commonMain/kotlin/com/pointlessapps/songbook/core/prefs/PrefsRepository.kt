@@ -22,8 +22,11 @@ interface PrefsRepository {
     fun getTextScaleFlow(): Flow<Int>
     suspend fun setTextScale(scale: Int)
 
-    fun getModeFlow(): Flow<String?>
-    suspend fun setMode(mode: String)
+    fun getDisplayModeFlow(): Flow<String?>
+    suspend fun setDisplayMode(mode: String)
+
+    fun getWrapModeFlow(): Flow<String?>
+    suspend fun setWrapMode(mode: String)
 
     suspend fun getShowPublicLyrics(): Boolean?
     suspend fun setShowPublicLyrics(show: Boolean)
@@ -34,7 +37,8 @@ internal class PrefsRepositoryImpl(
 ) : PrefsRepository {
     private val lastSearchesKey = stringSetPreferencesKey("last_searches")
     private val textScaleKey = intPreferencesKey("text_scale")
-    private val modeKey = stringPreferencesKey("mode")
+    private val displayModeKey = stringPreferencesKey("display_mode")
+    private val wrapModeKey = stringPreferencesKey("wrap_mode")
     private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
 
     override fun getLastSearchesFlow() = dataStore.data.map { preferences ->
@@ -77,15 +81,29 @@ internal class PrefsRepositoryImpl(
         }
     }
 
-    override fun getModeFlow() = dataStore.data.map { preferences ->
-        preferences[modeKey]
+    override fun getDisplayModeFlow() = dataStore.data.map { preferences ->
+        preferences[displayModeKey]
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun setMode(mode: String) {
+    override suspend fun setDisplayMode(mode: String) {
         withContext(Dispatchers.IO) {
             dataStore.updateData {
                 it.toMutablePreferences().apply {
-                    set(modeKey, mode)
+                    set(displayModeKey, mode)
+                }
+            }
+        }
+    }
+
+    override fun getWrapModeFlow() = dataStore.data.map { preferences ->
+        preferences[wrapModeKey]
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun setWrapMode(mode: String) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.toMutablePreferences().apply {
+                    set(wrapModeKey, mode)
                 }
             }
         }

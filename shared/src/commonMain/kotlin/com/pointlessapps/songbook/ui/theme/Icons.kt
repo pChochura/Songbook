@@ -18,6 +18,7 @@ import com.pointlessapps.songbook.shared.ic_color_palette
 import com.pointlessapps.songbook.shared.ic_delete
 import com.pointlessapps.songbook.shared.ic_delete_permanently
 import com.pointlessapps.songbook.shared.ic_descending
+import com.pointlessapps.songbook.shared.ic_display_mode
 import com.pointlessapps.songbook.shared.ic_done
 import com.pointlessapps.songbook.shared.ic_duplicate_file
 import com.pointlessapps.songbook.shared.ic_duplicate_folder
@@ -37,7 +38,6 @@ import com.pointlessapps.songbook.shared.ic_info
 import com.pointlessapps.songbook.shared.ic_key
 import com.pointlessapps.songbook.shared.ic_library
 import com.pointlessapps.songbook.shared.ic_minus
-import com.pointlessapps.songbook.shared.ic_mode
 import com.pointlessapps.songbook.shared.ic_move
 import com.pointlessapps.songbook.shared.ic_move_handle
 import com.pointlessapps.songbook.shared.ic_note
@@ -65,6 +65,7 @@ import com.pointlessapps.songbook.shared.ic_visibility
 import com.pointlessapps.songbook.shared.ic_visibility_off
 import com.pointlessapps.songbook.shared.ic_voice
 import com.pointlessapps.songbook.shared.ic_warning
+import com.pointlessapps.songbook.shared.ic_wrap_mode
 
 val IconAddFile = Res.drawable.ic_add_file
 val IconAddFolder = Res.drawable.ic_add_folder
@@ -114,7 +115,8 @@ val IconVisibility = Res.drawable.ic_visibility
 val IconVisibilityOff = Res.drawable.ic_visibility_off
 val IconWarning = Res.drawable.ic_warning
 val IconNote = Res.drawable.ic_note
-val IconMode = Res.drawable.ic_mode
+val IconWrapMode = Res.drawable.ic_wrap_mode
+val IconDisplayMode = Res.drawable.ic_display_mode
 val IconTextSize = Res.drawable.ic_text_size
 val IconQueue = Res.drawable.ic_queue
 val IconVoice = Res.drawable.ic_voice

@@ -13,15 +13,20 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.core.song.model.Section
-import com.pointlessapps.songbook.lyrics.LyricsMode
+import com.pointlessapps.songbook.lyrics.DisplayMode
+import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
+import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
+import com.pointlessapps.songbook.lyrics.WrapMode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsSections
 import com.pointlessapps.songbook.lyrics.ui.components.SongHeader
 import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
@@ -37,12 +42,22 @@ internal fun PreviewSongLayout(
     textScale: Int,
     keyOffset: Int,
     onTextScaleChanged: (Int) -> Unit,
-    mode: LyricsMode = LyricsMode.Inline,
+    displayMode: DisplayMode = DisplayMode.Inline,
+    wrapMode: WrapMode = WrapMode.NoWrap,
     paddingValues: PaddingValues = PaddingValues(),
 ) {
+    var currentTextScale by remember { mutableStateOf(textScale) }
     var chordDetailsDialogData by rememberSaveable { mutableStateOf<String?>(null) }
     val transformableState = rememberTransformableState { zoomChange, _, _ ->
-        onTextScaleChanged((textScale * zoomChange).roundToInt())
+        currentTextScale = (currentTextScale * zoomChange)
+            .roundToInt()
+            .coerceIn(MIN_ZOOM, MAX_ZOOM)
+    }
+
+    LaunchedEffect(transformableState.isTransformInProgress) {
+        if (!transformableState.isTransformInProgress) {
+            onTextScaleChanged(currentTextScale)
+        }
     }
 
     Box(
@@ -52,6 +67,7 @@ internal fun PreviewSongLayout(
         contentAlignment = Alignment.TopCenter,
     ) {
         LazyColumn(
+            userScrollEnabled = !transformableState.isTransformInProgress,
             modifier = Modifier
                 .widthIn(max = MAX_WIDTH)
                 .fillMaxSize(),
@@ -78,13 +94,12 @@ internal fun PreviewSongLayout(
 
             item(key = "sections") {
                 LyricsSections(
-                    modifier = Modifier.padding(
-                        horizontal = MaterialTheme.spacing.huge,
-                    ),
+                    modifier = Modifier.padding(horizontal = MaterialTheme.spacing.huge),
                     sections = sections,
-                    textScale = textScale,
+                    textScale = currentTextScale,
                     keyOffset = keyOffset,
-                    mode = mode,
+                    displayMode = displayMode,
+                    wrapMode = wrapMode,
                     onChordClicked = { chordDetailsDialogData = it },
                 )
             }
@@ -92,7 +107,7 @@ internal fun PreviewSongLayout(
 
         TextScaleOverlay(
             show = transformableState.isTransformInProgress,
-            textScale = textScale,
+            textScale = currentTextScale,
             modifier = Modifier.align(Alignment.Center),
         )
     }

@@ -30,17 +30,19 @@ import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheet
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.AddToSetlist
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Broadcast
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Delete
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.DisplayMode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Edit
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Fullscreen
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.KeyOffset
-import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Mode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.ShowQueue
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.TextScale
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.WrapMode
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmBroadcastToTeamDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.lyrics.ui.components.dialogs.DisplayModeDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.KeyOffsetDialog
-import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ModeDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
+import com.pointlessapps.songbook.lyrics.ui.components.dialogs.WrapModeDialog
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_close_fullscreen
 import com.pointlessapps.songbook.shared.lyrics_section_label
@@ -54,6 +56,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.collectWithLifecycle
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +101,7 @@ internal fun LyricsScreen(
                         rightButton = TopBarButton.menu(
                             onClick = { isBottomSheetVisible = true },
                         ),
-                        title = Res.string.lyrics_section_label,
+                        title = stringResource(Res.string.lyrics_section_label),
                     )
                 } else {
                     Spacer(Modifier.statusBarsPadding())
@@ -113,7 +116,8 @@ internal fun LyricsScreen(
                 sections = state.sections,
                 textScale = state.textScale,
                 keyOffset = state.keyOffset,
-                mode = state.mode,
+                displayMode = state.displayMode,
+                wrapMode = state.wrapMode,
                 onTextScaleChanged = viewModel::onTextScaleChanged,
                 paddingValues = paddingValues,
             )
@@ -140,7 +144,8 @@ internal fun LyricsScreen(
         }
     }
 
-    var isModeDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isWrapDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isKeyOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -162,7 +167,8 @@ internal fun LyricsScreen(
                     isBottomSheetVisible = false
                 }
 
-                Mode -> isModeDialogVisible = true
+                WrapMode -> isWrapDialogVisible = true
+                DisplayMode -> isDisplayModeDialogVisible = true
                 TextScale -> isTextScaleDialogVisible = true
                 KeyOffset -> isKeyOffsetDialogVisible = true
                 AddToSetlist -> TODO()
@@ -173,14 +179,25 @@ internal fun LyricsScreen(
         },
     )
 
-    if (isModeDialogVisible) {
-        ModeDialog(
-            mode = state.mode,
+    if (isWrapDialogVisible) {
+        WrapModeDialog(
+            mode = state.wrapMode,
             onModeSelected = {
-                viewModel.onModeChanged(it)
-                isModeDialogVisible = false
+                viewModel.onWrapModeChanged(it)
+                isWrapDialogVisible = false
             },
-            onDismissRequest = { isModeDialogVisible = false },
+            onDismissRequest = { isWrapDialogVisible = false },
+        )
+    }
+
+    if (isDisplayModeDialogVisible) {
+        DisplayModeDialog(
+            mode = state.displayMode,
+            onModeSelected = {
+                viewModel.onDisplayModeChanged(it)
+                isDisplayModeDialogVisible = false
+            },
+            onDismissRequest = { isDisplayModeDialogVisible = false },
         )
     }
 

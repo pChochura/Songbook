@@ -29,7 +29,7 @@ internal sealed interface LyricsEvent {
 }
 
 @Keep
-internal enum class LyricsMode {
+internal enum class DisplayMode {
     Inline,
     SideBySide,
     Both,
@@ -39,6 +39,9 @@ internal enum class LyricsMode {
     val shouldShowSideBySide get() = this == SideBySide || this == Both
 }
 
+@Keep
+internal enum class WrapMode { Wrap, NoWrap }
+
 internal data class LyricsState(
     val songId: Long? = null,
     val title: String = "",
@@ -47,7 +50,8 @@ internal data class LyricsState(
     val textScale: Int = 100,
     val keyOffset: Int = 0,
     val isOcrActive: Boolean = false,
-    val mode: LyricsMode = LyricsMode.Inline,
+    val displayMode: DisplayMode = DisplayMode.Inline,
+    val wrapMode: WrapMode = WrapMode.NoWrap,
     val isLoading: Boolean = false,
     val syncStatus: SyncStatus = SyncStatus.LOCAL,
 )
@@ -67,19 +71,21 @@ internal class LyricsViewModel(
 
     val state: StateFlow<LyricsState> = combine(
         prefsRepository.getTextScaleFlow(),
-        prefsRepository.getModeFlow(),
+        prefsRepository.getDisplayModeFlow(),
+        prefsRepository.getWrapModeFlow(),
         songRepository.getSongById(songId),
         _transientState,
-    ) { textScale, mode, songResult, transient ->
+    ) { textScale, displayMode, wrapMode, songResult, transient ->
         val song = songResult.data
         LyricsState(
             songId = songId,
-            title = song?.title ?: "",
-            artist = song?.artist ?: "",
-            sections = song?.sections ?: emptyList(),
+            title = song?.title.orEmpty(),
+            artist = song?.artist.orEmpty(),
+            sections = song?.sections.orEmpty(),
             syncStatus = songResult.status,
             textScale = textScale,
-            mode = mode?.let(LyricsMode::valueOf) ?: LyricsMode.Inline,
+            displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
+            wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
             keyOffset = transient.keyOffset,
             isLoading = transient.isLoading,
         )
@@ -114,9 +120,15 @@ internal class LyricsViewModel(
         _transientState.update { it.copy(keyOffset = keyOffset) }
     }
 
-    fun onModeChanged(mode: LyricsMode) {
+    fun onDisplayModeChanged(mode: DisplayMode) {
         viewModelScope.launch {
-            prefsRepository.setMode(mode.name)
+            prefsRepository.setDisplayMode(mode.name)
+        }
+    }
+
+    fun onWrapModeChanged(mode: WrapMode) {
+        viewModelScope.launch {
+            prefsRepository.setWrapMode(mode.name)
         }
     }
 
