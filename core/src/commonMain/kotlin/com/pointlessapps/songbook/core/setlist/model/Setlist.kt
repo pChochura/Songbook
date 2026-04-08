@@ -9,5 +9,11 @@ import kotlinx.serialization.Serializable
 data class Setlist(
     val id: Long,
     val name: String,
-    val songs: List<Song>,
+    val songs: List<Song> = emptyList(),
+)
+
+@Keep
+@Serializable
+data class NewSetlist(
+    val name: String,
 )

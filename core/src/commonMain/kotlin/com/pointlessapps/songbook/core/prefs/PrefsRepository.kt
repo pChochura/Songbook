@@ -19,14 +19,17 @@ interface PrefsRepository {
     suspend fun addLastSearch(search: String)
     suspend fun removeLastSearch(search: String)
 
-    fun getTextScaleFlow(): Flow<Int>
-    suspend fun setTextScale(scale: Int)
+    fun getLyricsTextScaleFlow(): Flow<Int>
+    suspend fun setLyricsTextScale(scale: Int)
 
-    fun getDisplayModeFlow(): Flow<String?>
-    suspend fun setDisplayMode(mode: String)
+    fun getLyricsDisplayModeFlow(): Flow<String?>
+    suspend fun setLyricsDisplayMode(mode: String)
 
-    fun getWrapModeFlow(): Flow<String?>
-    suspend fun setWrapMode(mode: String)
+    fun getLibraryDisplayModeFlow(): Flow<String?>
+    suspend fun setLibraryDisplayMode(mode: String)
+
+    fun getLyricsWrapModeFlow(): Flow<String?>
+    suspend fun setLyricsWrapMode(mode: String)
 
     suspend fun getShowPublicLyrics(): Boolean?
     suspend fun setShowPublicLyrics(show: Boolean)
@@ -36,9 +39,10 @@ internal class PrefsRepositoryImpl(
     private val dataStore: DataStore<Preferences>,
 ) : PrefsRepository {
     private val lastSearchesKey = stringSetPreferencesKey("last_searches")
-    private val textScaleKey = intPreferencesKey("text_scale")
-    private val displayModeKey = stringPreferencesKey("display_mode")
-    private val wrapModeKey = stringPreferencesKey("wrap_mode")
+    private val lyricsTextScaleKey = intPreferencesKey("lyrics_text_scale")
+    private val lyricsDisplayModeKey = stringPreferencesKey("lyrics_display_mode")
+    private val libraryDisplayModeKey = stringPreferencesKey("library_display_mode")
+    private val lyricsWrapModeKey = stringPreferencesKey("lyrics_wrap_mode")
     private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
 
     override fun getLastSearchesFlow() = dataStore.data.map { preferences ->
@@ -67,43 +71,57 @@ internal class PrefsRepositoryImpl(
         }
     }
 
-    override fun getTextScaleFlow() = dataStore.data.map { preferences ->
-        preferences[textScaleKey] ?: 100
+    override fun getLyricsTextScaleFlow() = dataStore.data.map { preferences ->
+        preferences[lyricsTextScaleKey] ?: 100
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun setTextScale(scale: Int) {
+    override suspend fun setLyricsTextScale(scale: Int) {
         withContext(Dispatchers.IO) {
             dataStore.updateData {
                 it.toMutablePreferences().apply {
-                    set(textScaleKey, scale)
+                    set(lyricsTextScaleKey, scale)
                 }
             }
         }
     }
 
-    override fun getDisplayModeFlow() = dataStore.data.map { preferences ->
-        preferences[displayModeKey]
+    override fun getLyricsDisplayModeFlow() = dataStore.data.map { preferences ->
+        preferences[lyricsDisplayModeKey]
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun setDisplayMode(mode: String) {
+    override suspend fun setLyricsDisplayMode(mode: String) {
         withContext(Dispatchers.IO) {
             dataStore.updateData {
                 it.toMutablePreferences().apply {
-                    set(displayModeKey, mode)
+                    set(lyricsDisplayModeKey, mode)
                 }
             }
         }
     }
 
-    override fun getWrapModeFlow() = dataStore.data.map { preferences ->
-        preferences[wrapModeKey]
+    override fun getLibraryDisplayModeFlow() = dataStore.data.map { preferences ->
+        preferences[libraryDisplayModeKey]
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun setWrapMode(mode: String) {
+    override suspend fun setLibraryDisplayMode(mode: String) {
         withContext(Dispatchers.IO) {
             dataStore.updateData {
                 it.toMutablePreferences().apply {
-                    set(wrapModeKey, mode)
+                    set(libraryDisplayModeKey, mode)
+                }
+            }
+        }
+    }
+
+    override fun getLyricsWrapModeFlow() = dataStore.data.map { preferences ->
+        preferences[lyricsWrapModeKey]
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun setLyricsWrapMode(mode: String) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.toMutablePreferences().apply {
+                    set(lyricsWrapModeKey, mode)
                 }
             }
         }

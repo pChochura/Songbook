@@ -29,13 +29,12 @@ import com.pointlessapps.songbook.ui.theme.IconMoveHandle
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun TopBar(
     leftButton: TopBarButton?,
     rightButton: TopBarButton?,
-    title: StringResource,
+    title: String,
 ) {
     Row(
         modifier = Modifier
@@ -75,7 +74,7 @@ internal fun TopBar(
             contentAlignment = Alignment.Center,
         ) {
             SongbookText(
-                text = stringResource(title),
+                text = title,
                 textStyle = defaultSongbookTextStyle().copy(
                     textColor = MaterialTheme.colorScheme.onSurface,
                     typography = MaterialTheme.typography.titleLarge,

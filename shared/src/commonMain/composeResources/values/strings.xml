@@ -39,6 +39,7 @@
     <string name="common_camera_permission_description">In order to use the camera you need to grant the permission in the app's settings.</string>
     <string name="common_open_settings">Open settings</string>
     <string name="common_chord_details">Chord details</string>
+    <string name="common_favourites">Favourites</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
@@ -60,6 +61,11 @@
     <string name="library_add_setlist">Add a setlist</string>
     <string name="library_add_setlist_description">Create a setlist that will contain a set of songs with a specified order.</string>
     <string name="library_add_setlist_placeholder">Setlist name</string>
+    <string name="library_menu_display_mode">Display mode</string>
+    <string name="library_menu_display_mode_list">List</string>
+    <string name="library_menu_display_mode_list_description">The songs will be displayed as a compact list</string>
+    <string name="library_menu_display_mode_grid">Grid</string>
+    <string name="library_menu_display_mode_grid_description">The songs will be displayed in a grid with a dynamic number of columns</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Add new song</string>

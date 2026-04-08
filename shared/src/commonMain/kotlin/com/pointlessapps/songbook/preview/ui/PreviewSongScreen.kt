@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.library.ui
+package com.pointlessapps.songbook.preview.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +20,6 @@ import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_back
-import com.pointlessapps.songbook.ui.PreviewSongLayout
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle

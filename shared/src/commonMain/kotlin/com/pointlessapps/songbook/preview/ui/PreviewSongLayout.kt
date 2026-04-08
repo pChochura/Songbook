@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.ui
+package com.pointlessapps.songbook.preview.ui
 
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
@@ -30,6 +30,7 @@ import com.pointlessapps.songbook.lyrics.WrapMode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsSections
 import com.pointlessapps.songbook.lyrics.ui.components.SongHeader
 import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
+import com.pointlessapps.songbook.preview.ui.components.dialogs.ChordDetailsDialog
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import kotlin.math.roundToInt

@@ -3,16 +3,20 @@ package com.pointlessapps.songbook.library.ui.components.dialogs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,11 +25,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.core.setlist.model.Setlist
+import com.pointlessapps.songbook.library.DisplayMode
+import com.pointlessapps.songbook.library.DisplayMode.Grid
+import com.pointlessapps.songbook.library.DisplayMode.List
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_confirm
-import com.pointlessapps.songbook.shared.import_menu_add_to_setlists
-import com.pointlessapps.songbook.shared.import_menu_add_to_setlists_description
+import com.pointlessapps.songbook.shared.common_select_display_mode
+import com.pointlessapps.songbook.shared.library_menu_display_mode_grid
+import com.pointlessapps.songbook.shared.library_menu_display_mode_grid_description
+import com.pointlessapps.songbook.shared.library_menu_display_mode_list
+import com.pointlessapps.songbook.shared.library_menu_display_mode_list_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -35,45 +44,33 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
-import com.pointlessapps.songbook.ui.theme.IconAddFolder
+import com.pointlessapps.songbook.ui.theme.IconDisplayMode
 import com.pointlessapps.songbook.ui.theme.IconDone
 import com.pointlessapps.songbook.ui.theme.spacing
-import com.pointlessapps.songbook.utils.rememberSnapshotMapSaver
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun SetlistsDialog(
-    setlists: Map<Setlist, Boolean>,
-    onSetlistsSelected: (List<Setlist>) -> Unit,
+internal fun DisplayModeDialog(
+    mode: DisplayMode,
+    onModeSelected: (DisplayMode) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val currentlySelectedSetlists = rememberSaveable(saver = rememberSnapshotMapSaver()) {
-        mutableStateMapOf(*(setlists.toList().toTypedArray()))
-    }
+    var currentlySelectedMode by rememberSaveable { mutableStateOf(mode) }
 
     SongbookDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.import_menu_add_to_setlists),
-            icon = IconAddFolder,
+            label = stringResource(Res.string.common_select_display_mode),
+            icon = IconDisplayMode,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {
-        SongbookText(
-            text = stringResource(Res.string.import_menu_add_to_setlists_description),
-            textStyle = defaultSongbookTextStyle().copy(
-                typography = MaterialTheme.typography.bodyMedium,
-                textColor = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-            ),
-        )
-
         LazyColumn(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
                 .weight(1f, fill = false),
         ) {
-            itemsIndexed(setlists.keys.toList()) { index, setlist ->
+            itemsIndexed(DisplayMode.entries) { index, mode ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -86,10 +83,7 @@ internal fun SetlistsDialog(
                         )
                         .clickable(
                             role = Role.Button,
-                            onClick = {
-                                currentlySelectedSetlists[setlist] =
-                                    !(currentlySelectedSetlists.getOrElse(setlist) { false })
-                            },
+                            onClick = { currentlySelectedMode = mode },
                         )
                         .padding(
                             vertical = MaterialTheme.spacing.medium,
@@ -98,26 +92,49 @@ internal fun SetlistsDialog(
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SongbookText(
+                    Column(
                         modifier = Modifier.weight(1f),
-                        text = setlist.name,
-                        textStyle = defaultSongbookTextStyle().copy(
-                            textColor = MaterialTheme.colorScheme.onSurface,
-                            typography = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = if (currentlySelectedSetlists[setlist] == true) {
-                                    FontWeight.Bold
-                                } else {
-                                    MaterialTheme.typography.labelMedium.fontWeight
+                        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+                    ) {
+                        SongbookText(
+                            modifier = Modifier.height(ICON_SIZE),
+                            text = stringResource(
+                                when (mode) {
+                                    Grid -> Res.string.library_menu_display_mode_grid
+                                    List -> Res.string.library_menu_display_mode_list
                                 },
                             ),
-                        ),
-                    )
+                            textStyle = defaultSongbookTextStyle().copy(
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                                typography = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = if (currentlySelectedMode == mode) {
+                                        FontWeight.Bold
+                                    } else {
+                                        MaterialTheme.typography.labelMedium.fontWeight
+                                    },
+                                ),
+                            ),
+                        )
+
+                        SongbookText(
+                            text = stringResource(
+                                when (mode) {
+                                    Grid -> Res.string.library_menu_display_mode_grid_description
+                                    List -> Res.string.library_menu_display_mode_list_description
+                                },
+                            ),
+                            textStyle = defaultSongbookTextStyle().copy(
+                                textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                typography = MaterialTheme.typography.labelSmall,
+                            ),
+                        )
+                    }
 
                     SongbookIcon(
                         modifier = Modifier
                             .size(ICON_SIZE)
                             .graphicsLayer {
-                                alpha = if (currentlySelectedSetlists[setlist] == true) 1f else 0f
+                                alpha = if (currentlySelectedMode == mode) 1f else 0f
                             },
                         icon = IconDone,
                         iconStyle = defaultSongbookIconStyle().copy(
@@ -131,9 +148,7 @@ internal fun SetlistsDialog(
         SongbookButton(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.common_confirm),
-            onClick = {
-                onSetlistsSelected(currentlySelectedSetlists.filterValues { it }.keys.toList())
-            },
+            onClick = { onModeSelected(currentlySelectedMode) },
             buttonStyle = defaultSongbookButtonStyle().copy(
                 containerColor = MaterialTheme.colorScheme.primary,
                 textStyle = defaultSongbookTextStyle().copy(

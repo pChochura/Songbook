@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,17 +35,20 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
-import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.setlist.model.Setlist
+import com.pointlessapps.songbook.library.DisplayMode.Grid
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
 import com.pointlessapps.songbook.library.ui.components.AddSetlistCard
 import com.pointlessapps.songbook.library.ui.components.AddSongCard
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheet
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.DisplayMode
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
 import com.pointlessapps.songbook.library.ui.components.dialogs.AddSetlistDialog
+import com.pointlessapps.songbook.library.ui.components.dialogs.DisplayModeDialog
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_app_name
 import com.pointlessapps.songbook.shared.common_syncing
@@ -71,14 +75,13 @@ internal fun LibraryScreen(
 ) {
     val navigator = LocalNavigator.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
-            is LibraryEvent.NavigateTo -> when (val route = event.route) {
-                is Route.Lyrics -> navigator.navigateToLyrics(route.songId)
-                is Route.ImportSong -> navigator.navigateToImportSong()
-                else -> Unit
-            }
+            is LibraryEvent.NavigateToImportSong -> navigator.navigateToImportSong()
+            is LibraryEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.id)
+            is LibraryEvent.NavigateToSetlist -> navigator.navigateToSetlist(event.id)
         }
     }
 
@@ -90,20 +93,26 @@ internal fun LibraryScreen(
             }
 
             TopBar(
-                leftButton = null,
-                rightButton = TopBarButton(
+                leftButton = TopBarButton(
                     enabled = false,
                     icon = if (state.syncStatus == SyncStatus.LOCAL) IconSync else IconSyncFailed,
                     tooltip = Res.string.common_syncing,
                     onClick = {},
                     modifier = Modifier.graphicsLayer { rotationZ = rotation.value },
                 ).takeIf { state.syncStatus == SyncStatus.LOCAL },
-                title = Res.string.common_app_name,
+                rightButton = TopBarButton.menu(
+                    onClick = { isBottomSheetVisible = true },
+                ),
+                title = stringResource(Res.string.common_app_name),
             )
         },
     ) { paddingValues ->
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 120.dp),
+            columns = if (state.displayMode == Grid) {
+                GridCells.Adaptive(minSize = 120.dp)
+            } else {
+                GridCells.Fixed(1)
+            },
             modifier = Modifier.fillMaxSize(),
             contentPadding = paddingValues
                 .add(MaterialTheme.spacing.huge)
@@ -125,6 +134,7 @@ internal fun LibraryScreen(
             item(key = "setlists", span = { GridItemSpan(maxLineSpan) }) {
                 SetlistsRow(
                     setlists = state.setlists,
+                    onSetlistClicked = viewModel::onSetlistClicked,
                     onAddSetlistClicked = viewModel::onAddSetlistClicked,
                 )
             }
@@ -140,6 +150,7 @@ internal fun LibraryScreen(
                 SongCard(
                     modifier = Modifier.animateItem(),
                     song = song,
+                    displayMode = state.displayMode,
                     onClick = { viewModel.onLyricsClicked(song.id) },
                 )
             }
@@ -152,11 +163,38 @@ internal fun LibraryScreen(
             }
         }
     }
+
+    var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
+
+    LibraryOptionsBottomSheet(
+        show = isBottomSheetVisible,
+        state = state,
+        onDismissRequest = { isBottomSheetVisible = false },
+        onAction = {
+            isBottomSheetVisible = false
+
+            when (it) {
+                DisplayMode -> isDisplayModeDialogVisible = true
+            }
+        },
+    )
+
+    if (isDisplayModeDialogVisible) {
+        DisplayModeDialog(
+            mode = state.displayMode,
+            onModeSelected = {
+                viewModel.onDisplayModeChanged(it)
+                isDisplayModeDialogVisible = false
+            },
+            onDismissRequest = { isDisplayModeDialogVisible = false },
+        )
+    }
 }
 
 @Composable
 private fun LazyGridItemScope.SetlistsRow(
     setlists: List<Setlist>,
+    onSetlistClicked: (Long) -> Unit,
     onAddSetlistClicked: (String) -> Unit,
 ) {
     var isAddSetlistDialogVisible by remember { mutableStateOf(false) }
@@ -193,7 +231,7 @@ private fun LazyGridItemScope.SetlistsRow(
             SetlistCard(
                 modifier = Modifier.fillMaxHeight(),
                 setlist = setlist,
-                onClick = {},
+                onClick = { onSetlistClicked(setlist.id) },
             )
         }
 

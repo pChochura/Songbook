@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.ui
+package com.pointlessapps.songbook.importsong.ui.components.dialogs
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -12,10 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_camera_permission
+import com.pointlessapps.songbook.shared.common_camera_permission_description
 import com.pointlessapps.songbook.shared.common_cancel
-import com.pointlessapps.songbook.shared.common_confirm
-import com.pointlessapps.songbook.shared.common_discard_changes
-import com.pointlessapps.songbook.shared.common_discard_changes_description
+import com.pointlessapps.songbook.shared.common_open_settings
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -29,20 +29,20 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun ConfirmDiscardChangesDialog(
-    onConfirmClicked: () -> Unit,
+internal fun CameraPermissionDeniedDialog(
+    onOpenSettingsClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     SongbookDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.common_discard_changes),
+            label = stringResource(Res.string.common_camera_permission),
             icon = IconWarning,
-            dismissible = SongbookDialogDismissible.OnBackPress,
+            dismissible = SongbookDialogDismissible.None,
         ),
     ) {
         SongbookText(
-            text = stringResource(Res.string.common_discard_changes_description),
+            text = stringResource(Res.string.common_camera_permission_description),
             textStyle = defaultSongbookTextStyle().copy(
                 typography = MaterialTheme.typography.bodyMedium,
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -56,8 +56,8 @@ internal fun ConfirmDiscardChangesDialog(
         ) {
             SongbookButton(
                 modifier = Modifier.fillMaxWidth(),
-                label = stringResource(Res.string.common_confirm),
-                onClick = { onConfirmClicked() },
+                label = stringResource(Res.string.common_open_settings),
+                onClick = onOpenSettingsClicked,
                 buttonStyle = defaultSongbookButtonStyle().copy(
                     containerColor = MaterialTheme.colorScheme.error,
                     textStyle = defaultSongbookTextStyle().copy(

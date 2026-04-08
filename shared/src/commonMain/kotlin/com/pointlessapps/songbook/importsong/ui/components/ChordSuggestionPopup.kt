@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.library.ui.components
+package com.pointlessapps.songbook.importsong.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background

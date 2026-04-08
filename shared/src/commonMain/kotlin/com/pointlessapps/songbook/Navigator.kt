@@ -56,6 +56,12 @@ internal sealed interface Route : NavKey {
         val artist: String,
         val sections: List<Section>,
     ) : Route
+
+    @Keep
+    @Serializable
+    data class Setlist(val id: Long) : Route {
+        override val hasBottomBar = true
+    }
 }
 
 internal val navigationConfig = SavedStateConfiguration {
@@ -66,6 +72,7 @@ internal val navigationConfig = SavedStateConfiguration {
             subclass(Route.Search::class, Route.Search.serializer())
             subclass(Route.ImportSong::class, Route.ImportSong.serializer())
             subclass(Route.PreviewSong::class, Route.PreviewSong.serializer())
+            subclass(Route.Setlist::class, Route.Setlist.serializer())
         }
     }
 }
@@ -134,6 +141,10 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
 
     fun navigateToPreview(title: String, artist: String, sections: List<Section>) {
         backStack.add(Route.PreviewSong(title, artist, sections))
+    }
+
+    fun navigateToSetlist(id: Long) {
+        backStack.add(Route.Setlist(id))
     }
 }
 

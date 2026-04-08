@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.library.ui.utils
+package com.pointlessapps.songbook.importsong.ui.utils
 
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.material3.MaterialTheme

@@ -8,6 +8,7 @@ import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithSongs
 import com.pointlessapps.songbook.core.setlist.database.mapper.toDomain
 import com.pointlessapps.songbook.core.setlist.database.mapper.toEntity
 import com.pointlessapps.songbook.core.setlist.database.mapper.toSongEntities
+import com.pointlessapps.songbook.core.setlist.model.NewSetlist
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.model.Song
 import io.github.jan.supabase.SupabaseClient
@@ -29,12 +30,15 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 import com.pointlessapps.songbook.core.song.database.mapper.toEntity as toSongEntity
 
 interface SetlistRepository {
     fun getAllSetlists(limit: Long = -1L): Flow<DataState<List<Setlist>>>
     fun getSetlistById(id: Long): Flow<DataState<Setlist?>>
+
+    suspend fun addSetlist(name: String): Long
 }
 
 @OptIn(SupabaseExperimental::class)
@@ -94,6 +98,10 @@ internal class SetlistRepositoryImpl(
         songDao.insertSongs(remoteData.flatMap(Setlist::songs).map(Song::toSongEntity))
         setlistDao.insertSetlists(remoteData.map(Setlist::toEntity))
         setlistDao.insertSetlistSongs(remoteData.flatMap(Setlist::toSongEntities))
+    }
+
+    override suspend fun addSetlist(name: String) = withContext(Dispatchers.IO) {
+        table.upsert(NewSetlist(name)) { select() }.decodeSingle<Setlist>().id
     }
 
     private suspend fun fetchSetlistsWithSongs(limit: Long): List<Setlist> = table

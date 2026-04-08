@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.library.ui.components.dialogs
+package com.pointlessapps.songbook.importsong.ui.components.dialogs
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.library
+package com.pointlessapps.songbook.importsong
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
@@ -138,8 +138,9 @@ internal class ImportSongViewModel(
                     sections = computeSections(),
                 ),
             )
-            eventChannel.send(ImportSongEvent.NavigateBack)
             _transientState.update { it.copy(isLoading = false) }
+            clearState()
+            eventChannel.trySend(ImportSongEvent.NavigateBack)
         }
     }
 
@@ -157,9 +158,7 @@ internal class ImportSongViewModel(
     }
 
     fun onDiscardChangesClicked() {
-        titleTextFieldState.clearText()
-        artistTextFieldState.clearText()
-        lyricsTextFieldState.clearText()
+        clearState()
         eventChannel.trySend(ImportSongEvent.NavigateBack)
     }
 
@@ -229,6 +228,12 @@ internal class ImportSongViewModel(
 
     fun onDismissChordPopup() {
         _transientState.update { it.copy(chordSuggestions = emptyList()) }
+    }
+
+    private fun clearState() {
+        titleTextFieldState.clearText()
+        artistTextFieldState.clearText()
+        lyricsTextFieldState.clearText()
     }
 
     private fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())

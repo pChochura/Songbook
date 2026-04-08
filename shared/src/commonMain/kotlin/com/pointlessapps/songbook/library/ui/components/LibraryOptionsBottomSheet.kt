@@ -1,0 +1,47 @@
+package com.pointlessapps.songbook.library.ui.components
+
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import com.pointlessapps.songbook.library.DisplayMode
+import com.pointlessapps.songbook.library.LibraryState
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_menu
+import com.pointlessapps.songbook.shared.library_menu_display_mode
+import com.pointlessapps.songbook.shared.library_menu_display_mode_grid
+import com.pointlessapps.songbook.shared.library_menu_display_mode_list
+import com.pointlessapps.songbook.ui.OptionsBottomSheet
+import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
+import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
+import com.pointlessapps.songbook.ui.theme.IconDisplayMode
+import org.jetbrains.compose.resources.stringResource
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun LibraryOptionsBottomSheet(
+    show: Boolean,
+    state: LibraryState,
+    onDismissRequest: () -> Unit,
+    onAction: (LibraryOptionsBottomSheetAction) -> Unit,
+) {
+    OptionsBottomSheet(
+        show = show,
+        onDismissRequest = onDismissRequest,
+        header = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
+        items = listOf(
+            OptionsBottomSheetItem.Divider,
+            OptionsBottomSheetItem.new(
+                icon = IconDisplayMode,
+                label = Res.string.library_menu_display_mode,
+                description = when (state.displayMode) {
+                    DisplayMode.List -> stringResource(Res.string.library_menu_display_mode_list)
+                    DisplayMode.Grid -> stringResource(Res.string.library_menu_display_mode_grid)
+                },
+                onClick = { onAction(LibraryOptionsBottomSheetAction.DisplayMode) },
+            ),
+        ),
+    )
+}
+
+internal enum class LibraryOptionsBottomSheetAction {
+    DisplayMode
+}

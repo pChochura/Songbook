@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.library.ui
+package com.pointlessapps.songbook.importsong.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -37,17 +37,18 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
-import com.pointlessapps.songbook.library.ImportSongEvent
-import com.pointlessapps.songbook.library.ImportSongViewModel
-import com.pointlessapps.songbook.library.ui.components.ChordSuggestionPopup
-import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheet
-import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.AddToSetlists
-import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.Preview
-import com.pointlessapps.songbook.library.ui.components.ImportSongOptionsBottomSheetAction.Rescan
-import com.pointlessapps.songbook.library.ui.components.dialogs.ExtractingInProgressDialog
-import com.pointlessapps.songbook.library.ui.components.dialogs.ScanDialog
-import com.pointlessapps.songbook.library.ui.components.dialogs.SetlistsDialog
-import com.pointlessapps.songbook.library.ui.utils.ChordHighlightTransformation
+import com.pointlessapps.songbook.importsong.ImportSongEvent
+import com.pointlessapps.songbook.importsong.ImportSongViewModel
+import com.pointlessapps.songbook.importsong.ui.components.ChordSuggestionPopup
+import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheet
+import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheetAction.AddToSetlists
+import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheetAction.Preview
+import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheetAction.Rescan
+import com.pointlessapps.songbook.importsong.ui.components.dialogs.ConfirmDiscardChangesDialog
+import com.pointlessapps.songbook.importsong.ui.components.dialogs.ExtractingInProgressDialog
+import com.pointlessapps.songbook.importsong.ui.components.dialogs.ScanDialog
+import com.pointlessapps.songbook.importsong.ui.components.dialogs.SetlistsDialog
+import com.pointlessapps.songbook.importsong.ui.utils.ChordHighlightTransformation
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_cancel
 import com.pointlessapps.songbook.shared.common_import_song
@@ -64,7 +65,6 @@ import com.pointlessapps.songbook.shared.import_lyrics_tip
 import com.pointlessapps.songbook.shared.import_menu_rescan_description
 import com.pointlessapps.songbook.shared.import_song_title_label
 import com.pointlessapps.songbook.shared.import_song_title_placeholder
-import com.pointlessapps.songbook.ui.ConfirmDiscardChangesDialog
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookButton
@@ -120,11 +120,13 @@ internal fun ImportSongScreen(
                 rightButton = TopBarButton.menu(
                     onClick = { isBottomSheetVisible = true },
                 ),
-                title = if (state.songId == null) {
-                    Res.string.import_header_title
-                } else {
-                    Res.string.import_header_title_edit
-                },
+                title = stringResource(
+                    if (state.songId == null) {
+                        Res.string.import_header_title
+                    } else {
+                        Res.string.import_header_title_edit
+                    },
+                ),
             )
         },
     ) { paddingValues ->
@@ -217,17 +219,12 @@ internal fun ImportSongScreen(
         state = state,
         onDismissRequest = { isBottomSheetVisible = false },
         onAction = {
+            isBottomSheetVisible = false
+
             when (it) {
                 AddToSetlists -> isSetlistsDialogVisible = true
-                Rescan -> {
-                    isRescanDialogVisible = true
-                    isBottomSheetVisible = false
-                }
-
-                Preview -> {
-                    viewModel.onPreviewClicked()
-                    isBottomSheetVisible = false
-                }
+                Rescan -> isRescanDialogVisible = true
+                Preview -> viewModel.onPreviewClicked()
             }
         },
     )

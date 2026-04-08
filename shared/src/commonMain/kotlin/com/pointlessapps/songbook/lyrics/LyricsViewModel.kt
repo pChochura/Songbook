@@ -70,9 +70,9 @@ internal class LyricsViewModel(
     private val _transientState = MutableStateFlow(LyricsTransientState())
 
     val state: StateFlow<LyricsState> = combine(
-        prefsRepository.getTextScaleFlow(),
-        prefsRepository.getDisplayModeFlow(),
-        prefsRepository.getWrapModeFlow(),
+        prefsRepository.getLyricsTextScaleFlow(),
+        prefsRepository.getLyricsDisplayModeFlow(),
+        prefsRepository.getLyricsWrapModeFlow(),
         songRepository.getSongById(songId),
         _transientState,
     ) { textScale, displayMode, wrapMode, songResult, transient ->
@@ -112,7 +112,7 @@ internal class LyricsViewModel(
     fun onTextScaleChanged(textScale: Int) {
         val newScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM)
         viewModelScope.launch {
-            prefsRepository.setTextScale(newScale)
+            prefsRepository.setLyricsTextScale(newScale)
         }
     }
 
@@ -122,13 +122,13 @@ internal class LyricsViewModel(
 
     fun onDisplayModeChanged(mode: DisplayMode) {
         viewModelScope.launch {
-            prefsRepository.setDisplayMode(mode.name)
+            prefsRepository.setLyricsDisplayMode(mode.name)
         }
     }
 
     fun onWrapModeChanged(mode: WrapMode) {
         viewModelScope.launch {
-            prefsRepository.setWrapMode(mode.name)
+            prefsRepository.setLyricsWrapMode(mode.name)
         }
     }
 

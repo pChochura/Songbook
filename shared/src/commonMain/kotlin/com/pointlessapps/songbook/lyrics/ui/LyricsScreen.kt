@@ -43,10 +43,10 @@ import com.pointlessapps.songbook.lyrics.ui.components.dialogs.DisplayModeDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.KeyOffsetDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.WrapModeDialog
+import com.pointlessapps.songbook.preview.ui.PreviewSongLayout
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_close_fullscreen
 import com.pointlessapps.songbook.shared.lyrics_section_label
-import com.pointlessapps.songbook.ui.PreviewSongLayout
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
@@ -144,8 +144,8 @@ internal fun LyricsScreen(
         }
     }
 
-    var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isWrapDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isKeyOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -156,23 +156,17 @@ internal fun LyricsScreen(
         state = state,
         onDismissRequest = { isBottomSheetVisible = false },
         onAction = {
+            isBottomSheetVisible = false
+
             when (it) {
-                Edit -> {
-                    viewModel.onEditSongClicked()
-                    isBottomSheetVisible = false
-                }
-
-                Fullscreen -> {
-                    isTopBarVisible = !isTopBarVisible
-                    isBottomSheetVisible = false
-                }
-
+                Edit -> viewModel.onEditSongClicked()
+                Fullscreen -> isTopBarVisible = !isTopBarVisible
                 WrapMode -> isWrapDialogVisible = true
                 DisplayMode -> isDisplayModeDialogVisible = true
                 TextScale -> isTextScaleDialogVisible = true
                 KeyOffset -> isKeyOffsetDialogVisible = true
-                AddToSetlist -> TODO()
-                ShowQueue -> TODO()
+                AddToSetlist -> {}
+                ShowQueue -> {}
                 Broadcast -> isBroadcastToTeamDialogVisible = true
                 Delete -> isConfirmDeleteDialogVisible = true
             }

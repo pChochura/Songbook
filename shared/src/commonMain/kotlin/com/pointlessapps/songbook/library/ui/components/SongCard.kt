@@ -1,17 +1,21 @@
 package com.pointlessapps.songbook.library.ui.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.movableContentWithReceiverOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import com.pointlessapps.songbook.core.song.model.Song
+import com.pointlessapps.songbook.library.DisplayMode
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_unknown
 import com.pointlessapps.songbook.shared.common_unnamed
@@ -31,6 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun SongCard(
     song: Song,
+    displayMode: DisplayMode,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -39,58 +44,73 @@ internal fun SongCard(
         onClick = onClick,
         onLongClick = { },
     ) {
-        Column(
-            modifier = Modifier.padding(MaterialTheme.spacing.large),
-            verticalArrangement = Arrangement.spacedBy(
-                space = MaterialTheme.spacing.medium,
-                alignment = Alignment.CenterVertically,
-            ),
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+        AnimatedContent(displayMode) { displayMode ->
+            Column(
+                modifier = Modifier.padding(MaterialTheme.spacing.large),
+                verticalArrangement = Arrangement.spacedBy(
+                    space = MaterialTheme.spacing.medium,
+                    alignment = Alignment.CenterVertically,
+                ),
+                horizontalAlignment = Alignment.Start,
             ) {
-                SongbookIcon(
-                    icon = IconNote,
-                    iconStyle = defaultSongbookIconStyle().copy(
-                        tint = MaterialTheme.colorScheme.primary,
-                    ),
-                )
-                SongbookIconButton(
-                    icon = IconFavouriteEmpty,
-                    tooltipLabel = Res.string.library_add_to_favourites,
-                    onClick = {},
-                    iconButtonStyle = defaultSongbookIconButtonStyle().copy(
-                        outlineColor = Color.Transparent,
-                        containerColor = Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                )
-            }
+                val songIdentityComposable = movableContentWithReceiverOf<Modifier> {
+                    Column(modifier = this) {
+                        SongbookText(
+                            text = song.title.takeIf { it.isNotEmpty() }
+                                ?: stringResource(Res.string.common_unnamed),
+                            textStyle = defaultSongbookTextStyle().copy(
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                                typography = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                textOverflow = TextOverflow.Ellipsis,
+                            ),
+                        )
+                        SongbookText(
+                            text = song.artist.takeIf { it.isNotEmpty() }
+                                ?: stringResource(Res.string.common_unknown),
+                            textStyle = defaultSongbookTextStyle().copy(
+                                textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                typography = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                textOverflow = TextOverflow.Ellipsis,
+                            ),
+                        )
+                    }
+                }
 
-            Column {
-                SongbookText(
-                    text = song.title.takeIf { it.isNotEmpty() }
-                        ?: stringResource(Res.string.common_unnamed),
-                    textStyle = defaultSongbookTextStyle().copy(
-                        textColor = MaterialTheme.colorScheme.onSurface,
-                        typography = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                        textOverflow = TextOverflow.Ellipsis,
-                    ),
-                )
-                SongbookText(
-                    text = song.artist.takeIf { it.isNotEmpty() }
-                        ?: stringResource(Res.string.common_unknown),
-                    textStyle = defaultSongbookTextStyle().copy(
-                        textColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        typography = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        textOverflow = TextOverflow.Ellipsis,
-                    ),
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                ) {
+                    SongbookIcon(
+                        icon = IconNote,
+                        iconStyle = defaultSongbookIconStyle().copy(
+                            tint = MaterialTheme.colorScheme.primary,
+                        ),
+                    )
+
+                    if (displayMode == DisplayMode.List) {
+                        songIdentityComposable(Modifier.weight(1f))
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
+
+                    SongbookIconButton(
+                        icon = IconFavouriteEmpty,
+                        tooltipLabel = Res.string.library_add_to_favourites,
+                        onClick = {},
+                        iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                            outlineColor = Color.Transparent,
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.primary,
+                        ),
+                    )
+                }
+
+                if (displayMode == DisplayMode.Grid) {
+                    songIdentityComposable(Modifier)
+                }
             }
         }
     }
