@@ -79,7 +79,7 @@ internal class ImportSongViewModel(
     private val _transientState = MutableStateFlow(ImportSongTransientState())
 
     val state: StateFlow<ImportSongState> = combine(
-        setlistRepository.getAllSetlists(),
+        setlistRepository.getAllSetlistsFlow(),
         snapshotFlow { titleTextFieldState.text }.distinctUntilChanged(),
         snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged(),
         _transientState,

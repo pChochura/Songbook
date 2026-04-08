@@ -2,10 +2,9 @@ package com.pointlessapps.songbook.core.database.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
@@ -19,7 +18,7 @@ internal interface SongDao {
     @Query("SELECT * FROM songs WHERE id = :id")
     fun getSongById(id: Long): Flow<SongEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertSongs(songs: List<SongEntity>)
 
     @Query("DELETE FROM songs WHERE id = :id")
@@ -39,7 +38,7 @@ internal interface SongDao {
         insertSearchIndex(searchEntities)
     }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertSearchIndex(entities: List<SongSearchEntity>)
 
     @Query("DELETE FROM songs_search WHERE rowid = :id")

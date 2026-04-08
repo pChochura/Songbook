@@ -132,7 +132,7 @@ internal class LyricsViewModel(
         }
     }
 
-    fun deleteSong() {
+    fun onDeleteSongConfirmClicked() {
         viewModelScope.launch {
             _transientState.update { it.copy(isLoading = true) }
             songRepository.deleteSong(songId)

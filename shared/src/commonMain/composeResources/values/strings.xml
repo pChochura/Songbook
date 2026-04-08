@@ -19,12 +19,10 @@
     <string name="common_from_gallery">From gallery</string>
     <string name="common_take_photo">Take a photo</string>
     <string name="common_close_fullscreen">Close fullscreen</string>
-    <string name="common_delete_the_song">Delete the song?</string>
     <string name="common_import_song">Import the song</string>
     <string name="common_save_changes">Save changes</string>
     <string name="common_discard_changes">Discard changes</string>
     <string name="common_discard_changes_description">This action cannot be undone and will remove all the changes</string>
-    <string name="common_delete_the_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
     <string name="common_select_display_mode">Select the display mode</string>
     <string name="common_select_text_scale">Select the text scale</string>
     <string name="common_decrement">Decrement</string>
@@ -114,6 +112,8 @@
     <string name="lyrics_display_mode_both_description">The chords will be displayed to the side of the lyrics and above each line</string>
     <string name="lyrics_display_mode_text_only">Text only</string>
     <string name="lyrics_display_mode_text_only_description">Only the text will be displayed</string>
+    <string name="lyrics_delete_song">Delete the song?</string>
+    <string name="lyrics_delete_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
 
     <!-- Search Screen -->
     <string name="search_placeholder">Search titles, artists and lyrics...</string>
@@ -133,4 +133,13 @@
     <string name="search_import_public_lyrics">Import public lyrics</string>
     <string name="search_import_public_lyrics_description">Import the lyrics into your library. Review the content beforehand, as it is crowdsourced and not guaranteed to be accurate.</string>
     <string name="search_import">Import the lyrics into your library. Review the content beforehand, as it is crowdsourced and not guaranteed to be accurate.</string>
+
+    <!-- Setlist Screen -->
+    <string name="setlist_menu_edit">Edit</string>
+    <string name="setlist_menu_delete">Delete the setlist</string>
+    <string name="setlist_menu_delete_description">The setlist will be moved to the trash, but the associated songs will remain intact</string>
+    <string name="setlist_delete_setlist">Delete the setlist?</string>
+    <string name="setlist_delete_setlist_description">It will be moved to the trash, and you'll be able to restore it later. All the songs associated with this setlist will remain intact.</string>
+    <string name="setlist_edit_setlist">Edit the setlist</string>
+    <string name="setlist_edit_setlist_placeholder">Setlist name</string>
 </resources>

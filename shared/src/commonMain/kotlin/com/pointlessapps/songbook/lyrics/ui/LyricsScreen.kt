@@ -38,7 +38,6 @@ import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetA
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.TextScale
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.WrapMode
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmBroadcastToTeamDialog
-import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.DisplayModeDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.KeyOffsetDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
@@ -46,6 +45,8 @@ import com.pointlessapps.songbook.lyrics.ui.components.dialogs.WrapModeDialog
 import com.pointlessapps.songbook.preview.ui.PreviewSongLayout
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_close_fullscreen
+import com.pointlessapps.songbook.shared.lyrics_delete_song
+import com.pointlessapps.songbook.shared.lyrics_delete_song_description
 import com.pointlessapps.songbook.shared.lyrics_section_label
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
@@ -53,6 +54,7 @@ import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
+import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -231,8 +233,10 @@ internal fun LyricsScreen(
 
     if (isConfirmDeleteDialogVisible) {
         ConfirmDeleteDialog(
+            title = Res.string.lyrics_delete_song,
+            description = Res.string.lyrics_delete_song_description,
             onConfirmClicked = {
-                viewModel.deleteSong()
+                viewModel.onDeleteSongConfirmClicked()
                 isConfirmDeleteDialogVisible = false
                 isBottomSheetVisible = false
             },

@@ -4,6 +4,7 @@ import com.pointlessapps.songbook.core.database.dao.SetlistDao
 import com.pointlessapps.songbook.core.database.dao.SongDao
 import com.pointlessapps.songbook.core.model.DataState
 import com.pointlessapps.songbook.core.model.SyncStatus
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithSongs
 import com.pointlessapps.songbook.core.setlist.database.mapper.toDomain
 import com.pointlessapps.songbook.core.setlist.database.mapper.toEntity
@@ -35,10 +36,12 @@ import kotlin.random.Random
 import com.pointlessapps.songbook.core.song.database.mapper.toEntity as toSongEntity
 
 interface SetlistRepository {
-    fun getAllSetlists(limit: Long = -1L): Flow<DataState<List<Setlist>>>
-    fun getSetlistById(id: Long): Flow<DataState<Setlist?>>
+    fun getAllSetlistsFlow(limit: Long = -1L): Flow<DataState<List<Setlist>>>
+    fun getSetlistByIdFlow(id: Long): Flow<DataState<Setlist?>>
 
     suspend fun addSetlist(name: String): Long
+    suspend fun deleteSetlist(id: Long)
+    suspend fun updateSetlist(setlist: Setlist)
 }
 
 @OptIn(SupabaseExperimental::class)
@@ -51,7 +54,7 @@ internal class SetlistRepositoryImpl(
     private val realtime = supabase.realtime
     private val table = supabase.from("setlists")
 
-    override fun getAllSetlists(limit: Long): Flow<DataState<List<Setlist>>> = flow {
+    override fun getAllSetlistsFlow(limit: Long): Flow<DataState<List<Setlist>>> = flow {
         val channel = realtime.channel("setlists_all_${Random.nextLong()}")
         val setlistChanges = channel.postgresChangeFlow<PostgresAction>("public") {
             table = "setlists"
@@ -74,7 +77,7 @@ internal class SetlistRepositoryImpl(
         }.catch { emit(SyncStatus.REMOTE_FAILED) }
             .flowOn(Dispatchers.IO)
 
-        val localFlow = setlistDao.getAllSetlists(limit)
+        val localFlow = setlistDao.getAllSetlistsFlow(limit)
             .map { it.map(SetlistWithSongs::toDomain) }
             .flowOn(Dispatchers.IO)
 
@@ -89,27 +92,39 @@ internal class SetlistRepositoryImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    override fun getSetlistById(id: Long): Flow<DataState<Setlist?>> = setlistDao.getSetlistById(id)
+    override fun getSetlistByIdFlow(id: Long): Flow<DataState<Setlist?>> = setlistDao.getSetlistByIdFlow(id)
         .map { DataState(it?.toDomain(), SyncStatus.LOCAL) }
         .flowOn(Dispatchers.IO)
 
     private suspend fun syncRemoteData(limit: Long) {
         val remoteData = fetchSetlistsWithSongs(limit)
         songDao.insertSongs(remoteData.flatMap(Setlist::songs).map(Song::toSongEntity))
-        setlistDao.insertSetlists(remoteData.map(Setlist::toEntity))
-        setlistDao.insertSetlistSongs(remoteData.flatMap(Setlist::toSongEntities))
+        setlistDao.syncSetlists(
+            setlists = remoteData.map(Setlist::toEntity),
+            setlistSongs = remoteData.flatMap(Setlist::toSongEntities),
+        )
     }
 
     override suspend fun addSetlist(name: String) = withContext(Dispatchers.IO) {
-        table.upsert(NewSetlist(name)) { select() }.decodeSingle<Setlist>().id
+        table.upsert(NewSetlist(name)) { select() }.decodeSingle<SetlistEntity>().id
+    }
+
+    override suspend fun deleteSetlist(id: Long) {
+        withContext(Dispatchers.IO) {
+            table.delete { filter { Setlist::id eq id } }
+            setlistDao.deleteSetlist(id)
+        }
+    }
+
+    override suspend fun updateSetlist(setlist: Setlist) {
+        withContext(Dispatchers.IO) {
+            val entity = setlist.toEntity()
+            table.upsert(entity)
+            setlistDao.updateSetlist(entity)
+        }
     }
 
     private suspend fun fetchSetlistsWithSongs(limit: Long): List<Setlist> = table
         .select(Columns.raw("id, name, songs(*)")) { limit(limit) }
         .decodeList<Setlist>()
-
-    private suspend fun fetchSetlistByIdWithSongs(id: Long): Setlist? = table
-        .select(Columns.raw("id, name, songs(*)")) {
-            filter { Setlist::id eq id }
-        }.decodeSingleOrNull<Setlist>()
 }

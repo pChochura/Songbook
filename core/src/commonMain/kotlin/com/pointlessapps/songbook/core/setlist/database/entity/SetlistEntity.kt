@@ -8,8 +8,10 @@ import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "setlists")
+@Serializable
 internal data class SetlistEntity(
     @PrimaryKey val id: Long,
     val name: String,
