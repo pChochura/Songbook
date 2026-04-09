@@ -29,7 +29,6 @@ internal fun SearchResultCard(
     SongbookCard(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
-        onLongClick = { },
     ) {
         Column(
             modifier = Modifier

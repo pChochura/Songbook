@@ -34,7 +34,6 @@ internal fun PublicLyricsCard(
     SongbookCard(
         modifier = modifier.fillMaxWidth(),
         onClick = onClicked,
-        onLongClick = { },
     ) {
         Row(
             modifier = Modifier

@@ -30,9 +30,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 
 interface SongRepository {
-    fun getAllSongs(): Flow<DataState<List<Song>>>
-    fun getSongById(id: Long): Flow<DataState<Song?>>
-    fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>
+    fun getAllSongsFlow(): Flow<DataState<List<Song>>>
+    fun getSongByIdFlow(id: Long): Flow<DataState<Song?>>
+    fun searchSongsFlow(query: String): Flow<PagingData<SongSearchResult>>
+
     suspend fun saveSong(newSong: NewSong)
     suspend fun deleteSong(id: Long)
 }
@@ -45,7 +46,7 @@ internal class SongRepositoryImpl(
 
     private val table = supabase.from("songs")
 
-    override fun getAllSongs(): Flow<DataState<List<Song>>> = flow {
+    override fun getAllSongsFlow(): Flow<DataState<List<Song>>> = flow {
         val remoteFlow = table.selectAsFlow(Song::id)
             .onEach { songs ->
                 songDao.insertSongsWithSearch(songs.map { it.toEntity() })
@@ -66,11 +67,11 @@ internal class SongRepositoryImpl(
         emitAll(combinedFlow)
     }.flowOn(Dispatchers.IO)
 
-    override fun getSongById(id: Long) = songDao.getSongById(id)
+    override fun getSongByIdFlow(id: Long) = songDao.getSongById(id)
         .map { DataState(it?.toDomain(), SyncStatus.LOCAL) }
         .flowOn(Dispatchers.IO)
 
-    override fun searchSongs(query: String): Flow<PagingData<SongSearchResult>> {
+    override fun searchSongsFlow(query: String): Flow<PagingData<SongSearchResult>> {
         if (query.isBlank()) return flowOf(PagingData.empty())
 
         return Pager(

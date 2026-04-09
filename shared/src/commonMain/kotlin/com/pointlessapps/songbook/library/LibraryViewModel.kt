@@ -45,7 +45,7 @@ internal class LibraryViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<LibraryState> = combine(
         setlistRepository.getAllSetlistsFlow(limit = SETLISTS_LIMIT),
-        songRepository.getAllSongs(),
+        songRepository.getAllSongsFlow(),
         prefsRepository.getLibraryDisplayModeFlow(),
     ) { setlistsState, songsState, displayMode ->
         LibraryState(

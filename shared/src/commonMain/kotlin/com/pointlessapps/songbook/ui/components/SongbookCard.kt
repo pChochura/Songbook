@@ -33,7 +33,7 @@ import com.pointlessapps.songbook.ui.theme.MEDIUM_CORNER_RADIUS
 fun SongbookCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onLongClick: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
     cardStyle: SongbookCardStyle = defaultSongbookCardStyle(),
     content: @Composable BoxScope.() -> Unit,
 ) {

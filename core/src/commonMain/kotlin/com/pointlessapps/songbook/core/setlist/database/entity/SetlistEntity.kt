@@ -1,13 +1,13 @@
 package com.pointlessapps.songbook.core.setlist.database.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.Junction
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Entity(tableName = "setlists")
@@ -19,38 +19,37 @@ internal data class SetlistEntity(
 
 @Entity(
     tableName = "setlist_songs",
-    primaryKeys = ["setlistId", "songId"],
-    indices = [Index("setlistId"), Index("songId")],
+    primaryKeys = ["setlist_id", "song_id"],
+    indices = [Index("setlist_id"), Index("song_id")],
     foreignKeys = [
         ForeignKey(
             entity = SetlistEntity::class,
             parentColumns = ["id"],
-            childColumns = ["setlistId"],
+            childColumns = ["setlist_id"],
             onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = SongEntity::class,
             parentColumns = ["id"],
-            childColumns = ["songId"],
+            childColumns = ["song_id"],
             onDelete = ForeignKey.CASCADE,
         ),
     ],
 )
+@Serializable
 internal data class SetlistSongEntity(
+    @ColumnInfo("setlist_id")
+    @SerialName("setlist_id")
     val setlistId: Long,
+    @ColumnInfo("song_id")
+    @SerialName("song_id")
     val songId: Long,
+    @ColumnInfo(defaultValue = "0")
+    val order: Int,
 )
 
-internal data class SetlistWithSongs(
-    @Embedded val setlist: SetlistEntity,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "id",
-        associateBy = Junction(
-            value = SetlistSongEntity::class,
-            parentColumn = "setlistId",
-            entityColumn = "songId",
-        ),
-    )
-    val songs: List<SongEntity>,
+internal data class SetlistWithCount(
+    @Embedded
+    val setlist: SetlistEntity,
+    val songCount: Int,
 )

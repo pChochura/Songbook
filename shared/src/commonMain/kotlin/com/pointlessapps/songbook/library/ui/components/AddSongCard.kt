@@ -29,7 +29,6 @@ internal fun AddSongCard(
     SongbookCard(
         modifier = modifier,
         onClick = onClick,
-        onLongClick = { },
         cardStyle = dashedSongbookCardStyle(),
     ) {
         Column(

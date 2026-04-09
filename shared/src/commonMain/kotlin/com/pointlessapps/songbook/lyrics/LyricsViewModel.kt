@@ -73,7 +73,7 @@ internal class LyricsViewModel(
         prefsRepository.getLyricsTextScaleFlow(),
         prefsRepository.getLyricsDisplayModeFlow(),
         prefsRepository.getLyricsWrapModeFlow(),
-        songRepository.getSongById(songId),
+        songRepository.getSongByIdFlow(songId),
         _transientState,
     ) { textScale, displayMode, wrapMode, songResult, transient ->
         val song = songResult.data

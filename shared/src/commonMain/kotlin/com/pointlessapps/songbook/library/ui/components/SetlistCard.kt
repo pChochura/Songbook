@@ -32,7 +32,6 @@ internal fun SetlistCard(
     SongbookCard(
         modifier = modifier,
         onClick = onClick,
-        onLongClick = { },
     ) {
         Row(
             modifier = Modifier
@@ -58,7 +57,7 @@ internal fun SetlistCard(
                     ),
                 )
                 SongbookText(
-                    text = stringResource(Res.string.library_setlist_songs, setlist.songs.size),
+                    text = stringResource(Res.string.library_setlist_songs, setlist.songCount),
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         typography = MaterialTheme.typography.bodySmall,

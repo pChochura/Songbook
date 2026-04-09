@@ -3,41 +3,56 @@ package com.pointlessapps.songbook.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import androidx.room.Upsert
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
-import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithSongs
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithCount
+import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface SetlistDao {
     @Transaction
-    @Query("SELECT * FROM setlists LIMIT :limit")
-    fun getAllSetlistsFlow(limit: Long = -1L): Flow<List<SetlistWithSongs>>
+    @Query(
+        """
+        SELECT *, (SELECT COUNT(*) FROM setlist_songs WHERE setlist_id = setlists.id) as songCount 
+        FROM setlists 
+        LIMIT :limit
+    """,
+    )
+    fun getAllSetlistsFlow(limit: Long = -1L): Flow<List<SetlistWithCount>>
 
     @Transaction
-    @Query("SELECT * FROM setlists WHERE id = :id")
-    fun getSetlistByIdFlow(id: Long): Flow<SetlistWithSongs?>
+    @Query(
+        """
+        SELECT *, (SELECT COUNT(*) FROM setlist_songs WHERE setlist_id = :id) as songCount 
+        FROM setlists 
+        WHERE id = :id
+    """,
+    )
+    fun getSetlistByIdFlow(id: Long): Flow<SetlistWithCount?>
+
+    @Transaction
+    @Query(
+        """
+        SELECT s.*
+        FROM songs s
+        INNER JOIN setlist_songs sj ON s.id = sj.song_id
+        WHERE sj.setlist_id = :id
+        ORDER BY sj.`order` ASC
+    """,
+    )
+    fun getSetlistSongsByIdFlow(id: Long): Flow<List<SongEntity>>
 
     @Upsert
     suspend fun insertSetlists(setlists: List<SetlistEntity>)
 
-    @Update
-    suspend fun updateSetlist(setlist: SetlistEntity)
+    @Query("UPDATE setlists SET name = :name WHERE id = :id")
+    suspend fun updateSetlistName(id: Long, name: String)
 
     @Upsert
     suspend fun insertSetlistSongs(setlistSongs: List<SetlistSongEntity>)
 
     @Query("DELETE FROM setlists WHERE id = :id")
     suspend fun deleteSetlist(id: Long)
-
-    @Transaction
-    suspend fun syncSetlists(
-        setlists: List<SetlistEntity>,
-        setlistSongs: List<SetlistSongEntity>,
-    ) {
-        insertSetlists(setlists)
-        insertSetlistSongs(setlistSongs)
-    }
 }

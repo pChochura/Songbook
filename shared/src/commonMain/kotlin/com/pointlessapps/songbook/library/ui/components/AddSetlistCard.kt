@@ -28,7 +28,6 @@ internal fun AddSetlistCard(
     SongbookCard(
         modifier = modifier,
         onClick = onClick,
-        onLongClick = { },
         cardStyle = dashedSongbookCardStyle(),
     ) {
         Row(

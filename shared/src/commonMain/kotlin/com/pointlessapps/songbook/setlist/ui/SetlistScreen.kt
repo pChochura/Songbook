@@ -3,20 +3,30 @@ package com.pointlessapps.songbook.setlist.ui
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
@@ -40,6 +50,7 @@ import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun SetlistScreen(
@@ -62,6 +73,8 @@ internal fun SetlistScreen(
             onLyricsClicked = viewModel::onLyricsClicked,
             onNameChanged = viewModel::onNameChanged,
             onDeleteSetlistConfirmClicked = viewModel::onDeleteSetlistConfirmClicked,
+            onMove = viewModel::onMove,
+            onReorderDone = viewModel::onReorderDone,
         )
     }
 }
@@ -72,8 +85,25 @@ private fun SetlistScreenContent(
     onLyricsClicked: (Long) -> Unit,
     onNameChanged: (String) -> Unit,
     onDeleteSetlistConfirmClicked: () -> Unit,
+    onMove: (Int, Int) -> Unit,
+    onReorderDone: () -> Unit,
 ) {
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    val lazyListState = rememberLazyListState()
+
+    val coroutineScope = rememberCoroutineScope()
+    val draggingOffsetAnimatable = remember { Animatable(0f) }
+    var draggedItemIndex by remember { mutableIntStateOf(-1) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val isDragged by interactionSource.collectIsDraggedAsState()
+    LaunchedEffect(isDragged) {
+        if (!isDragged) {
+            draggingOffsetAnimatable.animateTo(0f)
+            draggedItemIndex = -1
+            onReorderDone()
+        }
+    }
 
     SongbookScaffoldLayout(
         topBar = @Composable {
@@ -92,6 +122,7 @@ private fun SetlistScreenContent(
         },
     ) { paddingValues ->
         LazyColumn(
+            state = lazyListState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = paddingValues
                 .add(MaterialTheme.spacing.huge)
@@ -99,9 +130,53 @@ private fun SetlistScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
-            items(state.setlist.songs, key = { it.id }) { song ->
+            itemsIndexed(state.songs, key = { _, it -> it.id }) { index, song ->
+                val isDragging = index == draggedItemIndex
+                val zIndex = if (isDragging) 1f else 0f
+
                 SongCard(
-                    modifier = Modifier.animateItem(),
+                    modifier = Modifier
+                        .zIndex(zIndex)
+                        .graphicsLayer {
+                            translationY = if (isDragging) draggingOffsetAnimatable.value else 0f
+                        }
+                        .draggable(
+                            interactionSource = interactionSource,
+                            state = rememberDraggableState {
+                                val offset = draggingOffsetAnimatable.value + it
+                                coroutineScope.launch {
+                                    draggingOffsetAnimatable.snapTo(offset)
+                                }
+
+                                val draggedItemInfo = lazyListState.layoutInfo.visibleItemsInfo
+                                    .find { it.index == draggedItemIndex }
+                                    ?: return@rememberDraggableState
+
+                                val currentOffset = draggedItemInfo.offset + offset
+
+                                val targetItem = lazyListState.layoutInfo.visibleItemsInfo
+                                    .find { item ->
+                                        item.index != draggedItemIndex &&
+                                                currentOffset.toInt() in item.offset..(item.offset + item.size)
+                                    }
+
+                                if (targetItem != null) {
+                                    onMove(draggedItemIndex, targetItem.index)
+                                    draggedItemIndex = targetItem.index
+                                    coroutineScope.launch {
+                                        draggingOffsetAnimatable.snapTo(
+                                            currentOffset - targetItem.offset,
+                                        )
+                                    }
+                                }
+                            },
+                            orientation = Orientation.Vertical,
+                            onDragStarted = { draggedItemIndex = index },
+                        )
+                        .then(
+                            if (isDragging) Modifier
+                            else Modifier.animateItem(),
+                        ),
                     song = song,
                     displayMode = DisplayMode.List,
                     onClick = { onLyricsClicked(song.id) },

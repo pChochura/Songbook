@@ -84,7 +84,7 @@ internal class SearchViewModel(
         .debounce(SEARCH_QUERY_DEBOUNCE)
         .filter { it.isNotEmpty() }
         .onEach { _transientState.update { it.copy(isLoadingYourLibrary = true) } }
-        .flatMapLatest { songRepository.searchSongs(it.toString()) }
+        .flatMapLatest { songRepository.searchSongsFlow(it.toString()) }
         .onEach { _transientState.update { it.copy(isLoadingYourLibrary = false) } }
         .cachedIn(viewModelScope)
 

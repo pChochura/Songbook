@@ -28,7 +28,9 @@ internal class AuthRepositoryImpl(
         auth.awaitInitialization()
     }
 
-    override fun isSignedIn(): Boolean = auth.currentUserOrNull() != null
+    override fun isSignedIn(): Boolean = auth.currentUserOrNull().also {
+        println("LOG!, ${it?.id}")
+    } != null
 
     override suspend fun signInWithGoogle(googleIdToken: String) = withContext(Dispatchers.IO) {
         auth.signInWith(IDToken) {

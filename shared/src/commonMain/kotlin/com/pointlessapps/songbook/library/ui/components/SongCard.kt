@@ -42,7 +42,6 @@ internal fun SongCard(
     SongbookCard(
         modifier = modifier,
         onClick = onClick,
-        onLongClick = { },
     ) {
         AnimatedContent(displayMode) { displayMode ->
             Column(

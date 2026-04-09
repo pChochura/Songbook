@@ -2,14 +2,14 @@ package com.pointlessapps.songbook.core.setlist.database.mapper
 
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
-import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithSongs
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithCount
 import com.pointlessapps.songbook.core.setlist.model.Setlist
-import com.pointlessapps.songbook.core.song.database.mapper.toDomain
+import com.pointlessapps.songbook.core.song.model.Song
 
-internal fun SetlistWithSongs.toDomain() = Setlist(
+internal fun SetlistWithCount.toDomain() = Setlist(
     id = setlist.id,
     name = setlist.name,
-    songs = songs.map { it.toDomain() },
+    songCount = songCount,
 )
 
 internal fun Setlist.toEntity() = SetlistEntity(
@@ -17,9 +17,10 @@ internal fun Setlist.toEntity() = SetlistEntity(
     name = name,
 )
 
-internal fun Setlist.toSongEntities() = songs.map {
+internal fun List<Song>.toEntities(setlistId: Long) = mapIndexed { index, song ->
     SetlistSongEntity(
-        setlistId = id,
-        songId = it.id,
+        setlistId = setlistId,
+        songId = song.id,
+        order = index,
     )
 }
