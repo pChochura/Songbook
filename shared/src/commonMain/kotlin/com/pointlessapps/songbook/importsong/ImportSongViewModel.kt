@@ -1,7 +1,6 @@
 package com.pointlessapps.songbook.importsong
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
@@ -139,7 +138,6 @@ internal class ImportSongViewModel(
                 ),
             )
             _transientState.update { it.copy(isLoading = false) }
-            clearState()
             eventChannel.trySend(ImportSongEvent.NavigateBack)
         }
     }
@@ -158,7 +156,6 @@ internal class ImportSongViewModel(
     }
 
     fun onDiscardChangesClicked() {
-        clearState()
         eventChannel.trySend(ImportSongEvent.NavigateBack)
     }
 
@@ -228,12 +225,6 @@ internal class ImportSongViewModel(
 
     fun onDismissChordPopup() {
         _transientState.update { it.copy(chordSuggestions = emptyList()) }
-    }
-
-    private fun clearState() {
-        titleTextFieldState.clearText()
-        artistTextFieldState.clearText()
-        lyricsTextFieldState.clearText()
     }
 
     private fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())

@@ -7,8 +7,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.pointlessapps.songbook.core.song.model.Section
@@ -85,6 +87,10 @@ internal fun NavDisplay(backstack: NavBackStack<NavKey>) {
     NavDisplay(
         backStack = backstack,
         entryProvider = koinEntryProvider(),
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
         transitionSpec = {
             ContentTransform(
                 fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),

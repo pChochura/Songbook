@@ -55,9 +55,12 @@ internal fun PreviewSongLayout(
             .coerceIn(MIN_ZOOM, MAX_ZOOM)
     }
 
+    var didTransform by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(transformableState.isTransformInProgress) {
-        if (!transformableState.isTransformInProgress) {
+        if (didTransform && !transformableState.isTransformInProgress) {
             onTextScaleChanged(currentTextScale)
+        } else {
+            didTransform = true
         }
     }
 

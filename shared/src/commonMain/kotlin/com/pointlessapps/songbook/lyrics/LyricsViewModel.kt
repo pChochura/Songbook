@@ -110,9 +110,8 @@ internal class LyricsViewModel(
     }
 
     fun onTextScaleChanged(textScale: Int) {
-        val newScale = textScale.coerceIn(MIN_ZOOM, MAX_ZOOM)
         viewModelScope.launch {
-            prefsRepository.setLyricsTextScale(newScale)
+            prefsRepository.setLyricsTextScale(textScale.coerceIn(MIN_ZOOM, MAX_ZOOM))
         }
     }
 
