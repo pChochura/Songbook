@@ -47,7 +47,7 @@ internal fun PreviewSongLayout(
     wrapMode: WrapMode = WrapMode.NoWrap,
     paddingValues: PaddingValues = PaddingValues(),
 ) {
-    var currentTextScale by remember { mutableStateOf(textScale) }
+    var currentTextScale by remember(textScale) { mutableStateOf(textScale) }
     var chordDetailsDialogData by rememberSaveable { mutableStateOf<String?>(null) }
     val transformableState = rememberTransformableState { zoomChange, _, _ ->
         currentTextScale = (currentTextScale * zoomChange)
@@ -57,10 +57,10 @@ internal fun PreviewSongLayout(
 
     var didTransform by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(transformableState.isTransformInProgress) {
-        if (didTransform && !transformableState.isTransformInProgress) {
-            onTextScaleChanged(currentTextScale)
-        } else {
+        if (transformableState.isTransformInProgress) {
             didTransform = true
+        } else if (didTransform) {
+            onTextScaleChanged(currentTextScale)
         }
     }
 
