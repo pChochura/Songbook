@@ -85,7 +85,7 @@ internal class ImportSongViewModel(
     ) { allSetlists, titleText, lyricsText, transient ->
         ImportSongState(
             songId = id,
-            allSetlists = allSetlists.data,
+            allSetlists = allSetlists,
             selectedSetlists = transient.selectedSetlists,
             chordSuggestions = transient.chordSuggestions,
             canImport = titleText.isNotBlank() && lyricsText.isNotBlank(),

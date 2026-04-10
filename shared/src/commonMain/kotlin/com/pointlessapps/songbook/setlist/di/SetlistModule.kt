@@ -15,6 +15,7 @@ internal val setlistModule = module {
     viewModel { (id: Long) ->
         SetlistViewModel(
             id = id,
+            syncRepository = get(),
             setlistRepository = get(),
         )
     }

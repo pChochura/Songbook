@@ -8,15 +8,16 @@ import androidx.room.Upsert
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
+import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface SongDao {
     @Query("SELECT * FROM songs")
-    fun getAllSongs(): Flow<List<SongEntity>>
+    fun getAllSongs(): PagingSource<Int, SongEntity>
 
     @Query("SELECT * FROM songs WHERE id = :id")
-    fun getSongById(id: Long): Flow<SongEntity?>
+    fun getSongByIdFlow(id: Long): Flow<SongEntity?>
 
     @Upsert
     suspend fun insertSongs(songs: List<SongEntity>)
@@ -32,7 +33,7 @@ internal interface SongDao {
                 id = song.id,
                 title = song.title,
                 artist = song.artist,
-                content = song.sections.joinToString("\n") { it.lyrics }
+                content = song.sections.toLyrics(withChords = false),
             )
         }
         insertSearchIndex(searchEntities)
@@ -50,7 +51,8 @@ internal interface SongDao {
         deleteSearchIndex(id)
     }
 
-    @Query("""
+    @Query(
+        """
         SELECT 
             rowid as id, 
             title, 
@@ -58,6 +60,7 @@ internal interface SongDao {
             snippet(songs_search, '<b>', '</b>', '...', -1, 10) as snippet
         FROM songs_search
         WHERE songs_search MATCH :query
-    """)
+    """,
+    )
     fun searchSongs(query: String): PagingSource<Int, SongSearchResult>
 }

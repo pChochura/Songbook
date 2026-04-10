@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -33,10 +32,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
-import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.setlist.model.Setlist
+import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.library.DisplayMode.Grid
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
@@ -75,6 +76,7 @@ internal fun LibraryScreen(
 ) {
     val navigator = LocalNavigator.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val songs = viewModel.songs.collectAsLazyPagingItems()
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
@@ -95,11 +97,15 @@ internal fun LibraryScreen(
             TopBar(
                 leftButton = TopBarButton(
                     enabled = false,
-                    icon = if (state.syncStatus == SyncStatus.LOCAL) IconSync else IconSyncFailed,
+                    icon = if (state.syncStatus == SyncStatus.SYNC_FAILED) IconSyncFailed else IconSync,
                     tooltip = Res.string.common_syncing,
                     onClick = {},
-                    modifier = Modifier.graphicsLayer { rotationZ = rotation.value },
-                ).takeIf { state.syncStatus == SyncStatus.LOCAL },
+                    modifier = Modifier.graphicsLayer {
+                        if (state.syncStatus != SyncStatus.SYNC_FAILED) {
+                            rotationZ = rotation.value
+                        }
+                    },
+                ).takeIf { state.syncStatus != SyncStatus.SYNCED },
                 rightButton = TopBarButton.menu(
                     onClick = { isBottomSheetVisible = true },
                 ),
@@ -141,18 +147,24 @@ internal fun LibraryScreen(
 
             item(key = "all_songs_header", span = { GridItemSpan(maxLineSpan) }) {
                 AllSongsHeader(
-                    numberOfSongs = state.songs.size,
+                    numberOfSongs = songs.itemCount,
                     modifier = Modifier.animateItem(),
                 )
             }
 
-            items(state.songs, key = { it.id }) { song ->
-                SongCard(
-                    modifier = Modifier.animateItem(),
-                    song = song,
-                    displayMode = state.displayMode,
-                    onClick = { viewModel.onLyricsClicked(song.id) },
-                )
+            items(
+                count = songs.itemCount,
+                key = songs.itemKey { it.id },
+            ) { index ->
+                val result = songs[index]
+                if (result != null) {
+                    SongCard(
+                        modifier = Modifier.animateItem(),
+                        song = result,
+                        displayMode = state.displayMode,
+                        onClick = { viewModel.onLyricsClicked(result.id) },
+                    )
+                }
             }
 
             item(key = "add_song_button") {

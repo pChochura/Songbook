@@ -47,16 +47,19 @@ data class Section(
         }
 
     companion object {
-        fun List<Section>.toLyrics(): String = joinToString("\n\n") { section ->
-            val lines = section.lines.joinToString("\n") { line ->
-                val builder = StringBuilder(line.line)
-                line.chords.sortedByDescending { it.position }.forEach { chord ->
-                    builder.insert(chord.position, "[${chord.value}]")
+        fun List<Section>.toLyrics(withChords: Boolean = true): String =
+            joinToString("\n\n") { section ->
+                val lines = section.lines.joinToString("\n") { line ->
+                    val builder = StringBuilder(line.line)
+                    if (withChords) {
+                        line.chords.sortedByDescending { it.position }.forEach { chord ->
+                            builder.insert(chord.position, "[${chord.value}]")
+                        }
+                    }
+                    builder.toString()
                 }
-                builder.toString()
+                "[${section.name}]\n$lines"
             }
-            "[${section.name}]\n$lines"
-        }
     }
 }
 

@@ -2,7 +2,6 @@ package com.pointlessapps.songbook.lyrics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pointlessapps.songbook.core.model.SyncStatus
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
@@ -53,7 +52,6 @@ internal data class LyricsState(
     val displayMode: DisplayMode = DisplayMode.Inline,
     val wrapMode: WrapMode = WrapMode.NoWrap,
     val isLoading: Boolean = false,
-    val syncStatus: SyncStatus = SyncStatus.LOCAL,
 )
 
 internal class LyricsViewModel(
@@ -75,14 +73,12 @@ internal class LyricsViewModel(
         prefsRepository.getLyricsWrapModeFlow(),
         songRepository.getSongByIdFlow(songId),
         _transientState,
-    ) { textScale, displayMode, wrapMode, songResult, transient ->
-        val song = songResult.data
+    ) { textScale, displayMode, wrapMode, song, transient ->
         LyricsState(
             songId = songId,
             title = song?.title.orEmpty(),
             artist = song?.artist.orEmpty(),
             sections = song?.sections.orEmpty(),
-            syncStatus = songResult.status,
             textScale = textScale,
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
             wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
