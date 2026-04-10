@@ -117,7 +117,7 @@ internal class ImportSongViewModel(
                     val typedChord = textBeforeCursor.substring(lastOpenBracket + 1)
                     val suggestions = ChordLibrary.allChords.filter {
                         it.startsWith(typedChord, ignoreCase = true)
-                    }.take(MAX_CHORDS_SUGGESTIONS)
+                    }
                     _transientState.update { it.copy(chordSuggestions = suggestions) }
                 } else {
                     _transientState.update { it.copy(chordSuggestions = emptyList()) }

@@ -38,6 +38,7 @@
     <string name="common_open_settings">Open settings</string>
     <string name="common_chord_details">Chord details</string>
     <string name="common_favourites">Favourites</string>
+    <string name="common_no_chord_visualization">There is no visualization for this chord</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>

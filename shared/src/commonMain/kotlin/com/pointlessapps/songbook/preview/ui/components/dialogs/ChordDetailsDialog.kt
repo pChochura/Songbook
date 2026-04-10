@@ -29,6 +29,7 @@ import com.pointlessapps.songbook.core.song.model.ChordPosition
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_dismiss
 import com.pointlessapps.songbook.shared.common_next
+import com.pointlessapps.songbook.shared.common_no_chord_visualization
 import com.pointlessapps.songbook.shared.common_previous
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
@@ -67,21 +68,33 @@ internal fun ChordDetailsDialog(
             dismissible = SongbookDialogDismissible.Both,
         ),
     ) {
-        ChordDiagram(
-            position = positions[currentPositionIndex],
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-        )
+        if (positions.isNotEmpty()) {
+            ChordDiagram(
+                position = positions[currentPositionIndex],
+                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+            )
 
-        Counter(
-            value = currentPositionIndex + 1,
-            maxValue = positions.size,
-            onPreviousClicked = {
-                currentPositionIndex = (currentPositionIndex - 1 + positions.size) % positions.size
-            },
-            onNextClicked = {
-                currentPositionIndex = (currentPositionIndex + 1) % positions.size
-            },
-        )
+            Counter(
+                value = currentPositionIndex + 1,
+                maxValue = positions.size,
+                onPreviousClicked = {
+                    currentPositionIndex =
+                        (currentPositionIndex - 1 + positions.size) % positions.size
+                },
+                onNextClicked = {
+                    currentPositionIndex = (currentPositionIndex + 1) % positions.size
+                },
+            )
+        } else {
+            SongbookText(
+                text = stringResource(Res.string.common_no_chord_visualization),
+                textStyle = defaultSongbookTextStyle().copy(
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    typography = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                ),
+            )
+        }
 
         SongbookButton(
             modifier = Modifier
