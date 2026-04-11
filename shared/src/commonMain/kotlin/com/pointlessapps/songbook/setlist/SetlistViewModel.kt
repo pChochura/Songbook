@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 
@@ -37,20 +38,28 @@ internal sealed interface SetlistState {
 
 internal class SetlistViewModel(
     id: Long,
-    private val syncRepository: SyncRepository,
+    syncRepository: SyncRepository,
     private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
-    private val eventChannel = Channel<SetlistEvent>()
-    val events = eventChannel.receiveAsFlow()
-
     private val localSongs = MutableStateFlow<List<Song>?>(null)
+
+    private data class SetlistTransientState(
+        val isLoading: Boolean = false,
+    )
+
+    private val _transientState = MutableStateFlow(SetlistTransientState())
 
     val state: StateFlow<SetlistState> = combine(
         syncRepository.currentSyncStatus,
         setlistRepository.getSetlistByIdFlow(id),
-    ) { syncStatus, setlist ->
+        _transientState,
+    ) { syncStatus, setlist, transient ->
+        if (transient.isLoading) {
+            return@combine SetlistState.Loading
+        }
+
         if (setlist == null) {
             snackbarState.showSnackbar(
                 message = getString(Res.string.error_setlist_not_found),
@@ -72,6 +81,9 @@ internal class SetlistViewModel(
     )
 
     val songs = setlistRepository.getSetlistsSongsById(id).cachedIn(viewModelScope)
+
+    private val eventChannel = Channel<SetlistEvent>()
+    val events = eventChannel.receiveAsFlow()
 
     fun onLyricsClicked(id: Long) {
         eventChannel.trySend(SetlistEvent.NavigateToLyrics(id))
@@ -106,6 +118,7 @@ internal class SetlistViewModel(
     fun onDeleteSetlistConfirmClicked() {
         viewModelScope.launch {
             val setlist = (state.value as SetlistState.Loaded).setlist
+            _transientState.update { it.copy(isLoading = true) }
             setlistRepository.deleteSetlist(setlist.id)
             eventChannel.trySend(SetlistEvent.NavigateBack)
         }
