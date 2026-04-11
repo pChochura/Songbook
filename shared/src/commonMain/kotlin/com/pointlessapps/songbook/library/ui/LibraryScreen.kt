@@ -7,6 +7,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -120,9 +121,7 @@ internal fun LibraryScreen(
                 GridCells.Fixed(1)
             },
             modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues
-                .add(MaterialTheme.spacing.huge)
-                .add(bottom = LocalBottomBarPadding.current.padding.value),
+            contentPadding = paddingValues.add(MaterialTheme.spacing.huge),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
@@ -173,6 +172,8 @@ internal fun LibraryScreen(
                     onClick = viewModel::onImportSongClicked,
                 )
             }
+
+            item { Spacer(Modifier.padding(LocalBottomBarPadding.current.padding.value)) }
         }
     }
 

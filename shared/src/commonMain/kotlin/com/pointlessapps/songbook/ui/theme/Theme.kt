@@ -90,6 +90,10 @@ private fun lightColorPalette() = lightColorScheme(
     surfaceContainer = lightSurfaceContainer,
     surfaceContainerHigh = lightSurfaceContainerHigh,
     surfaceContainerLow = lightSurfaceContainerLow,
+    primaryContainer = lightPrimaryContainer,
+    onPrimaryContainer = lightOnPrimaryContainer,
+    inverseSurface = lightInverseSurface,
+    inverseOnSurface = lightInverseOnSurface,
 )
 
 @Composable
@@ -110,6 +114,10 @@ private fun darkColorPalette() = darkColorScheme(
     surfaceContainer = darkSurfaceContainer,
     surfaceContainerHigh = darkSurfaceContainerHigh,
     surfaceContainerLow = darkSurfaceContainerLow,
+    primaryContainer = darkPrimaryContainer,
+    onPrimaryContainer = darkOnPrimaryContainer,
+    inverseSurface = darkInverseSurface,
+    inverseOnSurface = darkInverseOnSurface,
 )
 
 @Composable

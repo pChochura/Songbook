@@ -23,6 +23,7 @@ internal val importSongModule = module {
             setlistRepository = get(),
             songRepository = get(),
             appRepository = get(),
+            snackbarState = get(),
         )
     }
 

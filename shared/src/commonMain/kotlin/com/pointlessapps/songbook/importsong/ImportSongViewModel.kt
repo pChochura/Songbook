@@ -2,10 +2,12 @@ package com.pointlessapps.songbook.importsong
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
+import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.app.AppRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
@@ -14,6 +16,15 @@ import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_show
+import com.pointlessapps.songbook.shared.error_image_capture_failed
+import com.pointlessapps.songbook.shared.error_image_extraction_failed
+import com.pointlessapps.songbook.shared.import_changes_saved
+import com.pointlessapps.songbook.shared.import_song_imported
+import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
+import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
@@ -26,6 +37,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 
 internal sealed interface ImportSongEvent {
     data object DiscardChanges : ImportSongEvent
@@ -59,6 +71,7 @@ internal class ImportSongViewModel(
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val appRepository: AppRepository,
+    private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
     val showScanDialog: Boolean =
@@ -129,7 +142,7 @@ internal class ImportSongViewModel(
     fun onImportSongClicked() {
         viewModelScope.launch {
             _transientState.update { it.copy(isLoading = true) }
-            songRepository.saveSong(
+            val id = songRepository.saveSong(
                 NewSong(
                     id = state.value.songId,
                     title = titleTextFieldState.text.toString(),
@@ -138,7 +151,20 @@ internal class ImportSongViewModel(
                 ),
             )
             _transientState.update { it.copy(isLoading = false) }
-            eventChannel.trySend(ImportSongEvent.NavigateBack)
+            eventChannel.send(ImportSongEvent.NavigateBack)
+
+            when (state.value.songId) {
+                null -> snackbarState.showSnackbar(
+                    message = getString(Res.string.import_song_imported),
+                    actionLabel = getString(Res.string.common_show),
+                    callbackAction = SongbookSnackbarCallbackAction.NavigateTo(
+                        Route.Lyrics(id),
+                    ),
+                    duration = SnackbarDuration.Long,
+                )
+
+                else -> snackbarState.showSnackbar(getString(Res.string.import_changes_saved))
+            }
         }
     }
 
@@ -167,7 +193,13 @@ internal class ImportSongViewModel(
 
     fun onImageCaptured(bytes: ByteArray?) {
         if (bytes == null) {
-            // TODO show a snackbar
+            viewModelScope.launch {
+                snackbarState.showSnackbar(
+                    message = getString(Res.string.error_image_capture_failed),
+                    icon = IconWarning,
+                )
+            }
+
             return
         }
 
@@ -176,8 +208,12 @@ internal class ImportSongViewModel(
             _transientState.update { it.copy(isExtractingInProgress = true) }
             val result = agent.extractSongData(bytes)
             if (result == null) {
-                // TODO show a snackbar
+                snackbarState.showSnackbar(
+                    message = getString(Res.string.error_image_extraction_failed),
+                    icon = IconWarning,
+                )
                 _transientState.update { it.copy(isExtractingInProgress = false) }
+
                 return@launch
             }
 
@@ -228,8 +264,4 @@ internal class ImportSongViewModel(
     }
 
     private fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
-
-    private companion object {
-        const val MAX_CHORDS_SUGGESTIONS = 6
-    }
 }

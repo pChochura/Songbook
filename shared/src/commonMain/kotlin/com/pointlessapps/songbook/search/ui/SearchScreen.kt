@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -142,9 +143,7 @@ internal fun SearchScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = MaterialTheme.spacing.large),
-            contentPadding = paddingValues.add(
-                vertical = MaterialTheme.spacing.medium,
-            ).add(bottom = LocalBottomBarPadding.current.padding.value),
+            contentPadding = paddingValues.add(vertical = MaterialTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
         ) {
             if (shouldShowLastSearches) {
@@ -262,6 +261,8 @@ internal fun SearchScreen(
                     }
                 }
             }
+
+            item { Spacer(Modifier.padding(LocalBottomBarPadding.current.padding.value)) }
         }
     }
 

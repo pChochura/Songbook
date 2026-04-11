@@ -7,6 +7,8 @@ import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.error_initilizing_error
+import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,15 +22,15 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.getString
 
-data class AppState(
-    val error: String? = null,
+internal data class AppState(
     val isLoading: Boolean = true,
 )
 
-class AppViewModel(
+internal class AppViewModel(
     private val chordLibrary: ChordLibrary,
     private val authRepository: AuthRepository,
     private val syncRepository: SyncRepository,
+    private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
     val state: StateFlow<AppState> = combine(
@@ -52,11 +54,9 @@ class AppViewModel(
         },
     ) { AppState(isLoading = false) }
         .catch {
-            emit(
-                AppState(
-                    error = getString(Res.string.error_initilizing_error),
-                    isLoading = false,
-                ),
+            snackbarState.showSnackbar(
+                message = getString(Res.string.error_initilizing_error),
+                icon = IconWarning,
             )
         }
         .stateIn(

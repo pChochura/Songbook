@@ -34,7 +34,7 @@ internal sealed interface Route : NavKey {
 
     @Keep
     @Serializable
-    data class Lyrics(val songId: Long? = null) : Route
+    data class Lyrics(val songId: Long) : Route
 
     @Keep
     @Serializable
@@ -128,11 +128,15 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
         }
     }
 
+    fun navigateTo(route: Route) {
+        backStack.add(route)
+    }
+
     fun navigateBack() {
         backStack.removeLastOrNull()
     }
 
-    fun navigateToLyrics(songId: Long? = null) {
+    fun navigateToLyrics(songId: Long) {
         backStack.add(Route.Lyrics(songId))
     }
 

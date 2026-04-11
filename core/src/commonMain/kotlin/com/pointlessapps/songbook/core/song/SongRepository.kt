@@ -26,7 +26,7 @@ interface SongRepository {
     fun getSongByIdFlow(id: Long): Flow<Song?>
     fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>
 
-    suspend fun saveSong(newSong: NewSong)
+    suspend fun saveSong(newSong: NewSong): Long
     suspend fun deleteSong(id: Long)
 }
 
@@ -58,10 +58,8 @@ internal class SongRepositoryImpl(
         ).flow.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun saveSong(newSong: NewSong) {
-        withContext(Dispatchers.IO) {
-            table.upsert(newSong)
-        }
+    override suspend fun saveSong(newSong: NewSong) = withContext(Dispatchers.IO) {
+        table.upsert(newSong) { select() }.decodeSingle<Song>().id
     }
 
     override suspend fun deleteSong(id: Long) {

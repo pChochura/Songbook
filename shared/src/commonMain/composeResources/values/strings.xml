@@ -39,9 +39,14 @@
     <string name="common_chord_details">Chord details</string>
     <string name="common_favourites">Favourites</string>
     <string name="common_no_chord_visualization">There is no visualization for this chord</string>
+    <string name="common_show">Show</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
+    <string name="error_image_capture_failed">Image capture failed</string>
+    <string name="error_image_extraction_failed">Image data extraction failed</string>
+    <string name="error_setlist_not_found">The setlist was not found</string>
+    <string name="error_song_not_found">The song was not found</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Library</string>
@@ -84,6 +89,8 @@
     <string name="import_menu_preview_description">Show the preview of the song with chords being correctly displayed</string>
     <string name="import_extraction_in_progress">Extraction in progress</string>
     <string name="import_extraction_in_progress_description">The AI is working hard on the image you provided to extract all the lyrics and chords. It may take a few seconds.</string>
+    <string name="import_song_imported">The song has been imported</string>
+    <string name="import_changes_saved">The changes have been saved</string>
 
     <!-- Lyrics Screen -->
     <string name="lyrics_section_label">Lyrics</string>

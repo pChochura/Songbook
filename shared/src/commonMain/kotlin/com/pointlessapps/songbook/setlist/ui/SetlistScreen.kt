@@ -6,7 +6,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -124,9 +126,7 @@ private fun SetlistScreenContent(
         LazyColumn(
             state = lazyListState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues
-                .add(MaterialTheme.spacing.huge)
-                .add(bottom = LocalBottomBarPadding.current.padding.value),
+            contentPadding = paddingValues.add(MaterialTheme.spacing.huge),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
@@ -144,6 +144,8 @@ private fun SetlistScreenContent(
                     )
                 }
             }
+
+            item { Spacer(Modifier.padding(LocalBottomBarPadding.current.padding.value)) }
         }
     }
 

@@ -7,6 +7,10 @@ import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import com.pointlessapps.songbook.core.utils.Keep
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.error_song_not_found
+import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 
 internal sealed interface LyricsEvent {
     data object NavigateBack : LyricsEvent
@@ -58,6 +63,7 @@ internal class LyricsViewModel(
     private val songId: Long,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
+    private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
     private data class LyricsTransientState(
@@ -74,11 +80,25 @@ internal class LyricsViewModel(
         songRepository.getSongByIdFlow(songId),
         _transientState,
     ) { textScale, displayMode, wrapMode, song, transient ->
+        if (transient.isLoading) {
+            return@combine LyricsState(isLoading = true)
+        }
+
+        if (song == null) {
+            snackbarState.showSnackbar(
+                message = getString(Res.string.error_song_not_found),
+                icon = IconWarning,
+            )
+            eventChannel.trySend(LyricsEvent.NavigateBack)
+
+            return@combine LyricsState(isLoading = true)
+        }
+
         LyricsState(
             songId = songId,
-            title = song?.title.orEmpty(),
-            artist = song?.artist.orEmpty(),
-            sections = song?.sections.orEmpty(),
+            title = song.title,
+            artist = song.artist,
+            sections = song.sections,
             textScale = textScale,
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
             wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
