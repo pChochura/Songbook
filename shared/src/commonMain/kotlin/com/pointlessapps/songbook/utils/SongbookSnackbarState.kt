@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -31,7 +31,7 @@ internal class SongbookSnackbarState {
 
     private val callbackActions = Channel<SongbookSnackbarCallbackAction>()
     val callbackActionsFlow: Flow<SongbookSnackbarCallbackAction>
-        get() = callbackActions.consumeAsFlow()
+        get() = callbackActions.receiveAsFlow()
 
     fun showSnackbar(
         message: String,
