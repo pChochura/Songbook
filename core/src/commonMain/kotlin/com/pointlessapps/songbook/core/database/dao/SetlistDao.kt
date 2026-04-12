@@ -1,6 +1,5 @@
 package com.pointlessapps.songbook.core.database.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -43,7 +42,7 @@ internal interface SetlistDao {
         ORDER BY sj.`order` ASC
     """,
     )
-    fun getSetlistSongsById(id: Long): PagingSource<Int, SongEntity>
+    fun getSetlistSongsById(id: Long): Flow<List<SongEntity>>
 
     @Upsert
     suspend fun insertSetlists(setlists: List<SetlistEntity>)

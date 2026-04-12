@@ -1,8 +1,5 @@
 package com.pointlessapps.songbook.core.setlist
 
-import androidx.paging.Pager
-import androidx.paging.PagingData
-import androidx.paging.map
 import com.pointlessapps.songbook.core.database.dao.SetlistDao
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithCount
@@ -26,7 +23,7 @@ import kotlinx.coroutines.withContext
 interface SetlistRepository {
     fun getAllSetlistsFlow(limit: Long = -1L): Flow<List<Setlist>>
     fun getSetlistByIdFlow(id: Long): Flow<Setlist?>
-    fun getSetlistsSongsById(id: Long): Flow<PagingData<Song>>
+    fun getSetlistsSongsById(id: Long): Flow<List<Song>>
 
     suspend fun addSetlist(name: String): Long
     suspend fun deleteSetlist(id: Long)
@@ -52,10 +49,7 @@ internal class SetlistRepositoryImpl(
         .map { it?.toDomain() }
         .flowOn(Dispatchers.IO)
 
-    override fun getSetlistsSongsById(id: Long) = Pager(
-        config = androidx.paging.PagingConfig(pageSize = 20),
-        pagingSourceFactory = { setlistDao.getSetlistSongsById(id) },
-    ).flow
+    override fun getSetlistsSongsById(id: Long) = setlistDao.getSetlistSongsById(id)
         .map { it.map(SongEntity::toDomain) }
         .flowOn(Dispatchers.IO)
 

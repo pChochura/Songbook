@@ -2,7 +2,6 @@ package com.pointlessapps.songbook.setlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.model.Song
@@ -32,8 +31,11 @@ internal sealed interface SetlistState {
     data object Loading : SetlistState
     data class Loaded(
         val setlist: Setlist,
+        val songs: List<Song>,
         val syncStatus: SyncStatus = SyncStatus.LOCAL,
     ) : SetlistState
+
+    val loaded: Loaded get() = this as Loaded
 }
 
 internal class SetlistViewModel(
@@ -43,9 +45,8 @@ internal class SetlistViewModel(
     private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
-    private val localSongs = MutableStateFlow<List<Song>?>(null)
-
     private data class SetlistTransientState(
+        val localSongs: List<Song>? = null,
         val isLoading: Boolean = false,
     )
 
@@ -54,8 +55,9 @@ internal class SetlistViewModel(
     val state: StateFlow<SetlistState> = combine(
         syncRepository.currentSyncStatus,
         setlistRepository.getSetlistByIdFlow(id),
+        setlistRepository.getSetlistsSongsById(id),
         _transientState,
-    ) { syncStatus, setlist, transient ->
+    ) { syncStatus, setlist, songs, transient ->
         if (transient.isLoading) {
             return@combine SetlistState.Loading
         }
@@ -72,6 +74,7 @@ internal class SetlistViewModel(
 
         SetlistState.Loaded(
             setlist = setlist,
+            songs = transient.localSongs ?: songs,
             syncStatus = syncStatus,
         )
     }.stateIn(
@@ -79,8 +82,6 @@ internal class SetlistViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = SetlistState.Loading,
     )
-
-    val songs = setlistRepository.getSetlistsSongsById(id).cachedIn(viewModelScope)
 
     private val eventChannel = Channel<SetlistEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -97,29 +98,32 @@ internal class SetlistViewModel(
     }
 
     fun onMove(fromIndex: Int, toIndex: Int) {
-//        val currentState = state.value as? SetlistState.Loaded ?: return
-//        val songs = currentState.songs.toMutableList()
-//        if (fromIndex !in songs.indices || toIndex !in songs.indices) return
-//
-//        val song = songs.removeAt(fromIndex)
-//        songs.add(toIndex, song)
-//
-//        localSongs.value = songs
+        val state = state.value.loaded
+        val songs = state.songs.toMutableList()
+        if (fromIndex !in songs.indices || toIndex !in songs.indices) return
+
+        val song = songs.removeAt(fromIndex)
+        songs.add(toIndex, song)
+
+        _transientState.update { it.copy(localSongs = songs) }
     }
 
     fun onReorderDone() {
         viewModelScope.launch {
-            val setlist = (state.value as SetlistState.Loaded).setlist
-            setlistRepository.updateSetlistSongsOrder(setlist.id, localSongs.value ?: emptyList())
-            localSongs.value = null
+            val state = state.value.loaded
+            setlistRepository.updateSetlistSongsOrder(
+                id = state.setlist.id,
+                songs = state.songs,
+            )
+            _transientState.update { it.copy(localSongs = null) }
         }
     }
 
     fun onDeleteSetlistConfirmClicked() {
         viewModelScope.launch {
-            val setlist = (state.value as SetlistState.Loaded).setlist
+            val state = state.value.loaded
             _transientState.update { it.copy(isLoading = true) }
-            setlistRepository.deleteSetlist(setlist.id)
+            setlistRepository.deleteSetlist(state.setlist.id)
             eventChannel.trySend(SetlistEvent.NavigateBack)
         }
     }

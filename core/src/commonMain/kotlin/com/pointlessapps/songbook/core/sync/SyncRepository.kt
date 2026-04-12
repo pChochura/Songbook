@@ -55,6 +55,8 @@ internal class SyncRepositoryImpl(
                 ),
             ),
         ) { songs, setlists, setlistSongs ->
+            _syncStatus.value = SyncStatus.SYNCING
+
             saveSongs(songs)
             saveSetlists(setlists)
             saveSetlistSongs(setlistSongs)

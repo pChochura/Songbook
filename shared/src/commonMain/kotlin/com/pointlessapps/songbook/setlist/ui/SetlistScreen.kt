@@ -3,6 +3,9 @@ package com.pointlessapps.songbook.setlist.ui
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -23,13 +27,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
-import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.library.DisplayMode
 import com.pointlessapps.songbook.library.ui.components.SongCard
 import com.pointlessapps.songbook.setlist.SetlistEvent
@@ -50,6 +52,7 @@ import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun SetlistScreen(
@@ -57,7 +60,6 @@ internal fun SetlistScreen(
 ) {
     val navigator = LocalNavigator.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val songs = viewModel.songs.collectAsLazyPagingItems()
 
     viewModel.events.collectWithLifecycle {
         when (it) {
@@ -70,7 +72,6 @@ internal fun SetlistScreen(
         SetlistState.Loading -> SongbookLoader(true)
         is SetlistState.Loaded -> SetlistScreenContent(
             state = state,
-            songs = songs,
             onLyricsClicked = viewModel::onLyricsClicked,
             onNameChanged = viewModel::onNameChanged,
             onDeleteSetlistConfirmClicked = viewModel::onDeleteSetlistConfirmClicked,
@@ -83,7 +84,6 @@ internal fun SetlistScreen(
 @Composable
 private fun SetlistScreenContent(
     state: SetlistState.Loaded,
-    songs: LazyPagingItems<Song>,
     onLyricsClicked: (Long) -> Unit,
     onNameChanged: (String) -> Unit,
     onDeleteSetlistConfirmClicked: () -> Unit,
@@ -130,19 +130,58 @@ private fun SetlistScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
-            items(
-                count = songs.itemCount,
-                key = songs.itemKey { it.id },
-            ) { index ->
-                val result = songs[index]
-                if (result != null) {
-                    SongCard(
-                        modifier = Modifier.animateItem(),
-                        song = result,
-                        displayMode = DisplayMode.List,
-                        onClick = { onLyricsClicked(result.id) },
-                    )
-                }
+            itemsIndexed(state.songs, key = { _, it -> it.id }) { index, song ->
+                val isDragging = index == draggedItemIndex
+                val zIndex = if (isDragging) 1f else 0f
+
+                SongCard(
+                    modifier = Modifier
+                        .zIndex(zIndex)
+                        .graphicsLayer {
+                            translationY = if (isDragging) draggingOffsetAnimatable.value else 0f
+                        }
+                        .draggable(
+                            interactionSource = interactionSource,
+                            state = rememberDraggableState {
+                                val itemInfos =
+                                    lazyListState.layoutInfo.visibleItemsInfo.dropLast(1)
+                                val offset = draggingOffsetAnimatable.value + it
+                                coroutineScope.launch {
+                                    draggingOffsetAnimatable.snapTo(offset)
+                                }
+
+                                val draggedItemInfo = itemInfos.find {
+                                    it.index == draggedItemIndex
+                                } ?: return@rememberDraggableState
+
+                                val currentOffset = draggedItemInfo.offset + offset
+
+                                val targetItem = itemInfos.find { item ->
+                                    item.index != draggedItemIndex &&
+                                            currentOffset.toInt() in item.offset..(item.offset + item.size)
+                                }
+
+                                if (targetItem != null) {
+                                    onMove(draggedItemIndex, targetItem.index)
+                                    draggedItemIndex = targetItem.index
+                                    coroutineScope.launch {
+                                        draggingOffsetAnimatable.snapTo(
+                                            currentOffset - targetItem.offset,
+                                        )
+                                    }
+                                }
+                            },
+                            orientation = Orientation.Vertical,
+                            onDragStarted = { draggedItemIndex = index },
+                        )
+                        .then(
+                            if (isDragging) Modifier
+                            else Modifier.animateItem(),
+                        ),
+                    song = song,
+                    displayMode = DisplayMode.List,
+                    onClick = { onLyricsClicked(song.id) },
+                )
             }
 
             item { Spacer(Modifier.padding(LocalBottomBarPadding.current.padding.value)) }
