@@ -15,6 +15,8 @@ import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.core.sync.SyncRepository
+import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -56,10 +58,12 @@ internal data class SearchState(
     val showPublicLyrics: Boolean? = null,
     val isLoadingYourLibrary: Boolean = false,
     val isLoadingPublicLyrics: Boolean = false,
+    val syncStatus: SyncStatus = SyncStatus.LOCAL,
 )
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 internal class SearchViewModel(
+    syncRepository: SyncRepository,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
     private val publicLyricsRepository: PublicLyricsRepository,
@@ -115,16 +119,18 @@ internal class SearchViewModel(
         }
 
     val state: StateFlow<SearchState> = combine(
+        syncRepository.currentSyncStatus,
         prefsRepository.getLastSearchesFlow(),
         publicLyricsSearchFlow,
         _transientState,
-    ) { lastSearches, publicLyrics, transient ->
+    ) { syncStatus, lastSearches, publicLyrics, transient ->
         SearchState(
             lastSearches = lastSearches.toList(),
             publicLyrics = publicLyrics,
             showPublicLyrics = transient.showPublicLyrics,
             isLoadingYourLibrary = transient.isLoadingYourLibrary,
             isLoadingPublicLyrics = transient.isLoadingPublicLyrics,
+            syncStatus = syncStatus,
         )
     }.stateIn(
         scope = viewModelScope,

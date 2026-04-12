@@ -1,8 +1,5 @@
 package com.pointlessapps.songbook.library.ui
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -21,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +25,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,7 +33,6 @@ import androidx.paging.compose.itemKey
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.core.setlist.model.Setlist
-import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.library.DisplayMode.Grid
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
@@ -53,7 +47,6 @@ import com.pointlessapps.songbook.library.ui.components.dialogs.AddSetlistDialog
 import com.pointlessapps.songbook.library.ui.components.dialogs.DisplayModeDialog
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_app_name
-import com.pointlessapps.songbook.shared.common_syncing
 import com.pointlessapps.songbook.shared.library_setlists_section_title
 import com.pointlessapps.songbook.shared.library_songs_found
 import com.pointlessapps.songbook.shared.library_songs_section_title
@@ -64,11 +57,10 @@ import com.pointlessapps.songbook.ui.components.SongbookChip
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
-import com.pointlessapps.songbook.ui.theme.IconSync
-import com.pointlessapps.songbook.ui.theme.IconSyncFailed
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
+import com.pointlessapps.songbook.utils.syncingTopBarButton
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -90,23 +82,8 @@ internal fun LibraryScreen(
 
     SongbookScaffoldLayout(
         topBar = @Composable {
-            val rotation = remember { Animatable(0f) }
-            LaunchedEffect(Unit) {
-                rotation.animateTo(360f, infiniteRepeatable(tween(3000)))
-            }
-
             TopBar(
-                leftButton = TopBarButton(
-                    enabled = false,
-                    icon = if (state.syncStatus == SyncStatus.SYNC_FAILED) IconSyncFailed else IconSync,
-                    tooltip = Res.string.common_syncing,
-                    onClick = {},
-                    modifier = Modifier.graphicsLayer {
-                        if (state.syncStatus != SyncStatus.SYNC_FAILED) {
-                            rotationZ = rotation.value
-                        }
-                    },
-                ).takeIf { state.syncStatus != SyncStatus.SYNCED },
+                leftButton = syncingTopBarButton(state.syncStatus),
                 rightButton = TopBarButton.menu(
                     onClick = { isBottomSheetVisible = true },
                 ),

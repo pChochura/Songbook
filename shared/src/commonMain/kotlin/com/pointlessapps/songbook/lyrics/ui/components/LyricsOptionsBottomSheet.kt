@@ -57,7 +57,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun LyricsOptionsBottomSheet(
     show: Boolean,
-    state: LyricsState,
+    state: LyricsState.Loaded,
     onDismissRequest: () -> Unit,
     onAction: (LyricsOptionsBottomSheetAction) -> Unit,
 ) {

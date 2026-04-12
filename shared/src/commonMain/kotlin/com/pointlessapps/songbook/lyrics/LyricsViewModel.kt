@@ -6,6 +6,8 @@ import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
+import com.pointlessapps.songbook.core.sync.SyncRepository
+import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.Keep
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.error_song_not_found
@@ -46,21 +48,28 @@ internal enum class DisplayMode {
 @Keep
 internal enum class WrapMode { Wrap, NoWrap }
 
-internal data class LyricsState(
-    val songId: Long? = null,
-    val title: String = "",
-    val artist: String = "",
-    val sections: List<Section> = emptyList(),
-    val textScale: Int = 100,
-    val keyOffset: Int = 0,
-    val isOcrActive: Boolean = false,
-    val displayMode: DisplayMode = DisplayMode.Inline,
-    val wrapMode: WrapMode = WrapMode.NoWrap,
-    val isLoading: Boolean = false,
-)
+internal sealed interface LyricsState {
+    data class Loaded(
+        val songId: Long,
+        val title: String = "",
+        val artist: String = "",
+        val sections: List<Section> = emptyList(),
+        val textScale: Int = 100,
+        val keyOffset: Int = 0,
+        val isOcrActive: Boolean = false,
+        val displayMode: DisplayMode = DisplayMode.Inline,
+        val wrapMode: WrapMode = WrapMode.NoWrap,
+        val syncStatus: SyncStatus = SyncStatus.LOCAL,
+    ) : LyricsState
+
+    data object Loading : LyricsState
+
+    val loaded: Loaded get() = this as Loaded
+}
 
 internal class LyricsViewModel(
-    private val songId: Long,
+    songId: Long,
+    syncRepository: SyncRepository,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
     private val snackbarState: SongbookSnackbarState,
@@ -74,14 +83,15 @@ internal class LyricsViewModel(
     private val _transientState = MutableStateFlow(LyricsTransientState())
 
     val state: StateFlow<LyricsState> = combine(
+        syncRepository.currentSyncStatus,
         prefsRepository.getLyricsTextScaleFlow(),
         prefsRepository.getLyricsDisplayModeFlow(),
         prefsRepository.getLyricsWrapModeFlow(),
         songRepository.getSongByIdFlow(songId),
         _transientState,
-    ) { textScale, displayMode, wrapMode, song, transient ->
+    ) { syncStatus, textScale, displayMode, wrapMode, song, transient ->
         if (transient.isLoading) {
-            return@combine LyricsState(isLoading = true)
+            return@combine LyricsState.Loading
         }
 
         if (song == null) {
@@ -91,10 +101,10 @@ internal class LyricsViewModel(
             )
             eventChannel.trySend(LyricsEvent.NavigateBack)
 
-            return@combine LyricsState(isLoading = true)
+            return@combine LyricsState.Loading
         }
 
-        LyricsState(
+        LyricsState.Loaded(
             songId = songId,
             title = song.title,
             artist = song.artist,
@@ -103,24 +113,26 @@ internal class LyricsViewModel(
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
             wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
             keyOffset = transient.keyOffset,
-            isLoading = transient.isLoading,
+            syncStatus = syncStatus,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = LyricsState(songId = songId, isLoading = true),
+        initialValue = LyricsState.Loading,
     )
 
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
 
     fun onEditSongClicked() {
+        val state = state.value.loaded
+
         eventChannel.trySend(
             LyricsEvent.NavigateToImportSong(
-                songId = songId,
-                title = state.value.title,
-                artist = state.value.artist,
-                lyrics = state.value.sections.toLyrics(),
+                songId = state.songId,
+                title = state.title,
+                artist = state.artist,
+                lyrics = state.sections.toLyrics(),
             ),
         )
     }
@@ -147,16 +159,18 @@ internal class LyricsViewModel(
         }
     }
 
-    fun onDeleteSongConfirmClicked() {
-        viewModelScope.launch {
-            _transientState.update { it.copy(isLoading = true) }
-            songRepository.deleteSong(songId)
-            eventChannel.send(LyricsEvent.NavigateBack)
-        }
+    fun onBroadcastToTeamConfirmClicked() {
+        // TODO
     }
 
-    fun broadcastSongToTeam() {
-        // TODO
+    fun onDeleteSongConfirmClicked() {
+        val state = state.value.loaded
+
+        viewModelScope.launch {
+            _transientState.update { it.copy(isLoading = true) }
+            songRepository.deleteSong(state.songId)
+            eventChannel.send(LyricsEvent.NavigateBack)
+        }
     }
 
     companion object {

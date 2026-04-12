@@ -22,10 +22,13 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
+import com.pointlessapps.songbook.lyrics.DisplayMode
 import com.pointlessapps.songbook.lyrics.LyricsEvent
+import com.pointlessapps.songbook.lyrics.LyricsState
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
+import com.pointlessapps.songbook.lyrics.WrapMode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheet
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.AddToSetlist
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Broadcast
@@ -67,22 +70,49 @@ internal fun LyricsScreen(
 ) {
     val navigator = LocalNavigator.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var isTopBarVisible by rememberSaveable { mutableStateOf(true) }
-    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
             is LyricsEvent.NavigateBack -> navigator.navigateBack()
-            is LyricsEvent.NavigateToImportSong -> {
-                navigator.navigateToImportSong(
-                    id = event.songId,
-                    title = event.title,
-                    artist = event.artist,
-                    lyrics = event.lyrics,
-                )
-            }
+            is LyricsEvent.NavigateToImportSong -> navigator.navigateToImportSong(
+                id = event.songId,
+                title = event.title,
+                artist = event.artist,
+                lyrics = event.lyrics,
+            )
         }
     }
+
+    when (val state = state) {
+        LyricsState.Loading -> SongbookLoader(true)
+        is LyricsState.Loaded -> LyricsScreenContent(
+            state = state,
+            onNavigateBack = navigator::navigateBack,
+            onEditSongClicked = viewModel::onEditSongClicked,
+            onTextScaleChanged = viewModel::onTextScaleChanged,
+            onKeyOffsetChanged = viewModel::onKeyOffsetChanged,
+            onDisplayModeChanged = viewModel::onDisplayModeChanged,
+            onWrapModeChanged = viewModel::onWrapModeChanged,
+            onBroadcastToTeamConfirmClicked = viewModel::onBroadcastToTeamConfirmClicked,
+            onDeleteSongConfirmClicked = viewModel::onDeleteSongConfirmClicked,
+        )
+    }
+}
+
+@Composable
+private fun LyricsScreenContent(
+    state: LyricsState.Loaded,
+    onNavigateBack: () -> Unit,
+    onEditSongClicked: () -> Unit,
+    onTextScaleChanged: (Int) -> Unit,
+    onKeyOffsetChanged: (Int) -> Unit,
+    onDisplayModeChanged: (DisplayMode) -> Unit,
+    onWrapModeChanged: (WrapMode) -> Unit,
+    onBroadcastToTeamConfirmClicked: () -> Unit,
+    onDeleteSongConfirmClicked: () -> Unit,
+) {
+    var isTopBarVisible by rememberSaveable { mutableStateOf(true) }
+    var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     NavigationBackHandler(
         state = rememberNavigationEventState(
@@ -98,7 +128,7 @@ internal fun LyricsScreen(
                 if (it) {
                     TopBar(
                         leftButton = TopBarButton.back(
-                            onClick = { navigator.navigateBack() },
+                            onClick = onNavigateBack,
                         ),
                         rightButton = TopBarButton.menu(
                             onClick = { isBottomSheetVisible = true },
@@ -120,7 +150,7 @@ internal fun LyricsScreen(
                 keyOffset = state.keyOffset,
                 displayMode = state.displayMode,
                 wrapMode = state.wrapMode,
-                onTextScaleChanged = viewModel::onTextScaleChanged,
+                onTextScaleChanged = onTextScaleChanged,
                 paddingValues = paddingValues,
             )
 
@@ -161,7 +191,7 @@ internal fun LyricsScreen(
             isBottomSheetVisible = false
 
             when (it) {
-                Edit -> viewModel.onEditSongClicked()
+                Edit -> onEditSongClicked()
                 Fullscreen -> isTopBarVisible = !isTopBarVisible
                 WrapMode -> isWrapDialogVisible = true
                 DisplayMode -> isDisplayModeDialogVisible = true
@@ -179,7 +209,7 @@ internal fun LyricsScreen(
         WrapModeDialog(
             mode = state.wrapMode,
             onModeSelected = {
-                viewModel.onWrapModeChanged(it)
+                onWrapModeChanged(it)
                 isWrapDialogVisible = false
             },
             onDismissRequest = { isWrapDialogVisible = false },
@@ -190,7 +220,7 @@ internal fun LyricsScreen(
         DisplayModeDialog(
             mode = state.displayMode,
             onModeSelected = {
-                viewModel.onDisplayModeChanged(it)
+                onDisplayModeChanged(it)
                 isDisplayModeDialogVisible = false
             },
             onDismissRequest = { isDisplayModeDialogVisible = false },
@@ -203,7 +233,7 @@ internal fun LyricsScreen(
             minTextScale = MIN_ZOOM,
             maxTextScale = MAX_ZOOM,
             onTextScaleSelected = {
-                viewModel.onTextScaleChanged(it)
+                onTextScaleChanged(it)
                 isTextScaleDialogVisible = false
             },
             onDismissRequest = { isTextScaleDialogVisible = false },
@@ -214,7 +244,7 @@ internal fun LyricsScreen(
         KeyOffsetDialog(
             keyOffset = state.keyOffset,
             onKeyOffsetSelected = {
-                viewModel.onKeyOffsetChanged(it)
+                onKeyOffsetChanged(it)
                 isKeyOffsetDialogVisible = false
             },
             onDismissRequest = { isKeyOffsetDialogVisible = false },
@@ -224,7 +254,7 @@ internal fun LyricsScreen(
     if (isBroadcastToTeamDialogVisible) {
         ConfirmBroadcastToTeamDialog(
             onConfirmClicked = {
-                viewModel.broadcastSongToTeam()
+                onBroadcastToTeamConfirmClicked()
                 isBroadcastToTeamDialogVisible = false
             },
             onDismissRequest = { isBroadcastToTeamDialogVisible = false },
@@ -236,13 +266,11 @@ internal fun LyricsScreen(
             title = Res.string.lyrics_delete_song,
             description = Res.string.lyrics_delete_song_description,
             onConfirmClicked = {
-                viewModel.onDeleteSongConfirmClicked()
+                onDeleteSongConfirmClicked()
                 isConfirmDeleteDialogVisible = false
                 isBottomSheetVisible = false
             },
             onDismissRequest = { isConfirmDeleteDialogVisible = false },
         )
     }
-
-    SongbookLoader(state.isLoading)
 }

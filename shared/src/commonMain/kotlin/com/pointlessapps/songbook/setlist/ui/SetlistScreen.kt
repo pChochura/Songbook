@@ -1,8 +1,6 @@
 package com.pointlessapps.songbook.setlist.ui
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -52,6 +50,7 @@ import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
+import com.pointlessapps.songbook.utils.syncingTopBarButton
 import kotlinx.coroutines.launch
 
 @Composable
@@ -109,13 +108,8 @@ private fun SetlistScreenContent(
 
     SongbookScaffoldLayout(
         topBar = @Composable {
-            val rotation = remember { Animatable(0f) }
-            LaunchedEffect(Unit) {
-                rotation.animateTo(360f, infiniteRepeatable(tween(3000)))
-            }
-
             TopBar(
-                leftButton = null,
+                leftButton = syncingTopBarButton(state.syncStatus),
                 rightButton = TopBarButton.menu(
                     onClick = { isBottomSheetVisible = true },
                 ),
