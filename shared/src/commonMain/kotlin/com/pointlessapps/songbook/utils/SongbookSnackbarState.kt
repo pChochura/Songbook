@@ -115,4 +115,9 @@ internal data class SongbookSnackbarVisuals(
 
 internal sealed interface SongbookSnackbarCallbackAction {
     data class NavigateTo(val route: Route) : SongbookSnackbarCallbackAction
+    data class AddSongToSetlist(
+        val setlistId: Long,
+        val songId: Long,
+        val order: Int,
+    ) : SongbookSnackbarCallbackAction
 }

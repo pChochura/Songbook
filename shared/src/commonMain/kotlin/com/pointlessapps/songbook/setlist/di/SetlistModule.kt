@@ -17,6 +17,7 @@ internal val setlistModule = module {
             id = id,
             syncRepository = get(),
             setlistRepository = get(),
+            songRepository = get(),
             snackbarState = get(),
         )
     }

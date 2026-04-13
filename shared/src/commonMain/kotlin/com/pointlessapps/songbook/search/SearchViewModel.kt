@@ -81,7 +81,6 @@ internal class SearchViewModel(
     private val _transientState = MutableStateFlow(SearchTransientState())
 
     val queryTextFieldState: TextFieldState = TextFieldState()
-
     val searchResults: Flow<PagingData<SongSearchResult>> = snapshotFlow {
         queryTextFieldState.text
     }.distinctUntilChanged()

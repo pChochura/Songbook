@@ -3,6 +3,7 @@ package com.pointlessapps.songbook
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.auth.AuthRepository
+import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.shared.Res
@@ -30,6 +31,7 @@ internal class AppViewModel(
     private val chordLibrary: ChordLibrary,
     private val authRepository: AuthRepository,
     private val syncRepository: SyncRepository,
+    private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
@@ -64,6 +66,12 @@ internal class AppViewModel(
             started = SharingStarted.Eagerly,
             initialValue = AppState(),
         )
+
+    fun addSongToSetlist(setlistId: Long, songId: Long, order: Int) {
+        viewModelScope.launch {
+            setlistRepository.addSongToSetlist(setlistId, songId, order)
+        }
+    }
 
     override fun onCleared() {
         viewModelScope.launch { syncRepository.stopSync() }

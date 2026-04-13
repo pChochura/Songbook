@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -16,20 +15,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import com.pointlessapps.songbook.ui.components.SongbookBottomSheet
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
@@ -47,43 +40,25 @@ internal fun OptionsBottomSheet(
     items: List<OptionsBottomSheetItem>,
     header: @Composable () -> Unit = { },
 ) {
-    var currentlyShown by remember(Unit) { mutableStateOf(show) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    LaunchedEffect(show) {
-        if (show) {
-            currentlyShown = true
-        } else {
-            sheetState.hide()
-            currentlyShown = false
-        }
-    }
-
-    if (currentlyShown) {
-        ModalBottomSheet(
-            contentWindowInsets = { WindowInsets() },
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
-            dragHandle = null,
-            onDismissRequest = onDismissRequest,
-            sheetState = sheetState,
+    SongbookBottomSheet(
+        show = show,
+        onDismissRequest = onDismissRequest,
+    ) {
+        LazyColumn(
+            contentPadding = PaddingValues(all = MaterialTheme.spacing.extraLarge),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
-            LazyColumn(
-                contentPadding = PaddingValues(all = MaterialTheme.spacing.extraLarge),
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-            ) {
-                item { Spacer(Modifier.statusBarsPadding()) }
-                item { header() }
-                items(items) {
-                    when (it) {
-                        is OptionsBottomSheetItem.Button -> OptionsBottomSheetItemButton(it)
-                        OptionsBottomSheetItem.Divider -> HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                        )
-                    }
+            item { Spacer(Modifier.statusBarsPadding()) }
+            item { header() }
+            items(items) {
+                when (it) {
+                    is OptionsBottomSheetItem.Button -> OptionsBottomSheetItemButton(it)
+                    OptionsBottomSheetItem.Divider -> HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                    )
                 }
-                item { Spacer(Modifier.navigationBarsPadding()) }
             }
+            item { Spacer(Modifier.navigationBarsPadding()) }
         }
     }
 }

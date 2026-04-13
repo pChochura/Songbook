@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_cancel
 import com.pointlessapps.songbook.shared.common_confirm
-import com.pointlessapps.songbook.shared.setlist_edit_setlist
 import com.pointlessapps.songbook.shared.setlist_edit_setlist_placeholder
+import com.pointlessapps.songbook.shared.setlist_rename_setlist
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -43,7 +43,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun EditSetlistDialog(
+internal fun RenameSetlistDialog(
     name: String,
     onConfirmClicked: (String) -> Unit,
     onDismissRequest: () -> Unit,
@@ -59,7 +59,7 @@ internal fun EditSetlistDialog(
     SongbookDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.setlist_edit_setlist),
+            label = stringResource(Res.string.setlist_rename_setlist),
             icon = IconEdit,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),

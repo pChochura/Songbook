@@ -1,6 +1,5 @@
 package com.pointlessapps.songbook.importsong.ui.components
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import com.pointlessapps.songbook.importsong.ImportSongState
 import com.pointlessapps.songbook.shared.Res
@@ -18,7 +17,6 @@ import com.pointlessapps.songbook.ui.theme.IconScan
 import com.pointlessapps.songbook.ui.theme.IconVisibility
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ImportSongOptionsBottomSheet(
     show: Boolean,

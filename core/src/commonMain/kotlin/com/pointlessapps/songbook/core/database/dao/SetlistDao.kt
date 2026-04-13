@@ -53,6 +53,9 @@ internal interface SetlistDao {
     @Upsert
     suspend fun insertSetlistSongs(setlistSongs: List<SetlistSongEntity>)
 
+    @Query("DELETE FROM setlist_songs WHERE setlist_id = :setlistId AND song_id = :songId")
+    suspend fun deleteSetlistSong(setlistId: Long, songId: Long)
+
     @Query("DELETE FROM setlists WHERE id = :id")
     suspend fun deleteSetlist(id: Long)
 }

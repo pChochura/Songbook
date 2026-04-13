@@ -1,21 +1,40 @@
 package com.pointlessapps.songbook.setlist
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
+import com.pointlessapps.songbook.core.song.SongRepository
+import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
+import com.pointlessapps.songbook.core.sync.model.SyncStatus.SYNCED
 import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_undo
 import com.pointlessapps.songbook.shared.error_setlist_not_found
+import com.pointlessapps.songbook.shared.setlist_song_removed_from_setlist
+import com.pointlessapps.songbook.ui.theme.IconInfo
 import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -38,26 +57,27 @@ internal sealed interface SetlistState {
     val loaded: Loaded get() = this as Loaded
 }
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 internal class SetlistViewModel(
-    id: Long,
+    private val id: Long,
     syncRepository: SyncRepository,
     private val setlistRepository: SetlistRepository,
+    private val songRepository: SongRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
     private data class SetlistTransientState(
-        val localSongs: List<Song>? = null,
+        val localSongs: List<Song> = emptyList(),
         val isLoading: Boolean = false,
     )
 
     private val _transientState = MutableStateFlow(SetlistTransientState())
 
     val state: StateFlow<SetlistState> = combine(
-        syncRepository.currentSyncStatus,
+        syncRepository.currentSyncStatus.onEach { if (it == SYNCED) updateLocalSongs() },
         setlistRepository.getSetlistByIdFlow(id),
-        setlistRepository.getSetlistsSongsById(id),
         _transientState,
-    ) { syncStatus, setlist, songs, transient ->
+    ) { syncStatus, setlist, transient ->
         if (transient.isLoading) {
             return@combine SetlistState.Loading
         }
@@ -74,7 +94,7 @@ internal class SetlistViewModel(
 
         SetlistState.Loaded(
             setlist = setlist,
-            songs = transient.localSongs ?: songs,
+            songs = transient.localSongs,
             syncStatus = syncStatus,
         )
     }.stateIn(
@@ -82,6 +102,14 @@ internal class SetlistViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = SetlistState.Loading,
     )
+
+    val songSearchQueryTextFieldState: TextFieldState = TextFieldState()
+    val songSearchResults: Flow<PagingData<SongSearchResult>> = snapshotFlow {
+        songSearchQueryTextFieldState.text
+    }.distinctUntilChanged()
+        .debounce(SEARCH_QUERY_DEBOUNCE)
+        .flatMapLatest { songRepository.searchSongs(it.toString()) }
+        .cachedIn(viewModelScope)
 
     private val eventChannel = Channel<SetlistEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -115,7 +143,6 @@ internal class SetlistViewModel(
                 id = state.setlist.id,
                 songs = state.songs,
             )
-            _transientState.update { it.copy(localSongs = null) }
         }
     }
 
@@ -126,5 +153,46 @@ internal class SetlistViewModel(
             setlistRepository.deleteSetlist(state.setlist.id)
             eventChannel.trySend(SetlistEvent.NavigateBack)
         }
+    }
+
+    fun onAddSongToSetlistClicked(id: Long) {
+        viewModelScope.launch {
+            val state = state.value.loaded
+            setlistRepository.addSongToSetlist(state.setlist.id, id, state.songs.size)
+            updateLocalSongs()
+        }
+    }
+
+    fun onRemoveSongFromSetlistClicked(id: Long) {
+        viewModelScope.launch {
+            val state = state.value.loaded
+            setlistRepository.removeSongFromSetlist(state.setlist.id, id)
+            val songIndex = _transientState.value.localSongs.indexOfFirst { it.id == id }
+            _transientState.update {
+                it.copy(localSongs = it.localSongs.filter { song -> song.id != id })
+            }
+            snackbarState.showSnackbar(
+                message = getString(Res.string.setlist_song_removed_from_setlist),
+                icon = IconInfo,
+                actionLabel = getString(Res.string.common_undo),
+                callbackAction = SongbookSnackbarCallbackAction.AddSongToSetlist(
+                    setlistId = state.setlist.id,
+                    songId = id,
+                    order = songIndex,
+                ),
+            )
+        }
+    }
+
+    private fun updateLocalSongs() {
+        viewModelScope.launch {
+            _transientState.update {
+                it.copy(localSongs = setlistRepository.getSetlistsSongsById(id).first())
+            }
+        }
+    }
+
+    private companion object {
+        const val SEARCH_QUERY_DEBOUNCE = 300L
     }
 }

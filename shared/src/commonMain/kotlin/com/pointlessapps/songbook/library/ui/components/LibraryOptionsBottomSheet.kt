@@ -1,6 +1,5 @@
 package com.pointlessapps.songbook.library.ui.components
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import com.pointlessapps.songbook.library.DisplayMode
 import com.pointlessapps.songbook.library.LibraryState
@@ -15,7 +14,6 @@ import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
 import com.pointlessapps.songbook.ui.theme.IconDisplayMode
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LibraryOptionsBottomSheet(
     show: Boolean,

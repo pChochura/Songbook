@@ -40,6 +40,7 @@
     <string name="common_favourites">Favourites</string>
     <string name="common_no_chord_visualization">There is no visualization for this chord</string>
     <string name="common_show">Show</string>
+    <string name="common_undo">Undo</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
@@ -143,11 +144,16 @@
     <string name="search_import">Import the lyrics into your library. Review the content beforehand, as it is crowdsourced and not guaranteed to be accurate.</string>
 
     <!-- Setlist Screen -->
-    <string name="setlist_menu_edit">Edit</string>
+    <string name="setlist_menu_rename">Rename</string>
     <string name="setlist_menu_delete">Delete the setlist</string>
     <string name="setlist_menu_delete_description">The setlist will be moved to the trash, but the associated songs will remain intact</string>
     <string name="setlist_delete_setlist">Delete the setlist?</string>
     <string name="setlist_delete_setlist_description">It will be moved to the trash, and you'll be able to restore it later. All the songs associated with this setlist will remain intact.</string>
-    <string name="setlist_edit_setlist">Edit the setlist</string>
+    <string name="setlist_rename_setlist">Rename the setlist</string>
     <string name="setlist_edit_setlist_placeholder">Setlist name</string>
+    <string name="setlist_add_song">Add a song to the setlist</string>
+    <string name="setlist_search_songs">Search songs</string>
+    <string name="setlist_search_songs_placeholder">Search for songs by title, artist or lyrics</string>
+    <string name="setlist_delete_from_setlist">Delete from setlist</string>
+    <string name="setlist_song_removed_from_setlist">The song has been removed from the setlist</string>
 </resources>

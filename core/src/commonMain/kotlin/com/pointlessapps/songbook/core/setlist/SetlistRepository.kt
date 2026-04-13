@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.core.setlist
 
 import com.pointlessapps.songbook.core.database.dao.SetlistDao
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithCount
 import com.pointlessapps.songbook.core.setlist.database.mapper.toDomain
 import com.pointlessapps.songbook.core.setlist.database.mapper.toEntities
@@ -29,6 +30,8 @@ interface SetlistRepository {
     suspend fun deleteSetlist(id: Long)
     suspend fun updateSetlistName(id: Long, name: String)
     suspend fun updateSetlistSongsOrder(id: Long, songs: List<Song>)
+    suspend fun addSongToSetlist(setlistId: Long, songId: Long, order: Int)
+    suspend fun removeSongFromSetlist(setlistId: Long, songId: Long)
 }
 
 @OptIn(SupabaseExperimental::class)
@@ -82,6 +85,26 @@ internal class SetlistRepositoryImpl(
             val entities = songs.toEntities(id)
             setlistSongsTable.upsert(entities)
             setlistDao.insertSetlistSongs(entities)
+        }
+    }
+
+    override suspend fun addSongToSetlist(setlistId: Long, songId: Long, order: Int) {
+        withContext(Dispatchers.IO) {
+            val entity = SetlistSongEntity(setlistId, songId, order)
+            setlistSongsTable.upsert(entity)
+            setlistDao.insertSetlistSongs(listOf(entity))
+        }
+    }
+
+    override suspend fun removeSongFromSetlist(setlistId: Long, songId: Long) {
+        withContext(Dispatchers.IO) {
+            setlistSongsTable.delete {
+                filter {
+                    SetlistSongEntity::setlistId eq setlistId
+                    and { SetlistSongEntity::songId eq songId }
+                }
+            }
+            setlistDao.deleteSetlistSong(setlistId, songId)
         }
     }
 }
