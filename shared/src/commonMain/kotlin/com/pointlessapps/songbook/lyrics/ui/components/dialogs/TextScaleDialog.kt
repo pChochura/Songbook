@@ -3,6 +3,7 @@ package com.pointlessapps.songbook.lyrics.ui.components.dialogs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.IconMinus
 import com.pointlessapps.songbook.ui.theme.IconPlus
@@ -87,9 +89,15 @@ private fun Counter(
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
     ) {
         SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
             icon = IconMinus,
             tooltipLabel = Res.string.common_decrement,
             onClick = onDecrementClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                outlineColor = MaterialTheme.colorScheme.outline,
+            ),
         )
 
         SongbookText(
@@ -100,9 +108,15 @@ private fun Counter(
         )
 
         SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
             icon = IconPlus,
             tooltipLabel = Res.string.common_increment,
             onClick = onIncrementClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                outlineColor = MaterialTheme.colorScheme.outline,
+            ),
         )
     }
 }

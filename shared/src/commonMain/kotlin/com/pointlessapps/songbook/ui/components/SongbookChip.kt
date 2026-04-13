@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconDone
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
@@ -42,7 +43,7 @@ fun SongbookChip(
                 },
             )
             .border(
-                width = CHIP_BORDER_WIDTH,
+                width = DEFAULT_BORDER_WIDTH,
                 color = if (isSelected) {
                     chipStyle.selectedOutlineColor
                 } else {
@@ -67,7 +68,7 @@ fun SongbookChip(
         val iconContent = movableContentOf {
             SongbookIcon(
                 modifier = Modifier.size(CHIP_ICON_SIZE),
-                icon = chipStyle.iconRes,
+                icon = chipStyle.icon,
                 iconStyle = defaultSongbookIconStyle().copy(
                     tint = chipStyle.iconColor,
                 ),
@@ -108,7 +109,7 @@ fun defaultSongbookChipStyle() = SongbookChipStyle(
     selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
     labelTypography = MaterialTheme.typography.labelLarge,
     iconColor = MaterialTheme.colorScheme.onSecondaryContainer,
-    iconRes = IconDone,
+    icon = IconDone,
     iconAlignment = Alignment.Start,
 )
 
@@ -121,9 +122,8 @@ data class SongbookChipStyle(
     val selectedLabelColor: Color,
     val labelTypography: TextStyle,
     val iconColor: Color,
-    val iconRes: DrawableResource,
+    val icon: DrawableResource,
     val iconAlignment: Alignment.Horizontal,
 )
 
-private val CHIP_BORDER_WIDTH = 1.dp
 private val CHIP_ICON_SIZE = 16.dp

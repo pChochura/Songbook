@@ -59,6 +59,7 @@ internal sealed interface LyricsState {
         val isOcrActive: Boolean = false,
         val displayMode: DisplayMode = DisplayMode.Inline,
         val wrapMode: WrapMode = WrapMode.NoWrap,
+        val showKeyOffsetFab: Boolean = true,
         val syncStatus: SyncStatus = SyncStatus.LOCAL,
     ) : LyricsState
 
@@ -87,9 +88,10 @@ internal class LyricsViewModel(
         prefsRepository.getLyricsTextScaleFlow(),
         prefsRepository.getLyricsDisplayModeFlow(),
         prefsRepository.getLyricsWrapModeFlow(),
+        prefsRepository.getShowKeyOffsetFabFlow(),
         songRepository.getSongByIdFlow(songId),
         _transientState,
-    ) { syncStatus, textScale, displayMode, wrapMode, song, transient ->
+    ) { syncStatus, textScale, displayMode, wrapMode, showKeyOffsetFab, song, transient ->
         if (transient.isLoading) {
             return@combine LyricsState.Loading
         }
@@ -113,6 +115,7 @@ internal class LyricsViewModel(
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
             wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
             keyOffset = transient.keyOffset,
+            showKeyOffsetFab = showKeyOffsetFab,
             syncStatus = syncStatus,
         )
     }.stateIn(
@@ -145,6 +148,12 @@ internal class LyricsViewModel(
 
     fun onKeyOffsetChanged(keyOffset: Int) {
         _transientState.update { it.copy(keyOffset = keyOffset) }
+    }
+
+    fun onShowKeyOffsetFabChanged(showKeyOffsetFab: Boolean) {
+        viewModelScope.launch {
+            prefsRepository.setShowKeyOffsetFab(showKeyOffsetFab)
+        }
     }
 
     fun onDisplayModeChanged(mode: DisplayMode) {

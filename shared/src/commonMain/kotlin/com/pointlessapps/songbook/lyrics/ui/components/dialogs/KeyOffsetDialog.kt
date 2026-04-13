@@ -3,6 +3,8 @@ package com.pointlessapps.songbook.lyrics.ui.components.dialogs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,13 +20,16 @@ import com.pointlessapps.songbook.shared.common_decrement
 import com.pointlessapps.songbook.shared.common_increment
 import com.pointlessapps.songbook.shared.common_select_key_offset
 import com.pointlessapps.songbook.shared.common_select_key_offset_description
+import com.pointlessapps.songbook.shared.lyrics_show_key_offset_fab
 import com.pointlessapps.songbook.ui.components.SongbookButton
+import com.pointlessapps.songbook.ui.components.SongbookCheckbox
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.IconKey
 import com.pointlessapps.songbook.ui.theme.IconMinus
@@ -35,10 +40,13 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun KeyOffsetDialog(
     keyOffset: Int,
-    onKeyOffsetSelected: (Int) -> Unit,
+    showKeyOffsetFab: Boolean,
+    onKeyOffsetChanged: (Int) -> Unit,
+    onShowKeyOffsetFabChanged: (Boolean) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     var currentKeyOffset by rememberSaveable { mutableStateOf(keyOffset) }
+    var currentShowKeyOffsetFab by rememberSaveable { mutableStateOf(showKeyOffsetFab) }
 
     SongbookDialog(
         onDismissRequest = onDismissRequest,
@@ -63,10 +71,25 @@ internal fun KeyOffsetDialog(
             onIncrementClicked = { currentKeyOffset++ },
         )
 
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.outlineVariant,
+        )
+
+        SongbookCheckbox(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.lyrics_show_key_offset_fab),
+            checked = currentShowKeyOffsetFab,
+            onCheckChanged = { currentShowKeyOffsetFab = !currentShowKeyOffsetFab },
+        )
+
         SongbookButton(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.common_confirm),
-            onClick = { onKeyOffsetSelected(currentKeyOffset) },
+            onClick = {
+                onShowKeyOffsetFabChanged(currentShowKeyOffsetFab)
+                onKeyOffsetChanged(currentKeyOffset)
+            },
             buttonStyle = defaultSongbookButtonStyle().copy(
                 containerColor = MaterialTheme.colorScheme.primary,
                 textStyle = defaultSongbookTextStyle().copy(
@@ -89,9 +112,15 @@ private fun Counter(
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
     ) {
         SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
             icon = IconMinus,
             tooltipLabel = Res.string.common_decrement,
             onClick = onDecrementClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                outlineColor = MaterialTheme.colorScheme.outline,
+            ),
         )
 
         SongbookText(
@@ -102,9 +131,15 @@ private fun Counter(
         )
 
         SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
             icon = IconPlus,
             tooltipLabel = Res.string.common_increment,
             onClick = onIncrementClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                outlineColor = MaterialTheme.colorScheme.outline,
+            ),
         )
     }
 }

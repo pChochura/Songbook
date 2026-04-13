@@ -2,6 +2,10 @@ package com.pointlessapps.songbook.lyrics.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +33,7 @@ import com.pointlessapps.songbook.lyrics.LyricsViewModel
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
 import com.pointlessapps.songbook.lyrics.WrapMode
+import com.pointlessapps.songbook.lyrics.ui.components.KeyOffsetFab
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheet
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.AddToSetlist
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Broadcast
@@ -91,6 +96,7 @@ internal fun LyricsScreen(
             onEditSongClicked = viewModel::onEditSongClicked,
             onTextScaleChanged = viewModel::onTextScaleChanged,
             onKeyOffsetChanged = viewModel::onKeyOffsetChanged,
+            onShowKeyOffsetFabChanged = viewModel::onShowKeyOffsetFabChanged,
             onDisplayModeChanged = viewModel::onDisplayModeChanged,
             onWrapModeChanged = viewModel::onWrapModeChanged,
             onBroadcastToTeamConfirmClicked = viewModel::onBroadcastToTeamConfirmClicked,
@@ -106,6 +112,7 @@ private fun LyricsScreenContent(
     onEditSongClicked: () -> Unit,
     onTextScaleChanged: (Int) -> Unit,
     onKeyOffsetChanged: (Int) -> Unit,
+    onShowKeyOffsetFabChanged: (Boolean) -> Unit,
     onDisplayModeChanged: (DisplayMode) -> Unit,
     onWrapModeChanged: (WrapMode) -> Unit,
     onBroadcastToTeamConfirmClicked: () -> Unit,
@@ -113,6 +120,13 @@ private fun LyricsScreenContent(
 ) {
     var isTopBarVisible by rememberSaveable { mutableStateOf(true) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+
+    var isWrapDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isKeyOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isConfirmDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     NavigationBackHandler(
         state = rememberNavigationEventState(
@@ -138,6 +152,19 @@ private fun LyricsScreenContent(
                 } else {
                     Spacer(Modifier.statusBarsPadding())
                 }
+            }
+        },
+        fab = @Composable {
+            AnimatedVisibility(
+                visible = state.showKeyOffsetFab,
+                enter = fadeIn() + slideInVertically { it / 2 },
+                exit = fadeOut() + slideOutVertically { it / 2 },
+            ) {
+                KeyOffsetFab(
+                    keyOffset = state.keyOffset,
+                    onKeyOffsetChanged = onKeyOffsetChanged,
+                    onClicked = { isKeyOffsetDialogVisible = true },
+                )
             }
         },
     ) { paddingValues ->
@@ -175,13 +202,6 @@ private fun LyricsScreenContent(
             }
         }
     }
-
-    var isWrapDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isKeyOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isConfirmDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     LyricsOptionsBottomSheet(
         show = isBottomSheetVisible,
@@ -243,8 +263,13 @@ private fun LyricsScreenContent(
     if (isKeyOffsetDialogVisible) {
         KeyOffsetDialog(
             keyOffset = state.keyOffset,
-            onKeyOffsetSelected = {
+            showKeyOffsetFab = state.showKeyOffsetFab,
+            onKeyOffsetChanged = {
                 onKeyOffsetChanged(it)
+                isKeyOffsetDialogVisible = false
+            },
+            onShowKeyOffsetFabChanged = {
+                onShowKeyOffsetFabChanged(it)
                 isKeyOffsetDialogVisible = false
             },
             onDismissRequest = { isKeyOffsetDialogVisible = false },

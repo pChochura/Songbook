@@ -123,6 +123,8 @@
     <string name="lyrics_display_mode_text_only_description">Only the text will be displayed</string>
     <string name="lyrics_delete_song">Delete the song?</string>
     <string name="lyrics_delete_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
+    <string name="lyrics_transpose">Transpose</string>
+    <string name="lyrics_show_key_offset_fab">Display the permanent transpose widget on the bottom of the screen</string>
 
     <!-- Search Screen -->
     <string name="search_placeholder">Search titles, artists and lyrics...</string>

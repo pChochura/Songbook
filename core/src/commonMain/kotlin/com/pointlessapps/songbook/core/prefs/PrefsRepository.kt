@@ -31,6 +31,9 @@ interface PrefsRepository {
     fun getLyricsWrapModeFlow(): Flow<String?>
     suspend fun setLyricsWrapMode(mode: String)
 
+    fun getShowKeyOffsetFabFlow(): Flow<Boolean>
+    suspend fun setShowKeyOffsetFab(show: Boolean)
+
     suspend fun getShowPublicLyrics(): Boolean?
     suspend fun setShowPublicLyrics(show: Boolean)
 }
@@ -43,6 +46,7 @@ internal class PrefsRepositoryImpl(
     private val lyricsDisplayModeKey = stringPreferencesKey("lyrics_display_mode")
     private val libraryDisplayModeKey = stringPreferencesKey("library_display_mode")
     private val lyricsWrapModeKey = stringPreferencesKey("lyrics_wrap_mode")
+    private val showKeyOffsetFabKey = booleanPreferencesKey("show_key_offset_fab")
     private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
 
     override fun getLastSearchesFlow() = dataStore.data.map { preferences ->
@@ -122,6 +126,20 @@ internal class PrefsRepositoryImpl(
             dataStore.updateData {
                 it.toMutablePreferences().apply {
                     set(lyricsWrapModeKey, mode)
+                }
+            }
+        }
+    }
+
+    override fun getShowKeyOffsetFabFlow() = dataStore.data.map { preferences ->
+        preferences[showKeyOffsetFabKey] ?: true
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun setShowKeyOffsetFab(show: Boolean) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.toMutablePreferences().apply {
+                    set(showKeyOffsetFabKey, show)
                 }
             }
         }
