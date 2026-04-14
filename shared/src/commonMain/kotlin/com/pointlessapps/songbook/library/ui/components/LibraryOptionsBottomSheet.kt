@@ -8,10 +8,13 @@ import com.pointlessapps.songbook.shared.common_menu
 import com.pointlessapps.songbook.shared.library_menu_display_mode
 import com.pointlessapps.songbook.shared.library_menu_display_mode_grid
 import com.pointlessapps.songbook.shared.library_menu_display_mode_list
+import com.pointlessapps.songbook.shared.library_menu_sync
+import com.pointlessapps.songbook.shared.library_menu_sync_description
 import com.pointlessapps.songbook.ui.OptionsBottomSheet
 import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
 import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
 import com.pointlessapps.songbook.ui.theme.IconDisplayMode
+import com.pointlessapps.songbook.ui.theme.IconSync
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -36,10 +39,17 @@ internal fun LibraryOptionsBottomSheet(
                 },
                 onClick = { onAction(LibraryOptionsBottomSheetAction.DisplayMode) },
             ),
+            OptionsBottomSheetItem.Divider,
+            OptionsBottomSheetItem.new(
+                icon = IconSync,
+                label = Res.string.library_menu_sync,
+                description = stringResource(Res.string.library_menu_sync_description),
+                onClick = { onAction(LibraryOptionsBottomSheetAction.Sync) },
+            ),
         ),
     )
 }
 
 internal enum class LibraryOptionsBottomSheetAction {
-    DisplayMode
+    DisplayMode, Sync
 }

@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.getString
 
 internal sealed interface SetlistEvent {
     data object NavigateBack : SetlistEvent
-    data class NavigateToLyrics(val songId: Long) : SetlistEvent
+    data class NavigateToLyrics(val songId: String) : SetlistEvent
 }
 
 internal sealed interface SetlistState {
@@ -59,7 +59,7 @@ internal sealed interface SetlistState {
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 internal class SetlistViewModel(
-    private val id: Long,
+    private val id: String,
     syncRepository: SyncRepository,
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
@@ -114,7 +114,7 @@ internal class SetlistViewModel(
     private val eventChannel = Channel<SetlistEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    fun onLyricsClicked(id: Long) {
+    fun onLyricsClicked(id: String) {
         eventChannel.trySend(SetlistEvent.NavigateToLyrics(id))
     }
 
@@ -141,7 +141,7 @@ internal class SetlistViewModel(
             val state = state.value.loaded
             setlistRepository.updateSetlistSongsOrder(
                 id = state.setlist.id,
-                songs = state.songs,
+                songsIds = state.songs.map(Song::id),
             )
         }
     }
@@ -155,7 +155,7 @@ internal class SetlistViewModel(
         }
     }
 
-    fun onAddSongToSetlistClicked(id: Long) {
+    fun onAddSongToSetlistClicked(id: String) {
         viewModelScope.launch {
             val state = state.value.loaded
             setlistRepository.addSongToSetlist(state.setlist.id, id, state.songs.size)
@@ -163,7 +163,7 @@ internal class SetlistViewModel(
         }
     }
 
-    fun onRemoveSongFromSetlistClicked(id: Long) {
+    fun onRemoveSongFromSetlistClicked(id: String) {
         viewModelScope.launch {
             val state = state.value.loaded
             setlistRepository.removeSongFromSetlist(state.setlist.id, id)

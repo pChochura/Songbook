@@ -6,5 +6,14 @@
 	<true/>
     <key>Privacy - Camera Usage Description</key>
     <string>This app uses camera for importing the songs using OCR.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.pointlessapps.songbook.sync</string>
+	</array>
 </dict>
 </plist>

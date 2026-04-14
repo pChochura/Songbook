@@ -34,7 +34,7 @@ internal sealed interface Route : NavKey {
 
     @Keep
     @Serializable
-    data class Lyrics(val songId: Long) : Route
+    data class Lyrics(val songId: String) : Route
 
     @Keep
     @Serializable
@@ -45,7 +45,7 @@ internal sealed interface Route : NavKey {
     @Keep
     @Serializable
     data class ImportSong(
-        val id: Long? = null,
+        val id: String? = null,
         val title: String? = null,
         val artist: String? = null,
         val lyrics: String? = null,
@@ -61,7 +61,7 @@ internal sealed interface Route : NavKey {
 
     @Keep
     @Serializable
-    data class Setlist(val id: Long) : Route {
+    data class Setlist(val id: String) : Route {
         override val hasBottomBar = true
     }
 }
@@ -136,12 +136,12 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
         backStack.removeLastOrNull()
     }
 
-    fun navigateToLyrics(songId: Long) {
+    fun navigateToLyrics(songId: String) {
         backStack.add(Route.Lyrics(songId))
     }
 
     fun navigateToImportSong(
-        id: Long? = null,
+        id: String? = null,
         title: String? = null,
         artist: String? = null,
         lyrics: String? = null,
@@ -153,7 +153,7 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
         backStack.add(Route.PreviewSong(title, artist, sections))
     }
 
-    fun navigateToSetlist(id: Long) {
+    fun navigateToSetlist(id: String) {
         backStack.add(Route.Setlist(id))
     }
 }

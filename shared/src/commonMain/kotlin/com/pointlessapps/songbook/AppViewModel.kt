@@ -2,7 +2,6 @@ package com.pointlessapps.songbook
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pointlessapps.songbook.core.auth.AuthRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.sync.SyncRepository
@@ -28,22 +27,13 @@ internal data class AppState(
 )
 
 internal class AppViewModel(
-    private val chordLibrary: ChordLibrary,
-    private val authRepository: AuthRepository,
-    private val syncRepository: SyncRepository,
+    chordLibrary: ChordLibrary,
+    syncRepository: SyncRepository,
     private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
     val state: StateFlow<AppState> = combine(
-        flow {
-            authRepository.initialize()
-            if (!authRepository.isSignedIn()) {
-                authRepository.signInAnonymously()
-            }
-            syncRepository.startSync()
-            emit(Unit)
-        },
         flow {
             withContext(Dispatchers.IO) {
                 chordLibrary.initialize(
@@ -54,12 +44,15 @@ internal class AppViewModel(
             }
             emit(Unit)
         },
+        syncRepository.observeRemoteAsFlow(),
     ) { AppState(isLoading = false) }
         .catch {
+            it.printStackTrace()
             snackbarState.showSnackbar(
                 message = getString(Res.string.error_initilizing_error),
                 icon = IconWarning,
             )
+            emit(AppState(isLoading = false))
         }
         .stateIn(
             scope = viewModelScope,
@@ -67,15 +60,10 @@ internal class AppViewModel(
             initialValue = AppState(),
         )
 
-    fun addSongToSetlist(setlistId: Long, songId: Long, order: Int) {
+    fun addSongToSetlist(setlistId: String, songId: String, order: Int) {
         viewModelScope.launch {
             setlistRepository.addSongToSetlist(setlistId, songId, order)
         }
-    }
-
-    override fun onCleared() {
-        viewModelScope.launch { syncRepository.stopSync() }
-        super.onCleared()
     }
 
     private companion object {

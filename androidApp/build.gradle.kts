@@ -46,7 +46,9 @@ android {
 
 dependencies {
     implementation(projects.shared)
+    implementation(projects.core)
 
+    implementation(libs.androidx.work.runtime)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.runtime.compose)

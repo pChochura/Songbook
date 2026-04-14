@@ -40,6 +40,7 @@ import com.pointlessapps.songbook.library.ui.components.AddSetlistCard
 import com.pointlessapps.songbook.library.ui.components.AddSongCard
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheet
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.DisplayMode
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Sync
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
@@ -165,6 +166,7 @@ internal fun LibraryScreen(
 
             when (it) {
                 DisplayMode -> isDisplayModeDialogVisible = true
+                Sync -> viewModel.onSyncClicked()
             }
         },
     )
@@ -184,7 +186,7 @@ internal fun LibraryScreen(
 @Composable
 private fun LazyGridItemScope.SetlistsRow(
     setlists: List<Setlist>,
-    onSetlistClicked: (Long) -> Unit,
+    onSetlistClicked: (String) -> Unit,
     onAddSetlistClicked: (String) -> Unit,
 ) {
     var isAddSetlistDialogVisible by remember { mutableStateOf(false) }

@@ -13,7 +13,7 @@ import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 internal val importSongModule = module {
-    viewModel { (id: Long?, title: String?, artist: String?, lyrics: String?) ->
+    viewModel { (id: String?, title: String?, artist: String?, lyrics: String?) ->
         ImportSongViewModel(
             id = id,
             title = title,

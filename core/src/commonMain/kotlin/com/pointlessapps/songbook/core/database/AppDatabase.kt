@@ -11,6 +11,8 @@ import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
+import com.pointlessapps.songbook.core.sync.database.dao.SyncActionDao
+import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
 
 @Database(
     entities = [
@@ -18,6 +20,7 @@ import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
         SongSearchEntity::class,
         SetlistEntity::class,
         SetlistSongEntity::class,
+        SyncActionEntity::class,
     ],
     version = 1,
 )
@@ -26,6 +29,7 @@ import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
 internal abstract class AppDatabase : RoomDatabase() {
     abstract fun songDao(): SongDao
     abstract fun setlistDao(): SetlistDao
+    abstract fun syncActionDao(): SyncActionDao
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")

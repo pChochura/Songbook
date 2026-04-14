@@ -27,7 +27,7 @@ import org.jetbrains.compose.resources.getString
 internal sealed interface LyricsEvent {
     data object NavigateBack : LyricsEvent
     data class NavigateToImportSong(
-        val songId: Long,
+        val songId: String,
         val title: String,
         val artist: String,
         val lyrics: String,
@@ -50,7 +50,7 @@ internal enum class WrapMode { Wrap, NoWrap }
 
 internal sealed interface LyricsState {
     data class Loaded(
-        val songId: Long,
+        val songId: String,
         val title: String = "",
         val artist: String = "",
         val sections: List<Section> = emptyList(),
@@ -69,7 +69,7 @@ internal sealed interface LyricsState {
 }
 
 internal class LyricsViewModel(
-    songId: Long,
+    songId: String,
     syncRepository: SyncRepository,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,

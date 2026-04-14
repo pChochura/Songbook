@@ -22,8 +22,8 @@ import kotlinx.coroutines.launch
 
 internal sealed interface LibraryEvent {
     data object NavigateToImportSong : LibraryEvent
-    data class NavigateToLyrics(val id: Long) : LibraryEvent
-    data class NavigateToSetlist(val id: Long) : LibraryEvent
+    data class NavigateToLyrics(val id: String) : LibraryEvent
+    data class NavigateToSetlist(val id: String) : LibraryEvent
 }
 
 @Keep
@@ -68,11 +68,11 @@ internal class LibraryViewModel(
         eventChannel.trySend(LibraryEvent.NavigateToImportSong)
     }
 
-    fun onLyricsClicked(id: Long) {
+    fun onLyricsClicked(id: String) {
         eventChannel.trySend(LibraryEvent.NavigateToLyrics(id))
     }
 
-    fun onSetlistClicked(id: Long) {
+    fun onSetlistClicked(id: String) {
         eventChannel.trySend(LibraryEvent.NavigateToSetlist(id))
     }
 
@@ -87,6 +87,10 @@ internal class LibraryViewModel(
         viewModelScope.launch {
             prefsRepository.setLibraryDisplayMode(mode.name)
         }
+    }
+
+    fun onSyncClicked() {
+        viewModelScope.launch { syncRepository.sync() }
     }
 
     private companion object {

@@ -50,6 +50,7 @@ val coreModule = module {
 
     single { get<AppDatabase>().songDao() }
     single { get<AppDatabase>().setlistDao() }
+    single { get<AppDatabase>().syncActionDao() }
 
     includes(syncModule)
     includes(authModule)

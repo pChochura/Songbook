@@ -64,8 +64,8 @@ internal fun AddSongToSetlistBottomSheet(
     show: Boolean,
     textFieldState: TextFieldState,
     searchResults: LazyPagingItems<SongSearchResult>,
-    setlistsSongIds: Set<Long>,
-    onItemClicked: (Long) -> Unit,
+    setlistsSongIds: Set<String>,
+    onItemClicked: (String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }

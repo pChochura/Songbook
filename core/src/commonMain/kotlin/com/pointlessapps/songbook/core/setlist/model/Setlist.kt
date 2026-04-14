@@ -6,13 +6,7 @@ import kotlinx.serialization.Serializable
 @Keep
 @Serializable
 data class Setlist(
-    val id: Long,
+    val id: String,
     val name: String,
     val songCount: Int = 0,
-)
-
-@Keep
-@Serializable
-data class NewSetlist(
-    val name: String,
 )

@@ -12,7 +12,7 @@ import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 internal val setlistModule = module {
-    viewModel { (id: Long) ->
+    viewModel { (id: String) ->
         SetlistViewModel(
             id = id,
             syncRepository = get(),

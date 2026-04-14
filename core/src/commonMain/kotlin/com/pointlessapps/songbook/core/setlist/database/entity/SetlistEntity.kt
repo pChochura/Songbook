@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Entity(tableName = "setlists")
 @Serializable
 internal data class SetlistEntity(
-    @PrimaryKey val id: Long,
+    @PrimaryKey val id: String,
     val name: String,
 )
 
@@ -40,10 +40,10 @@ internal data class SetlistEntity(
 internal data class SetlistSongEntity(
     @ColumnInfo("setlist_id")
     @SerialName("setlist_id")
-    val setlistId: Long,
+    val setlistId: String,
     @ColumnInfo("song_id")
     @SerialName("song_id")
-    val songId: Long,
+    val songId: String,
     @ColumnInfo(defaultValue = "0")
     val order: Int,
 )

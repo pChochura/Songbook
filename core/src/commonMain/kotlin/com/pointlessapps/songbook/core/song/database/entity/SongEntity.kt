@@ -6,7 +6,7 @@ import com.pointlessapps.songbook.core.song.model.Section
 
 @Entity(tableName = "songs")
 internal data class SongEntity(
-    @PrimaryKey val id: Long,
+    @PrimaryKey val id: String,
     val title: String,
     val artist: String,
     val sections: List<Section>,

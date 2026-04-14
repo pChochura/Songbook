@@ -8,11 +8,12 @@ import com.pointlessapps.songbook.core.database.dao.SongDao
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.database.mapper.toDomain
+import com.pointlessapps.songbook.core.song.database.mapper.toEntity
 import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Song
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.postgrest.from
+import com.pointlessapps.songbook.core.sync.database.dao.SyncActionDao
+import com.pointlessapps.songbook.core.sync.database.entity.SyncAction
+import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -20,23 +21,23 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 interface SongRepository {
     fun getAllSongs(): Flow<PagingData<Song>>
-    fun getSongByIdFlow(id: Long): Flow<Song?>
+    fun getSongByIdFlow(id: String): Flow<Song?>
     fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>
 
-    suspend fun saveSong(newSong: NewSong): Long
-    suspend fun deleteSong(id: Long)
+    suspend fun saveSong(newSong: NewSong): String
+    suspend fun deleteSong(id: String)
 }
 
-@OptIn(SupabaseExperimental::class)
+@OptIn(ExperimentalUuidApi::class)
 internal class SongRepositoryImpl(
-    supabase: SupabaseClient,
     private val songDao: SongDao,
+    private val syncActionDao: SyncActionDao,
 ) : SongRepository {
-
-    private val table = supabase.from("songs")
 
     override fun getAllSongs() = Pager(
         config = PagingConfig(pageSize = 20),
@@ -45,7 +46,7 @@ internal class SongRepositoryImpl(
         pagingData.map(SongEntity::toDomain)
     }.flowOn(Dispatchers.IO)
 
-    override fun getSongByIdFlow(id: Long) = songDao.getSongByIdFlow(id)
+    override fun getSongByIdFlow(id: String) = songDao.getSongByIdFlow(id)
         .map { it?.toDomain() }
         .flowOn(Dispatchers.IO)
 
@@ -59,14 +60,33 @@ internal class SongRepositoryImpl(
     }
 
     override suspend fun saveSong(newSong: NewSong) = withContext(Dispatchers.IO) {
-        table.upsert(newSong) { select() }.decodeSingle<Song>().id
+        val song = Song(
+            id = newSong.id ?: Uuid.random().toString(),
+            title = newSong.title,
+            artist = newSong.artist,
+            sections = newSong.sections,
+        )
+
+        songDao.insertSongsWithSearch(listOf(song.toEntity()))
+
+        syncActionDao.insertAction(
+            SyncActionEntity(
+                syncAction = SyncAction.SaveSong(song),
+            ),
+        )
+
+        return@withContext song.id
     }
 
-    override suspend fun deleteSong(id: Long) {
-        // TODO mark as deleted instead of removing
+    override suspend fun deleteSong(id: String) {
         withContext(Dispatchers.IO) {
-            table.delete { filter { Song::id eq id } }
             songDao.deleteSongWithSearch(id)
+
+            syncActionDao.insertAction(
+                SyncActionEntity(
+                    syncAction = SyncAction.DeleteSong(id),
+                ),
+            )
         }
     }
 }

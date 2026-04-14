@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Keep
 @Serializable
 data class Song(
-    val id: Long,
+    val id: String,
     val title: String,
     val artist: String,
     val sections: List<Section>,
@@ -15,7 +15,7 @@ data class Song(
 @Keep
 @Serializable
 data class NewSong(
-    val id: Long? = null,
+    val id: String? = null,
     val title: String,
     val artist: String,
     val sections: List<Section>,
@@ -28,6 +28,8 @@ data class Section(
     val lyrics: String,
     val chords: List<Chord>,
 ) {
+    @Keep
+    @Serializable
     data class Line(
         val line: String,
         val chords: List<Chord>,
