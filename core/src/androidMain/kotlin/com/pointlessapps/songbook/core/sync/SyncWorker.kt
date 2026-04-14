@@ -13,16 +13,8 @@ class SyncWorker(
 
     private val syncRepository: SyncRepository by inject()
 
-    override suspend fun doWork(): Result {
-        return try {
-            syncRepository.sync()
-            Result.success()
-        } catch (e: Exception) {
-            if (runAttemptCount < 3) {
-                Result.retry()
-            } else {
-                Result.failure()
-            }
-        }
-    }
+    override suspend fun doWork() = syncRepository.sync().fold(
+        onSuccess = { Result.success() },
+        onFailure = { Result.retry() },
+    )
 }

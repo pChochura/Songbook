@@ -33,12 +33,10 @@ class IosSyncManager : KoinComponent {
         }
 
         scope.launch {
-            try {
-                syncRepository.sync()
-                task.setTaskCompletedWithSuccess(true)
-            } catch (e: Exception) {
-                task.setTaskCompletedWithSuccess(false)
-            }
+            syncRepository.sync().fold(
+                onSuccess = { task.setTaskCompletedWithSuccess(true) },
+                onFailure = { task.setTaskCompletedWithSuccess(false) },
+            )
         }
     }
 

@@ -3,6 +3,9 @@
     <string name="common_unknown">Unknown</string>
     <string name="common_unnamed">Unnamed</string>
     <string name="common_syncing">Syncing</string>
+    <string name="common_sync_failed">Sync failed</string>
+    <string name="common_synced">Synced</string>
+    <string name="common_offline">Offline</string>
     <string name="common_play">Play</string>
     <string name="common_back">Back</string>
     <string name="common_menu">Menu</string>

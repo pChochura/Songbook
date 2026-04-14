@@ -20,6 +20,7 @@ kotlin {
     android {
         namespace = "com.pointlessapps.songbook.core"
         compileSdk = libs.versions.sdk.compile.get().toInt()
+        minSdk = libs.versions.sdk.min.get().toInt()
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)

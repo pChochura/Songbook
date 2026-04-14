@@ -12,6 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_offline
+import com.pointlessapps.songbook.shared.common_sync_failed
+import com.pointlessapps.songbook.shared.common_synced
 import com.pointlessapps.songbook.shared.common_syncing
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.theme.IconSync
@@ -41,14 +44,17 @@ internal fun syncingTopBarButton(syncStatus: SyncStatus): TopBarButton? {
 
     return TopBarButton(
         enabled = false,
-        icon = if (syncStatus == SyncStatus.SYNC_FAILED) IconSyncFailed else IconSync,
-        tooltip = Res.string.common_syncing,
+        icon = if (syncStatus.failed) IconSyncFailed else IconSync,
+        tooltip = when (syncStatus) {
+            SyncStatus.OFFLINE, SyncStatus.LOCAL -> Res.string.common_offline
+            SyncStatus.SYNCING -> Res.string.common_syncing
+            SyncStatus.SYNC_FAILED -> Res.string.common_sync_failed
+            SyncStatus.SYNCED -> Res.string.common_synced
+        },
         onClick = {},
         modifier = Modifier.graphicsLayer {
             this.alpha = alpha.value
-            if (syncStatus != SyncStatus.SYNC_FAILED) {
-                this.rotationZ = rotation.value
-            }
+            if (!syncStatus.failed) this.rotationZ = rotation.value
         },
     )
 }

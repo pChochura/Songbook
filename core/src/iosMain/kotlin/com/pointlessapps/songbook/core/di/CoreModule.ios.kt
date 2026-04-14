@@ -8,8 +8,12 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.pointlessapps.songbook.core.app.di.appModule
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.database.AppDatabaseConstructor
+import com.pointlessapps.songbook.core.network.NetworkRepository
+import com.pointlessapps.songbook.core.network.NetworkRepositoryImpl
 import com.pointlessapps.songbook.core.utils.documentDirectory
 import okio.Path.Companion.toPath
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import platform.Foundation.NSHomeDirectory
 
@@ -29,6 +33,8 @@ internal actual val platformModule = module {
             produceFile = { (documentDirectory() + "/songbook.preferences_pb").toPath() },
         )
     }
+
+    singleOf(::NetworkRepositoryImpl).bind<NetworkRepository>()
 
     includes(appModule)
 }
