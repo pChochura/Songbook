@@ -1,29 +1,38 @@
 package com.pointlessapps.songbook.preview.ui.components.dialogs
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.song.model.ChordPosition
 import com.pointlessapps.songbook.shared.Res
@@ -38,6 +47,7 @@ import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconArrowLeft
@@ -45,6 +55,7 @@ import com.pointlessapps.songbook.ui.theme.IconArrowRight
 import com.pointlessapps.songbook.ui.theme.IconNote
 import com.pointlessapps.songbook.ui.theme.MEDIUM_CORNER_RADIUS
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -58,7 +69,10 @@ internal fun ChordDetailsDialog(
 
     val transposedChord = remember(chord, keyOffset) { ChordLibrary.transpose(chord, keyOffset) }
     val positions = remember(transposedChord) { chordLibrary.getChordPositions(transposedChord) }
-    var currentPositionIndex by rememberSaveable { mutableIntStateOf(0) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState { positions.size }
+    val fadingEdgeAlpha by animateFloatAsState(if (pagerState.isScrollInProgress) 1f else 0f)
 
     SongbookDialog(
         onDismissRequest = onDismissRequest,
@@ -69,20 +83,37 @@ internal fun ChordDetailsDialog(
         ),
     ) {
         if (positions.isNotEmpty()) {
-            ChordDiagram(
-                position = positions[currentPositionIndex],
-                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-            )
+            Box {
+                HorizontalPager(state = pagerState) {
+                    ChordDiagram(
+                        position = positions[it],
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                    )
+                }
+
+                FadingEdges(
+                    modifier = Modifier
+                        .graphicsLayer { alpha = fadingEdgeAlpha }
+                        .matchParentSize(),
+                )
+            }
 
             Counter(
-                value = currentPositionIndex + 1,
+                value = pagerState.currentPage + 1,
                 maxValue = positions.size,
                 onPreviousClicked = {
-                    currentPositionIndex =
-                        (currentPositionIndex - 1 + positions.size) % positions.size
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(
+                            (pagerState.currentPage - 1 + positions.size) % positions.size,
+                        )
+                    }
                 },
                 onNextClicked = {
-                    currentPositionIndex = (currentPositionIndex + 1) % positions.size
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(
+                            (pagerState.currentPage + 1) % positions.size,
+                        )
+                    }
                 },
             )
         } else {
@@ -118,6 +149,34 @@ internal fun ChordDetailsDialog(
 }
 
 @Composable
+private fun FadingEdges(
+    modifier: Modifier,
+) {
+    Box(
+        modifier = modifier
+            .wrapContentWidth(Alignment.Start)
+            .width(30.dp)
+            .background(
+                brush = Brush.horizontalGradient(
+                    0f to MaterialTheme.colorScheme.surfaceContainerHigh,
+                    1f to Color.Transparent,
+                ),
+            ),
+    )
+    Box(
+        modifier = modifier
+            .wrapContentWidth(Alignment.End)
+            .width(30.dp)
+            .background(
+                brush = Brush.horizontalGradient(
+                    0f to Color.Transparent,
+                    1f to MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
+            ),
+    )
+}
+
+@Composable
 private fun Counter(
     value: Int,
     maxValue: Int,
@@ -129,9 +188,15 @@ private fun Counter(
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
     ) {
         SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
             icon = IconArrowLeft,
             tooltipLabel = Res.string.common_previous,
             onClick = onPreviousClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                outlineColor = MaterialTheme.colorScheme.outline,
+            ),
         )
 
         SongbookText(
@@ -142,9 +207,15 @@ private fun Counter(
         )
 
         SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
             icon = IconArrowRight,
             tooltipLabel = Res.string.common_next,
             onClick = onNextClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                outlineColor = MaterialTheme.colorScheme.outline,
+            ),
         )
     }
 }

@@ -34,11 +34,12 @@ internal fun KeyOffsetFab(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = MaterialTheme.spacing.extraLarge)
             .padding(bottom = MaterialTheme.spacing.extraLarge)
             .navigationBarsPadding(),
         horizontalArrangement = Arrangement.spacedBy(
             space = MaterialTheme.spacing.large,
-            alignment = Alignment.CenterHorizontally,
+            alignment = Alignment.End,
         ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
