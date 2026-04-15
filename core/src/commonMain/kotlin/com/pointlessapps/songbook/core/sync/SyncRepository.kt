@@ -118,7 +118,14 @@ internal class SyncRepositoryImpl(
 
             actions.forEach { action ->
                 when (val payload = action.syncAction) {
-                    is SyncAction.SaveSong -> songsTable.upsert(payload.song)
+                    is SyncAction.SaveSong -> {
+                        songsTable.upsert(payload.song)
+                        setlistSongsTable.upsert(
+                            payload.setlistsIds.mapIndexed { index, setlistId ->
+                                SetlistSongEntity(setlistId, payload.song.id, index)
+                            },
+                        )
+                    }
 
                     is SyncAction.DeleteSong ->
                         songsTable.delete { filter { Song::id eq payload.id } }

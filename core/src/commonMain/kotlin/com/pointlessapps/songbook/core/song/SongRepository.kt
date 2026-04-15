@@ -35,7 +35,7 @@ interface SongRepository {
     fun getSongSetlistsById(id: String): Flow<List<Setlist>>
 
     suspend fun updateSongSetlists(id: String, setlistsIds: List<String>)
-    suspend fun saveSong(newSong: NewSong): String
+    suspend fun saveSong(newSong: NewSong, setlistsIds: List<String>): String
     suspend fun deleteSong(id: String)
 }
 
@@ -86,24 +86,31 @@ internal class SongRepositoryImpl(
         }
     }
 
-    override suspend fun saveSong(newSong: NewSong) = withContext(Dispatchers.IO) {
-        val song = Song(
-            id = newSong.id ?: Uuid.random().toString(),
-            title = newSong.title,
-            artist = newSong.artist,
-            sections = newSong.sections,
-        )
+    override suspend fun saveSong(newSong: NewSong, setlistsIds: List<String>) =
+        withContext(Dispatchers.IO) {
+            val song = Song(
+                id = newSong.id ?: Uuid.random().toString(),
+                title = newSong.title,
+                artist = newSong.artist,
+                sections = newSong.sections,
+            )
 
-        songDao.insertSongsWithSearch(listOf(song.toEntity()))
+            songDao.insertSongsWithSearch(listOf(song.toEntity()))
+            songDao.updateSongSetlists(
+                songId = song.id,
+                setlistSongs = setlistsIds.mapIndexed { index, setlistId ->
+                    SetlistSongEntity(setlistId, song.id, index)
+                },
+            )
 
-        syncActionDao.insertAction(
-            SyncActionEntity(
-                syncAction = SyncAction.SaveSong(song),
-            ),
-        )
+            syncActionDao.insertAction(
+                SyncActionEntity(
+                    syncAction = SyncAction.SaveSong(song, setlistsIds),
+                ),
+            )
 
-        return@withContext song.id
-    }
+            return@withContext song.id
+        }
 
     override suspend fun deleteSong(id: String) {
         withContext(Dispatchers.IO) {

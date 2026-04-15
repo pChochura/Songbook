@@ -125,12 +125,15 @@ private fun SetlistScreenContent(
     var draggedItemIndex by remember { mutableIntStateOf(-1) }
     val reorderInteractionSource = remember { MutableInteractionSource() }
 
+    var wasReordered by rememberSaveable { mutableStateOf(false) }
     val isReordered by reorderInteractionSource.collectIsDraggedAsState()
     LaunchedEffect(isReordered) {
-        if (!isReordered) {
+        if (wasReordered && !isReordered) {
             reorderingOffsetAnimatable.animateTo(0f)
             draggedItemIndex = -1
             onReorderDone()
+        } else if (isReordered) {
+            wasReordered = true
         }
     }
 

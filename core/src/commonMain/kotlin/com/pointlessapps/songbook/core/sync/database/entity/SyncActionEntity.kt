@@ -24,6 +24,7 @@ internal sealed interface SyncAction {
     @Serializable
     data class SaveSong(
         val song: Song,
+        val setlistsIds: List<String>,
     ) : SyncAction
 
     @Keep
@@ -87,6 +88,7 @@ internal sealed interface SyncAction {
                 subclass(DeleteSetlist::class, DeleteSetlist.serializer())
                 subclass(UpdateSetlistName::class, UpdateSetlistName.serializer())
                 subclass(UpdateSetlistSongs::class, UpdateSetlistSongs.serializer())
+                subclass(UpdateSongSetlists::class, UpdateSongSetlists.serializer())
                 subclass(AddSongToSetlist::class, AddSongToSetlist.serializer())
                 subclass(RemoveSongFromSetlist::class, RemoveSongFromSetlist.serializer())
             }

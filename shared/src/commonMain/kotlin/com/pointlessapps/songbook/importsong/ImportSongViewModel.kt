@@ -143,12 +143,13 @@ internal class ImportSongViewModel(
         viewModelScope.launch {
             _transientState.update { it.copy(isLoading = true) }
             val id = songRepository.saveSong(
-                NewSong(
+                newSong = NewSong(
                     id = state.value.songId,
                     title = titleTextFieldState.text.toString(),
                     artist = artistTextFieldState.text.toString(),
                     sections = computeSections(),
                 ),
+                setlistsIds = state.value.selectedSetlists.map { it.id },
             )
             _transientState.update { it.copy(isLoading = false) }
             eventChannel.send(ImportSongEvent.NavigateBack)
