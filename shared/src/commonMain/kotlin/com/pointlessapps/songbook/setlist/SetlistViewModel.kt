@@ -139,7 +139,7 @@ internal class SetlistViewModel(
     fun onReorderDone() {
         viewModelScope.launch {
             val state = state.value.loaded
-            setlistRepository.updateSetlistSongsOrder(
+            setlistRepository.updateSetlistSongs(
                 id = state.setlist.id,
                 songsIds = state.songs.map(Song::id),
             )

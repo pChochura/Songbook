@@ -10,6 +10,11 @@ internal fun SetlistWithCount.toDomain() = Setlist(
     songCount = songCount,
 )
 
+internal fun SetlistEntity.toDomain() = Setlist(
+    id = id,
+    name = name,
+)
+
 internal fun Setlist.toEntity() = SetlistEntity(
     id = id,
     name = name,

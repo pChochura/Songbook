@@ -23,15 +23,15 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 interface SetlistRepository {
-    fun getAllSetlistsFlow(limit: Long = -1L): Flow<List<Setlist>>
+    fun getAllSetlistsFlow(limit: Long = Long.MAX_VALUE): Flow<List<Setlist>>
     fun getSetlistByIdFlow(id: String): Flow<Setlist?>
     fun getSetlistsSongsById(id: String): Flow<List<Song>>
 
     suspend fun addSetlist(name: String): String
     suspend fun deleteSetlist(id: String)
     suspend fun updateSetlistName(id: String, name: String)
-    suspend fun updateSetlistSongsOrder(id: String, songsIds: List<String>)
-    suspend fun addSongToSetlist(setlistId: String, songId: String, order: Int)
+    suspend fun updateSetlistSongs(id: String, songsIds: List<String>)
+    suspend fun addSongToSetlist(id: String, songId: String, order: Int)
     suspend fun removeSongFromSetlist(setlistId: String, songId: String)
 }
 
@@ -41,10 +41,9 @@ internal class SetlistRepositoryImpl(
     private val syncActionDao: SyncActionDao,
 ) : SetlistRepository {
 
-    override fun getAllSetlistsFlow(limit: Long): Flow<List<Setlist>> =
-        setlistDao.getAllSetlistsFlow(limit)
-            .map { it.map(SetlistWithCount::toDomain) }
-            .flowOn(Dispatchers.IO)
+    override fun getAllSetlistsFlow(limit: Long) = setlistDao.getAllSetlistsFlow(limit)
+        .map { it.map(SetlistWithCount::toDomain) }
+        .flowOn(Dispatchers.IO)
 
     override fun getSetlistByIdFlow(id: String) = setlistDao.getSetlistByIdFlow(id)
         .map { it?.toDomain() }
@@ -93,25 +92,26 @@ internal class SetlistRepositoryImpl(
         }
     }
 
-    override suspend fun updateSetlistSongsOrder(id: String, songsIds: List<String>) {
+    override suspend fun updateSetlistSongs(id: String, songsIds: List<String>) {
         withContext(Dispatchers.IO) {
-            setlistDao.insertSetlistSongs(
-                songsIds.mapIndexed { index, songId ->
+            setlistDao.updateSetlistSongs(
+                setlistId = id,
+                setlistSongs = songsIds.mapIndexed { index, songId ->
                     SetlistSongEntity(id, songId, index)
                 },
             )
 
             syncActionDao.insertAction(
                 SyncActionEntity(
-                    syncAction = SyncAction.UpdateSetlistSongsOrder(id, songsIds),
+                    syncAction = SyncAction.UpdateSetlistSongs(id, songsIds),
                 ),
             )
         }
     }
 
-    override suspend fun addSongToSetlist(setlistId: String, songId: String, order: Int) {
+    override suspend fun addSongToSetlist(id: String, songId: String, order: Int) {
         withContext(Dispatchers.IO) {
-            val entity = SetlistSongEntity(setlistId, songId, order)
+            val entity = SetlistSongEntity(id, songId, order)
             setlistDao.insertSetlistSongs(listOf(entity))
 
             syncActionDao.insertAction(

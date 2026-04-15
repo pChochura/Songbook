@@ -20,7 +20,7 @@ internal interface SetlistDao {
         LIMIT :limit
     """,
     )
-    fun getAllSetlistsFlow(limit: Long = -1L): Flow<List<SetlistWithCount>>
+    fun getAllSetlistsFlow(limit: Long): Flow<List<SetlistWithCount>>
 
     @Transaction
     @Query(
@@ -53,8 +53,17 @@ internal interface SetlistDao {
     @Upsert
     suspend fun insertSetlistSongs(setlistSongs: List<SetlistSongEntity>)
 
+    @Transaction
+    suspend fun updateSetlistSongs(setlistId: String, setlistSongs: List<SetlistSongEntity>) {
+        deleteSetlistSongs(setlistId)
+        insertSetlistSongs(setlistSongs)
+    }
+
     @Query("DELETE FROM setlist_songs WHERE setlist_id = :setlistId AND song_id = :songId")
     suspend fun deleteSetlistSong(setlistId: String, songId: String)
+
+    @Query("DELETE FROM setlist_songs WHERE setlist_id = :setlistId")
+    suspend fun deleteSetlistSongs(setlistId: String)
 
     @Query("DELETE FROM setlists WHERE id = :id")
     suspend fun deleteSetlist(id: String)

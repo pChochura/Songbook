@@ -53,9 +53,16 @@ internal sealed interface SyncAction {
 
     @Keep
     @Serializable
-    data class UpdateSetlistSongsOrder(
+    data class UpdateSetlistSongs(
         val id: String,
         val songsIds: List<String>,
+    ) : SyncAction
+
+    @Keep
+    @Serializable
+    data class UpdateSongSetlists(
+        val id: String,
+        val setlistsIds: List<String>,
     ) : SyncAction
 
     @Keep
@@ -79,7 +86,7 @@ internal sealed interface SyncAction {
                 subclass(AddSetlist::class, AddSetlist.serializer())
                 subclass(DeleteSetlist::class, DeleteSetlist.serializer())
                 subclass(UpdateSetlistName::class, UpdateSetlistName.serializer())
-                subclass(UpdateSetlistSongsOrder::class, UpdateSetlistSongsOrder.serializer())
+                subclass(UpdateSetlistSongs::class, UpdateSetlistSongs.serializer())
                 subclass(AddSongToSetlist::class, AddSongToSetlist.serializer())
                 subclass(RemoveSongFromSetlist::class, RemoveSongFromSetlist.serializer())
             }

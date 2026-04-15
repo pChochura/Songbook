@@ -134,7 +134,16 @@ internal class SyncRepositoryImpl(
                             request = { filter { Setlist::id eq payload.id } },
                         )
 
-                    is SyncAction.UpdateSetlistSongsOrder -> {
+                    is SyncAction.UpdateSongSetlists -> {
+                        setlistSongsTable.delete { filter { SetlistSongEntity::songId eq payload.id } }
+                        setlistSongsTable.upsert(
+                            payload.setlistsIds.mapIndexed { index, setlistId ->
+                                SetlistSongEntity(setlistId, payload.id, index)
+                            },
+                        )
+                    }
+
+                    is SyncAction.UpdateSetlistSongs -> {
                         setlistSongsTable.delete { filter { SetlistSongEntity::setlistId eq payload.id } }
                         setlistSongsTable.upsert(
                             payload.songsIds.mapIndexed { index, songId ->

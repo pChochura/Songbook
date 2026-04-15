@@ -3,6 +3,8 @@ package com.pointlessapps.songbook.lyrics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
+import com.pointlessapps.songbook.core.setlist.SetlistRepository
+import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
@@ -60,8 +62,13 @@ internal sealed interface LyricsState {
         val displayMode: DisplayMode = DisplayMode.Inline,
         val wrapMode: WrapMode = WrapMode.NoWrap,
         val showKeyOffsetFab: Boolean = true,
+        val allSetlists: List<Setlist> = emptyList(),
+        val selectedSetlists: List<Setlist> = emptyList(),
         val syncStatus: SyncStatus = SyncStatus.LOCAL,
-    ) : LyricsState
+    ) : LyricsState {
+        val setlistsSelection =
+            allSetlists.associateWith { it.id in selectedSetlists.map(Setlist::id) }
+    }
 
     data object Loading : LyricsState
 
@@ -73,6 +80,7 @@ internal class LyricsViewModel(
     syncRepository: SyncRepository,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
+    private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : ViewModel() {
 
@@ -85,13 +93,15 @@ internal class LyricsViewModel(
 
     val state: StateFlow<LyricsState> = combine(
         syncRepository.currentSyncStatus,
+        setlistRepository.getAllSetlistsFlow(),
+        songRepository.getSongSetlistsById(songId),
         prefsRepository.getLyricsTextScaleFlow(),
         prefsRepository.getLyricsDisplayModeFlow(),
         prefsRepository.getLyricsWrapModeFlow(),
         prefsRepository.getShowKeyOffsetFabFlow(),
         songRepository.getSongByIdFlow(songId),
         _transientState,
-    ) { syncStatus, textScale, displayMode, wrapMode, showKeyOffsetFab, song, transient ->
+    ) { syncStatus, allSetlists, selectedSetlists, textScale, displayMode, wrapMode, showKeyOffsetFab, song, transient ->
         if (transient.isLoading) {
             return@combine LyricsState.Loading
         }
@@ -116,6 +126,8 @@ internal class LyricsViewModel(
             wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
             keyOffset = transient.keyOffset,
             showKeyOffsetFab = showKeyOffsetFab,
+            allSetlists = allSetlists,
+            selectedSetlists = selectedSetlists,
             syncStatus = syncStatus,
         )
     }.stateIn(
@@ -165,6 +177,15 @@ internal class LyricsViewModel(
     fun onWrapModeChanged(mode: WrapMode) {
         viewModelScope.launch {
             prefsRepository.setLyricsWrapMode(mode.name)
+        }
+    }
+
+    fun onSetlistsSelected(setlists: List<Setlist>) {
+        viewModelScope.launch {
+            songRepository.updateSongSetlists(
+                id = state.value.loaded.songId,
+                setlistsIds = setlists.map { it.id },
+            )
         }
     }
 

@@ -5,12 +5,13 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 
 @Dao
 internal interface SongDao {
@@ -64,4 +65,28 @@ internal interface SongDao {
     """,
     )
     fun searchSongs(query: String): PagingSource<Int, SongSearchResult>
+
+    @Transaction
+    @Query(
+        """
+        SELECT s.*
+        FROM setlists s
+        INNER JOIN setlist_songs sj ON s.id = sj.setlist_id
+        WHERE sj.song_id = :id
+        ORDER BY sj.`order` ASC
+    """,
+    )
+    fun getSongSetlistsById(id: String): Flow<List<SetlistEntity>>
+
+    @Query("DELETE FROM setlist_songs WHERE song_id = :songId")
+    suspend fun deleteSongSetlist(songId: String)
+
+    @Upsert
+    suspend fun insertSetlistSongs(setlistSongs: List<SetlistSongEntity>)
+
+    @Transaction
+    suspend fun updateSongSetlists(songId: String, setlistSongs: List<SetlistSongEntity>) {
+        deleteSongSetlist(songId)
+        insertSetlistSongs(setlistSongs)
+    }
 }

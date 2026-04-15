@@ -20,7 +20,7 @@ import com.pointlessapps.songbook.shared.lyrics_display_mode_both
 import com.pointlessapps.songbook.shared.lyrics_display_mode_inline
 import com.pointlessapps.songbook.shared.lyrics_display_mode_side_by_side
 import com.pointlessapps.songbook.shared.lyrics_display_mode_text_only
-import com.pointlessapps.songbook.shared.lyrics_menu_add_to_setlist
+import com.pointlessapps.songbook.shared.lyrics_menu_add_to_setlists
 import com.pointlessapps.songbook.shared.lyrics_menu_broadcast_to_team
 import com.pointlessapps.songbook.shared.lyrics_menu_broadcast_to_team_description
 import com.pointlessapps.songbook.shared.lyrics_menu_delete
@@ -123,8 +123,10 @@ internal fun LyricsOptionsBottomSheet(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
                 icon = IconAddFolder,
-                label = Res.string.lyrics_menu_add_to_setlist,
-                onClick = { onAction(LyricsOptionsBottomSheetAction.AddToSetlist) },
+                label = Res.string.lyrics_menu_add_to_setlists,
+                description = state.selectedSetlists.joinToString { it.name }
+                    .takeIf { state.selectedSetlists.isNotEmpty() },
+                onClick = { onAction(LyricsOptionsBottomSheetAction.AddToSetlists) },
             ),
             OptionsBottomSheetItem.new(
                 icon = IconQueue,
@@ -183,5 +185,5 @@ private fun LyricsOptionsBottomSheetHeader(title: String, artist: String) {
 }
 
 internal enum class LyricsOptionsBottomSheetAction {
-    Edit, Fullscreen, WrapMode, DisplayMode, TextScale, KeyOffset, AddToSetlist, ShowQueue, Broadcast, Delete
+    Edit, Fullscreen, WrapMode, DisplayMode, TextScale, KeyOffset, AddToSetlists, ShowQueue, Broadcast, Delete
 }

@@ -26,6 +26,7 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
+import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.lyrics.DisplayMode
 import com.pointlessapps.songbook.lyrics.LyricsEvent
 import com.pointlessapps.songbook.lyrics.LyricsState
@@ -35,7 +36,7 @@ import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MIN_ZOOM
 import com.pointlessapps.songbook.lyrics.WrapMode
 import com.pointlessapps.songbook.lyrics.ui.components.KeyOffsetFab
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheet
-import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.AddToSetlist
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.AddToSetlists
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Broadcast
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.Delete
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.DisplayMode
@@ -63,6 +64,7 @@ import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.ui.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -99,6 +101,7 @@ internal fun LyricsScreen(
             onShowKeyOffsetFabChanged = viewModel::onShowKeyOffsetFabChanged,
             onDisplayModeChanged = viewModel::onDisplayModeChanged,
             onWrapModeChanged = viewModel::onWrapModeChanged,
+            onSetlistsSelected = viewModel::onSetlistsSelected,
             onBroadcastToTeamConfirmClicked = viewModel::onBroadcastToTeamConfirmClicked,
             onDeleteSongConfirmClicked = viewModel::onDeleteSongConfirmClicked,
         )
@@ -115,6 +118,7 @@ private fun LyricsScreenContent(
     onShowKeyOffsetFabChanged: (Boolean) -> Unit,
     onDisplayModeChanged: (DisplayMode) -> Unit,
     onWrapModeChanged: (WrapMode) -> Unit,
+    onSetlistsSelected: (List<Setlist>) -> Unit,
     onBroadcastToTeamConfirmClicked: () -> Unit,
     onDeleteSongConfirmClicked: () -> Unit,
 ) {
@@ -124,8 +128,9 @@ private fun LyricsScreenContent(
     var isWrapDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isKeyOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isSetlistsDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isConfirmDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     NavigationBackHandler(
@@ -217,7 +222,7 @@ private fun LyricsScreenContent(
                 DisplayMode -> isDisplayModeDialogVisible = true
                 TextScale -> isTextScaleDialogVisible = true
                 KeyOffset -> isKeyOffsetDialogVisible = true
-                AddToSetlist -> {}
+                AddToSetlists -> isSetlistsDialogVisible = true
                 ShowQueue -> {}
                 Broadcast -> isBroadcastToTeamDialogVisible = true
                 Delete -> isConfirmDeleteDialogVisible = true
@@ -273,6 +278,17 @@ private fun LyricsScreenContent(
                 isKeyOffsetDialogVisible = false
             },
             onDismissRequest = { isKeyOffsetDialogVisible = false },
+        )
+    }
+
+    if (isSetlistsDialogVisible) {
+        SetlistsDialog(
+            setlists = state.setlistsSelection,
+            onSetlistsSelected = {
+                onSetlistsSelected(it)
+                isSetlistsDialogVisible = false
+            },
+            onDismissRequest = { isSetlistsDialogVisible = false },
         )
     }
 

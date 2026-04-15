@@ -47,7 +47,6 @@ import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBott
 import com.pointlessapps.songbook.importsong.ui.components.dialogs.ConfirmDiscardChangesDialog
 import com.pointlessapps.songbook.importsong.ui.components.dialogs.ExtractingInProgressDialog
 import com.pointlessapps.songbook.importsong.ui.components.dialogs.ScanDialog
-import com.pointlessapps.songbook.importsong.ui.components.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.importsong.ui.utils.ChordHighlightTransformation
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_cancel
@@ -77,6 +76,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconHelp
 import com.pointlessapps.songbook.ui.theme.spacing

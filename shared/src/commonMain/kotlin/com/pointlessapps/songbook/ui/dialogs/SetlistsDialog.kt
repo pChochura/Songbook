@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.importsong.ui.components.dialogs
+package com.pointlessapps.songbook.ui.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,6 +58,7 @@ internal fun SetlistsDialog(
         dialogStyle = defaultSongbookDialogStyle().copy(
             label = stringResource(Res.string.import_menu_add_to_setlists),
             icon = IconAddFolder,
+            scrollable = false,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {
@@ -75,7 +76,10 @@ internal fun SetlistsDialog(
                 .clip(MaterialTheme.shapes.medium)
                 .weight(1f, fill = false),
         ) {
-            itemsIndexed(setlists.keys.toList()) { index, setlist ->
+            itemsIndexed(
+                items = setlists.keys.toList(),
+                key = { _, setlist -> setlist.id },
+            ) { index, setlist ->
                 SetlistItem(
                     modifier = Modifier.animateItem(),
                     index = index,

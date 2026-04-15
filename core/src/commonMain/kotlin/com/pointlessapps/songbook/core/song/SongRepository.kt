@@ -5,6 +5,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.pointlessapps.songbook.core.database.dao.SongDao
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
+import com.pointlessapps.songbook.core.setlist.database.mapper.toDomain
+import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.database.mapper.toDomain
@@ -28,7 +32,9 @@ interface SongRepository {
     fun getAllSongs(): Flow<PagingData<Song>>
     fun getSongByIdFlow(id: String): Flow<Song?>
     fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>
+    fun getSongSetlistsById(id: String): Flow<List<Setlist>>
 
+    suspend fun updateSongSetlists(id: String, setlistsIds: List<String>)
     suspend fun saveSong(newSong: NewSong): String
     suspend fun deleteSong(id: String)
 }
@@ -57,6 +63,27 @@ internal class SongRepositoryImpl(
             config = PagingConfig(pageSize = 20),
             pagingSourceFactory = { songDao.searchSongs("$query*") },
         ).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun getSongSetlistsById(id: String) = songDao.getSongSetlistsById(id)
+        .map { it.map(SetlistEntity::toDomain) }
+        .flowOn(Dispatchers.IO)
+
+    override suspend fun updateSongSetlists(id: String, setlistsIds: List<String>) {
+        withContext(Dispatchers.IO) {
+            songDao.updateSongSetlists(
+                songId = id,
+                setlistSongs = setlistsIds.mapIndexed { index, setlistId ->
+                    SetlistSongEntity(setlistId, id, index)
+                },
+            )
+
+            syncActionDao.insertAction(
+                SyncActionEntity(
+                    syncAction = SyncAction.UpdateSongSetlists(id, setlistsIds),
+                ),
+            )
+        }
     }
 
     override suspend fun saveSong(newSong: NewSong) = withContext(Dispatchers.IO) {

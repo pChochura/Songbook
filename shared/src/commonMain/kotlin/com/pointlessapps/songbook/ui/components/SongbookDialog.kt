@@ -59,7 +59,13 @@ fun SongbookDialog(
                         color = dialogStyle.outlineColor,
                         shape = MaterialTheme.shapes.large,
                     )
-                    .verticalScroll(rememberScrollState())
+                    .then(
+                        if (dialogStyle.scrollable) {
+                            Modifier.verticalScroll(rememberScrollState())
+                        } else {
+                            Modifier
+                        },
+                    )
                     .padding(horizontal = MaterialTheme.spacing.huge)
                     .padding(
                         top = MaterialTheme.spacing.extraHuge,
@@ -120,6 +126,7 @@ fun defaultSongbookDialogStyle() = SongbookDialogStyle(
     accentColor = MaterialTheme.colorScheme.primary,
     textColor = MaterialTheme.colorScheme.onSurface,
     iconColor = MaterialTheme.colorScheme.onPrimary,
+    scrollable = true,
     dismissible = SongbookDialogDismissible.Both,
 )
 
@@ -131,6 +138,7 @@ data class SongbookDialogStyle(
     val accentColor: Color,
     val textColor: Color,
     val iconColor: Color,
+    val scrollable: Boolean,
     val dismissible: SongbookDialogDismissible,
 )
 
