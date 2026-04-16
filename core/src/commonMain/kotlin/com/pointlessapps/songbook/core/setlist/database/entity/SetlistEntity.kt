@@ -7,11 +7,13 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
+import com.pointlessapps.songbook.core.utils.Keep
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Entity(tableName = "setlists")
 @Serializable
+@Keep
 internal data class SetlistEntity(
     @PrimaryKey val id: String,
     val name: String,
@@ -37,6 +39,7 @@ internal data class SetlistEntity(
     ],
 )
 @Serializable
+@Keep
 internal data class SetlistSongEntity(
     @ColumnInfo("setlist_id")
     @SerialName("setlist_id")
@@ -48,6 +51,7 @@ internal data class SetlistSongEntity(
     val order: Int,
 )
 
+@Keep
 internal data class SetlistWithCount(
     @Embedded
     val setlist: SetlistEntity,
