@@ -84,10 +84,10 @@
     <string name="library_menu_display_mode_list_description">The songs will be displayed as a compact list</string>
     <string name="library_menu_display_mode_grid">Grid</string>
     <string name="library_menu_display_mode_grid_description">The songs will be displayed in a grid with a dynamic number of columns</string>
-    <string name="library_menu_login">Login with Google</string>
+    <string name="library_menu_login">Link with Google</string>
     <string name="library_menu_login_description">Allows for synchronizing the library with other devices</string>
     <string name="library_menu_logout">Logout</string>
-    <string name="library_menu_logout_description">Use the app anonymously</string>
+    <string name="library_menu_logout_description">Clear the local database and log out of the app</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Add new song</string>

@@ -41,8 +41,9 @@ import com.pointlessapps.songbook.library.ui.components.AddSetlistCard
 import com.pointlessapps.songbook.library.ui.components.AddSongCard
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheet
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.DisplayMode
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Login
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Logout
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Sync
-import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.ToggleLogin
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
@@ -77,6 +78,7 @@ internal fun LibraryScreen(
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
+            is LibraryEvent.NavigateToIntroduction -> navigator.navigateToIntroduction()
             is LibraryEvent.NavigateToImportSong -> navigator.navigateToImportSong()
             is LibraryEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.id)
             is LibraryEvent.NavigateToSetlist -> navigator.navigateToSetlist(event.id)
@@ -167,7 +169,8 @@ internal fun LibraryScreen(
             isBottomSheetVisible = false
 
             when (it) {
-                ToggleLogin -> viewModel.toggleLoginClicked()
+                Login -> viewModel.loginClicked()
+                Logout -> viewModel.logoutClicked()
                 DisplayMode -> isDisplayModeDialogVisible = true
                 Sync -> viewModel.onSyncClicked()
             }

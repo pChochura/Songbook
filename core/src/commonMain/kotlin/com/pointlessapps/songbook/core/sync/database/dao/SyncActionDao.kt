@@ -19,4 +19,7 @@ internal interface SyncActionDao {
 
     @Query("DELETE FROM sync_actions WHERE id = :id")
     suspend fun deleteAction(id: Long)
+
+    @Query("DELETE FROM sync_actions")
+    suspend fun clearActions()
 }

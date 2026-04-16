@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 internal sealed interface LibraryEvent {
+    data object NavigateToIntroduction : LibraryEvent
     data object NavigateToImportSong : LibraryEvent
     data class NavigateToLyrics(val id: String) : LibraryEvent
     data class NavigateToSetlist(val id: String) : LibraryEvent
@@ -91,13 +92,17 @@ internal class LibraryViewModel(
         }
     }
 
-    fun toggleLoginClicked() {
+    fun loginClicked() {
         viewModelScope.launch {
-            if (state.value.loginStatus == LoginStatus.LOGGED_IN) {
-                authRepository.logout()
-            } else {
-                authRepository.linkWithGoogle()
-            }
+            authRepository.linkWithGoogle()
+        }
+    }
+
+    fun logoutClicked() {
+        viewModelScope.launch {
+            authRepository.logout()
+            syncRepository.clearDatabase()
+            eventChannel.send(LibraryEvent.NavigateToIntroduction)
         }
     }
 

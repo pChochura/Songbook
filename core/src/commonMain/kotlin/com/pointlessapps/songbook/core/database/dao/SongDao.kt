@@ -105,4 +105,16 @@ internal interface SongDao {
         deleteSongSetlist(songId)
         insertSetlistSongs(setlistSongs)
     }
+
+    @Query("DELETE FROM songs")
+    suspend fun clearSongs()
+
+    @Query("DELETE FROM songs_search")
+    suspend fun clearSearchIndex()
+
+    @Transaction
+    suspend fun clear() {
+        clearSongs()
+        clearSearchIndex()
+    }
 }

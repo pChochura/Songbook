@@ -16,7 +16,9 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.realtime.selectAsFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 
@@ -33,6 +36,7 @@ interface SyncRepository {
 
     fun observeRemoteAsFlow(): Flow<Unit>
     suspend fun sync(): Result<Unit>
+    suspend fun clearDatabase()
 }
 
 internal class SyncRepositoryImpl(
@@ -79,7 +83,7 @@ internal class SyncRepositoryImpl(
         }.onCompletion {
             it?.printStackTrace()
             _syncStatus.value = if (it != null) SyncStatus.SYNC_FAILED else SyncStatus.LOCAL
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun sync(): Result<Unit> {
@@ -160,6 +164,12 @@ internal class SyncRepositoryImpl(
             it.printStackTrace()
             _syncStatus.value = SyncStatus.SYNC_FAILED
         }
+    }
+
+    override suspend fun clearDatabase() {
+        songDao.clear()
+        setlistDao.clearSetlists()
+        syncActionDao.clearActions()
     }
 
     private suspend fun saveSongs(songs: List<Song>) {

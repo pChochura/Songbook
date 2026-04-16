@@ -84,10 +84,10 @@
     <string name="library_menu_display_mode_list_description">Piosenki będą wyświetlane jako zwarta lista</string>
     <string name="library_menu_display_mode_grid">Siatka</string>
     <string name="library_menu_display_mode_grid_description">Piosenki będą wyświetlane w siatce z dynamiczną liczbą kolumn</string>
-    <string name="library_menu_login">Zaloguj się przez Google</string>
+    <string name="library_menu_login">Połącz z kontem Google</string>
     <string name="library_menu_login_description">Pozwala na synchronizację biblioteki z innymi urządzeniami</string>
     <string name="library_menu_logout">Wyloguj się</string>
-    <string name="library_menu_logout_description">Korzystaj z aplikacji anonimowo</string>
+    <string name="library_menu_logout_description">Wyczyść lokalną bazę danych i wyloguj się z aplikacji</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Dodaj nową piosenkę</string>

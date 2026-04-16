@@ -31,29 +31,23 @@ internal fun LibraryOptionsBottomSheet(
     onDismissRequest: () -> Unit,
     onAction: (LibraryOptionsBottomSheetAction) -> Unit,
 ) {
-    val isLoggedIn = state.loginStatus == LoginStatus.LOGGED_IN
-
     OptionsBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
         header = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
-        items = listOf(
+        items = listOfNotNull(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
-                icon = if (isLoggedIn) IconLogout else IconLogin,
-                label = if (isLoggedIn) {
-                    Res.string.library_menu_logout
-                } else {
-                    Res.string.library_menu_login
-                },
-                description = stringResource(
-                    if (isLoggedIn) {
-                        Res.string.library_menu_logout_description
-                    } else {
-                        Res.string.library_menu_login_description
-                    },
-                ),
-                onClick = { onAction(LibraryOptionsBottomSheetAction.ToggleLogin) },
+                icon = IconLogin,
+                label = Res.string.library_menu_login,
+                description = stringResource(Res.string.library_menu_login_description),
+                onClick = { onAction(LibraryOptionsBottomSheetAction.Login) },
+            ).takeIf { state.loginStatus == LoginStatus.ANONYMOUS },
+            OptionsBottomSheetItem.new(
+                icon = IconLogout,
+                label = Res.string.library_menu_logout,
+                description = stringResource(Res.string.library_menu_logout_description),
+                onClick = { onAction(LibraryOptionsBottomSheetAction.Logout) },
             ),
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
@@ -77,5 +71,5 @@ internal fun LibraryOptionsBottomSheet(
 }
 
 internal enum class LibraryOptionsBottomSheetAction {
-    ToggleLogin, DisplayMode, Sync
+    Login, Logout, DisplayMode, Sync
 }

@@ -85,4 +85,7 @@ internal interface SetlistDao {
 
     @Query("DELETE FROM setlists WHERE id = :id")
     suspend fun deleteSetlist(id: String)
+
+    @Query("DELETE FROM setlists")
+    suspend fun clearSetlists()
 }
