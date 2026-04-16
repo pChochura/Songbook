@@ -24,11 +24,12 @@ internal interface SongDao {
     @Upsert
     suspend fun insertSongs(songs: List<SongEntity>)
 
-    @Query("DELETE FROM songs WHERE id = :id")
-    suspend fun deleteSong(id: String)
-
     @Transaction
-    suspend fun insertSongsWithSearch(songs: List<SongEntity>) {
+    suspend fun insertSongsWithSearch(songs: List<SongEntity>, removeExisting: Boolean = false) {
+        if (removeExisting) {
+            deleteSongsWithSearchExcept(songs.map(SongEntity::id))
+        }
+
         insertSongs(songs)
         val searchEntities = songs.map { song ->
             SongSearchEntity(
@@ -44,6 +45,9 @@ internal interface SongDao {
     @Upsert
     suspend fun insertSearchIndex(entities: List<SongSearchEntity>)
 
+    @Query("DELETE FROM songs WHERE id = :id")
+    suspend fun deleteSong(id: String)
+
     @Query("DELETE FROM songs_search WHERE songId = :id")
     suspend fun deleteSearchIndex(id: String)
 
@@ -51,6 +55,18 @@ internal interface SongDao {
     suspend fun deleteSongWithSearch(id: String) {
         deleteSong(id)
         deleteSearchIndex(id)
+    }
+
+    @Query("DELETE FROM songs WHERE id NOT IN (:ids)")
+    suspend fun deleteSongsExcept(ids: List<String>)
+
+    @Query("DELETE FROM songs_search WHERE songId NOT IN (:ids)")
+    suspend fun deleteSearchIndexesExcept(ids: List<String>)
+
+    @Transaction
+    suspend fun deleteSongsWithSearchExcept(ids: List<String>) {
+        deleteSongsExcept(ids)
+        deleteSearchIndexesExcept(ids)
     }
 
     @Query(

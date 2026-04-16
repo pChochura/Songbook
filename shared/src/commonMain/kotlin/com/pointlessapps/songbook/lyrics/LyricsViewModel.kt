@@ -1,6 +1,5 @@
 package com.pointlessapps.songbook.lyrics
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
@@ -14,6 +13,7 @@ import com.pointlessapps.songbook.core.utils.Keep
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.error_song_not_found
 import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,7 +82,7 @@ internal class LyricsViewModel(
     private val songRepository: SongRepository,
     private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
-) : ViewModel() {
+) : BaseViewModel(snackbarState) {
 
     private data class LyricsTransientState(
         val keyOffset: Int = 0,
@@ -92,7 +92,7 @@ internal class LyricsViewModel(
     private val _transientState = MutableStateFlow(LyricsTransientState())
 
     val state: StateFlow<LyricsState> = combine(
-        syncRepository.currentSyncStatus,
+        syncRepository.currentSyncStatusFlow,
         setlistRepository.getAllSetlistsFlow(),
         songRepository.getSongSetlistsById(songId),
         prefsRepository.getLyricsTextScaleFlow(),

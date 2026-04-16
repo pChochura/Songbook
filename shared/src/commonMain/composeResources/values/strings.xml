@@ -44,6 +44,7 @@
     <string name="common_no_chord_visualization">There is no visualization for this chord</string>
     <string name="common_show">Show</string>
     <string name="common_undo">Undo</string>
+    <string name="common_or">Or</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
@@ -51,14 +52,21 @@
     <string name="error_image_extraction_failed">Image data extraction failed</string>
     <string name="error_setlist_not_found">The setlist was not found</string>
     <string name="error_song_not_found">The song was not found</string>
+    <string name="error_unknown_error">An unknown error occurred</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Library</string>
     <string name="navigation_search">Search</string>
 
+    <!-- Introduction Screen -->
+    <string name="introduction_title">Your Stage,\nSimplified.</string>
+    <string name="introduction_description">Access your library of lyrics and chords anywhere.</string>
+    <string name="introduction_continue_as_guest">Continue as a Guest</string>
+    <string name="introduction_sign_in_with_google">Sign in with Google</string>
+
     <!-- Library Screen -->
     <string name="library_header_title">Library</string>
-    <string name="library_songs_section_title">All Songs</string>
+    <string name="library_songs_section_title">Songs</string>
     <string name="library_setlists_section_title">Setlists</string>
     <string name="library_setlist_songs">Songs: %1$d</string>
     <string name="library_songs_found">%1$d Found</string>
@@ -68,7 +76,7 @@
     <string name="library_add_to_favourites">Add to favourites</string>
     <string name="library_add_setlist">Add a setlist</string>
     <string name="library_add_setlist_description">Create a setlist that will contain a set of songs with a specified order.</string>
-    <string name="library_add_setlist_placeholder">Setlist name</string>
+    <string name="library_add_setlist_placeholder">Setlist name...</string>
     <string name="library_menu_display_mode">Display mode</string>
     <string name="library_menu_sync">Force a sync</string>
     <string name="library_menu_sync_description">Force the schedule of the synchronization to be run immediately</string>
@@ -76,14 +84,18 @@
     <string name="library_menu_display_mode_list_description">The songs will be displayed as a compact list</string>
     <string name="library_menu_display_mode_grid">Grid</string>
     <string name="library_menu_display_mode_grid_description">The songs will be displayed in a grid with a dynamic number of columns</string>
+    <string name="library_menu_login">Login with Google</string>
+    <string name="library_menu_login_description">Allows for synchronizing the library with other devices</string>
+    <string name="library_menu_logout">Logout</string>
+    <string name="library_menu_logout_description">Use the app anonymously</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Add new song</string>
     <string name="import_header_title_edit">Edit the song</string>
     <string name="import_song_title_label">Song title</string>
-    <string name="import_song_title_placeholder">Title</string>
+    <string name="import_song_title_placeholder">Title...</string>
     <string name="import_artist_label">Artist</string>
-    <string name="import_artist_placeholder">Artist</string>
+    <string name="import_artist_placeholder">Artist...</string>
     <string name="import_lyrics_label">Song lyrics</string>
     <string name="import_lyrics_placeholder">Lyrics of the song...</string>
     <string name="import_lyrics_tip">Tip: Use [Chord] for inline chords or naming the sections.</string>
@@ -157,10 +169,10 @@
     <string name="setlist_delete_setlist">Delete the setlist?</string>
     <string name="setlist_delete_setlist_description">It will be moved to the trash, and you'll be able to restore it later. All the songs associated with this setlist will remain intact.</string>
     <string name="setlist_rename_setlist">Rename the setlist</string>
-    <string name="setlist_edit_setlist_placeholder">Setlist name</string>
+    <string name="setlist_edit_setlist_placeholder">Setlist name...</string>
     <string name="setlist_add_song">Add a song to the setlist</string>
     <string name="setlist_search_songs">Search songs</string>
-    <string name="setlist_search_songs_placeholder">Search for songs by title, artist or lyrics</string>
+    <string name="setlist_search_songs_placeholder">Search for songs by title, artist or lyrics...</string>
     <string name="setlist_delete_from_setlist">Delete from setlist</string>
     <string name="setlist_song_removed_from_setlist">The song has been removed from the setlist</string>
 </resources>

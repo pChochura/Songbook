@@ -4,7 +4,6 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -17,6 +16,8 @@ import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
+import com.pointlessapps.songbook.utils.BaseViewModel
+import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -67,7 +68,8 @@ internal class SearchViewModel(
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
     private val publicLyricsRepository: PublicLyricsRepository,
-) : ViewModel() {
+    snackbarState: SongbookSnackbarState,
+) : BaseViewModel(snackbarState) {
 
     private val eventChannel = Channel<SearchEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -118,7 +120,7 @@ internal class SearchViewModel(
         }
 
     val state: StateFlow<SearchState> = combine(
-        syncRepository.currentSyncStatus,
+        syncRepository.currentSyncStatusFlow,
         prefsRepository.getLastSearchesFlow(),
         publicLyricsSearchFlow,
         _transientState,

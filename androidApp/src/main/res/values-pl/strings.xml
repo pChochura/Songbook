@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Songbook</string>
+    <string name="widget_description">Widżet szybkiego filtrowania Songbook</string>
+</resources>

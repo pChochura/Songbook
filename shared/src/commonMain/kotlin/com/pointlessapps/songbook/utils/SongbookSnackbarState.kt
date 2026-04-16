@@ -20,6 +20,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 import kotlin.coroutines.resume
 
 internal class SongbookSnackbarState {
@@ -32,6 +34,20 @@ internal class SongbookSnackbarState {
     private val callbackActions = Channel<SongbookSnackbarCallbackAction>()
     val callbackActionsFlow: Flow<SongbookSnackbarCallbackAction>
         get() = callbackActions.receiveAsFlow()
+
+    fun showSnackbar(
+        message: StringResource,
+        icon: DrawableResource? = null,
+        duration: SnackbarDuration = SnackbarDuration.Short,
+    ) {
+        coroutineScope.launch {
+            showSnackbar(
+                message = getString(message),
+                icon = icon,
+                duration = duration,
+            )
+        }
+    }
 
     fun showSnackbar(
         message: String,
@@ -52,6 +68,24 @@ internal class SongbookSnackbarState {
     }
 
     fun showSnackbar(
+        message: StringResource,
+        actionLabel: StringResource,
+        callbackAction: SongbookSnackbarCallbackAction,
+        icon: DrawableResource? = null,
+        duration: SnackbarDuration = SnackbarDuration.Long,
+    ) {
+        coroutineScope.launch {
+            showSnackbar(
+                message = getString(message),
+                actionLabel = getString(actionLabel),
+                callbackAction = callbackAction,
+                icon = icon,
+                duration = duration,
+            )
+        }
+    }
+
+    fun showSnackbar(
         message: String,
         actionLabel: String,
         callbackAction: SongbookSnackbarCallbackAction,
@@ -59,17 +93,15 @@ internal class SongbookSnackbarState {
         duration: SnackbarDuration = SnackbarDuration.Long,
     ) {
         coroutineScope.launch {
-            val result = withTimeout(duration.toMillis()) {
-                showSnackbar(
-                    SongbookSnackbarVisuals(
-                        message = message,
-                        actionLabel = actionLabel,
-                        withDismissAction = false,
-                        duration = duration,
-                        icon = icon,
-                    ),
-                )
-            }
+            val result = showSnackbar(
+                SongbookSnackbarVisuals(
+                    message = message,
+                    actionLabel = actionLabel,
+                    withDismissAction = false,
+                    duration = duration,
+                    icon = icon,
+                ),
+            )
 
             if (result == SnackbarResult.ActionPerformed) {
                 callbackActions.send(callbackAction)
@@ -80,8 +112,10 @@ internal class SongbookSnackbarState {
     private suspend fun showSnackbar(visuals: SongbookSnackbarVisuals): SnackbarResult {
         mutex.withLock {
             try {
-                return suspendCancellableCoroutine { continuation ->
-                    currentSnackbarData = SongbookSnackbarData(visuals, continuation)
+                return withTimeout(visuals.duration.toMillis()) {
+                    suspendCancellableCoroutine { continuation ->
+                        currentSnackbarData = SongbookSnackbarData(visuals, continuation)
+                    }
                 }
             } finally {
                 currentSnackbarData = null

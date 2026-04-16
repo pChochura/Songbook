@@ -4,7 +4,6 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.snapshotFlow
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
 import com.pointlessapps.songbook.Route
@@ -23,6 +22,7 @@ import com.pointlessapps.songbook.shared.error_image_extraction_failed
 import com.pointlessapps.songbook.shared.import_changes_saved
 import com.pointlessapps.songbook.shared.import_song_imported
 import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.Job
@@ -72,7 +72,7 @@ internal class ImportSongViewModel(
     private val songRepository: SongRepository,
     private val appRepository: AppRepository,
     private val snackbarState: SongbookSnackbarState,
-) : ViewModel() {
+) : BaseViewModel(snackbarState) {
 
     val showScanDialog: Boolean =
         id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()

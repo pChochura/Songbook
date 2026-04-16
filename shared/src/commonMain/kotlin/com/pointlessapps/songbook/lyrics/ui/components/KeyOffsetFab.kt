@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.lyrics.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -31,17 +32,13 @@ internal fun KeyOffsetFab(
     onKeyOffsetChanged: (Int) -> Unit,
     onClicked: () -> Unit,
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = MaterialTheme.spacing.extraLarge)
             .padding(bottom = MaterialTheme.spacing.extraLarge)
             .navigationBarsPadding(),
-        horizontalArrangement = Arrangement.spacedBy(
-            space = MaterialTheme.spacing.large,
-            alignment = Alignment.End,
-        ),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.End,
     ) {
         BottomBarBackground {
             Row(

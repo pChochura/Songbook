@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.di
 
 import com.pointlessapps.songbook.AppViewModel
 import com.pointlessapps.songbook.importsong.di.importSongModule
+import com.pointlessapps.songbook.introduction.di.introductionModule
 import com.pointlessapps.songbook.library.di.libraryModule
 import com.pointlessapps.songbook.lyrics.di.lyricsModule
 import com.pointlessapps.songbook.preview.di.previewModule
@@ -17,6 +18,7 @@ internal val sharedModule = module {
     viewModelOf(::AppViewModel)
 
     includes(
+        introductionModule,
         libraryModule,
         lyricsModule,
         searchModule,

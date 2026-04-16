@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -41,6 +42,7 @@ import com.pointlessapps.songbook.library.ui.components.AddSongCard
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheet
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.DisplayMode
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Sync
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.ToggleLogin
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
@@ -165,6 +167,7 @@ internal fun LibraryScreen(
             isBottomSheetVisible = false
 
             when (it) {
+                ToggleLogin -> viewModel.toggleLoginClicked()
                 DisplayMode -> isDisplayModeDialogVisible = true
                 Sync -> viewModel.onSyncClicked()
             }
@@ -274,6 +277,7 @@ private fun AllSongsHeader(
                 .wrapContentWidth(Alignment.End),
             text = stringResource(Res.string.library_sort_by_date),
             textStyle = defaultSongbookTextStyle().copy(
+                textAlign = TextAlign.End,
                 textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 typography = MaterialTheme.typography.labelMedium,
             ),

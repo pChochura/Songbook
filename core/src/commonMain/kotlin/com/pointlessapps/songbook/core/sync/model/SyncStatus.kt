@@ -1,5 +1,8 @@
 package com.pointlessapps.songbook.core.sync.model
 
+import com.pointlessapps.songbook.core.utils.Keep
+
+@Keep
 enum class SyncStatus {
     LOCAL, SYNCING, SYNCED, SYNC_FAILED, OFFLINE;
 

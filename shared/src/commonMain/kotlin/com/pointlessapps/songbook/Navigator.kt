@@ -28,6 +28,12 @@ internal sealed interface Route : NavKey {
 
     @Keep
     @Serializable
+    data object Introduction : Route {
+        override val hasBottomBar = false
+    }
+
+    @Keep
+    @Serializable
     data object Library : Route {
         override val hasBottomBar = true
     }
@@ -69,6 +75,7 @@ internal sealed interface Route : NavKey {
 internal val navigationConfig = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
+            subclass(Route.Introduction::class, Route.Introduction.serializer())
             subclass(Route.Library::class, Route.Library.serializer())
             subclass(Route.Lyrics::class, Route.Lyrics.serializer())
             subclass(Route.Search::class, Route.Search.serializer())
@@ -134,6 +141,11 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
 
     fun navigateBack() {
         backStack.removeLastOrNull()
+    }
+
+    fun navigateToLibrary() {
+        backStack.clear()
+        backStack.add(Route.Library)
     }
 
     fun navigateToLyrics(songId: String) {

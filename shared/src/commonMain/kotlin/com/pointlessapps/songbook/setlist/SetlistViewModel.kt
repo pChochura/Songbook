@@ -2,7 +2,6 @@ package com.pointlessapps.songbook.setlist
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -20,6 +19,7 @@ import com.pointlessapps.songbook.shared.error_setlist_not_found
 import com.pointlessapps.songbook.shared.setlist_song_removed_from_setlist
 import com.pointlessapps.songbook.ui.theme.IconInfo
 import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,7 +64,7 @@ internal class SetlistViewModel(
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val snackbarState: SongbookSnackbarState,
-) : ViewModel() {
+) : BaseViewModel(snackbarState) {
 
     private data class SetlistTransientState(
         val localSongs: List<Song> = emptyList(),
@@ -74,7 +74,7 @@ internal class SetlistViewModel(
     private val _transientState = MutableStateFlow(SetlistTransientState())
 
     val state: StateFlow<SetlistState> = combine(
-        syncRepository.currentSyncStatus.onEach { if (it == SYNCED) updateLocalSongs() },
+        syncRepository.currentSyncStatusFlow.onEach { if (it == SYNCED) updateLocalSongs() },
         setlistRepository.getSetlistByIdFlow(id),
         _transientState,
     ) { syncStatus, setlist, transient ->

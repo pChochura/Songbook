@@ -1,3 +1,5 @@
+import org.jetbrains.compose.internal.utils.getLocalProperty
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
@@ -20,10 +22,19 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file(getLocalProperty("storeFile")!!)
+            storePassword = getLocalProperty("storePassword")!!
+            keyAlias = getLocalProperty("keyAlias")!!
+            keyPassword = getLocalProperty("keyPassword")!!
+        }
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
@@ -55,6 +66,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.splashscreen)
     implementation(libs.koin.android)
 
     implementation(libs.androidx.glance.appwidget)

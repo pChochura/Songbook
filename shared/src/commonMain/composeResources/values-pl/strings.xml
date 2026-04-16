@@ -1,0 +1,178 @@
+<resources>
+    <string name="common_app_name">Songbook</string>
+    <string name="common_unknown">Nieznany</string>
+    <string name="common_unnamed">Bez nazwy</string>
+    <string name="common_syncing">Synchronizowanie</string>
+    <string name="common_sync_failed">Synchronizacja nieudana</string>
+    <string name="common_synced">Zsynchronizowano</string>
+    <string name="common_offline">Offline</string>
+    <string name="common_play">Graj</string>
+    <string name="common_back">Wstecz</string>
+    <string name="common_menu">Menu</string>
+    <string name="common_confirm">Potwierdź</string>
+    <string name="common_cancel">Anuluj</string>
+    <string name="common_dismiss">Zamknij</string>
+    <string name="common_clear">Wyczyść</string>
+    <string name="common_remove">Usuń</string>
+    <string name="common_tooltip">Podpowiedź</string>
+    <string name="common_scan_photo">Zeskanuj zdjęcie</string>
+    <string name="common_show_all">Pokaż wszystko</string>
+    <string name="common_scan_photo_description">Zeskanuj tekst i akordy ze zdjęcia piosenki lub wprowadź je ręcznie</string>
+    <string name="common_enter_manually">Wprowadź ręcznie</string>
+    <string name="common_from_gallery">Z galerii</string>
+    <string name="common_take_photo">Zrób zdjęcie</string>
+    <string name="common_close_fullscreen">Zamknij pełny ekran</string>
+    <string name="common_import_song">Importuj piosenkę</string>
+    <string name="common_save_changes">Zapisz zmiany</string>
+    <string name="common_discard_changes">Odrzuć zmiany</string>
+    <string name="common_discard_changes_description">Ta operacja nie może zostać cofnięta i usunie wszystkie zmiany</string>
+    <string name="common_select_display_mode">Wybierz tryb wyświetlania</string>
+    <string name="common_select_text_scale">Wybierz skalę tekstu</string>
+    <string name="common_decrement">Zmniejsz</string>
+    <string name="common_increment">Zwiększ</string>
+    <string name="common_previous">Poprzedni</string>
+    <string name="common_next">Następny</string>
+    <string name="common_broadcast_to_team">Wyślij do zespołu</string>
+    <string name="common_broadcast_to_team_description">Wyślij powiadomienie do wszystkich członków zespołu, że aktualnie grana piosenka jest gotowa.</string>
+    <string name="common_select_key_offset">Wybierz przesunięcie tonacji</string>
+    <string name="common_select_key_offset_description">Transponuj piosenkę do innej tonacji.</string>
+    <string name="common_camera_permission">Uprawnienia do aparatu</string>
+    <string name="common_camera_permission_description">Aby korzystać z aparatu, musisz przyznać uprawnienia w ustawieniach aplikacji.</string>
+    <string name="common_open_settings">Otwórz ustawienia</string>
+    <string name="common_chord_details">Szczegóły akordu</string>
+    <string name="common_favourites">Ulubione</string>
+    <string name="common_no_chord_visualization">Brak wizualizacji dla tego akordu</string>
+    <string name="common_show">Pokaż</string>
+    <string name="common_undo">Cofnij</string>
+    <string name="common_or">Lub</string>
+
+    <!-- Errors -->
+    <string name="error_initilizing_error">Wystąpił błąd podczas inicjalizacji aplikacji. Proszę uruchom aplikację ponownie</string>
+    <string name="error_image_capture_failed">Nie udało się zrobić zdjęcia</string>
+    <string name="error_image_extraction_failed">Nie udało się wyodrębnić danych z obrazu</string>
+    <string name="error_setlist_not_found">Nie znaleziono setlisty</string>
+    <string name="error_song_not_found">Nie znaleziono piosenki</string>
+    <string name="error_unknown_error">Wystąpił nieznany błąd</string>
+
+    <!-- Bottom navigation -->
+    <string name="navigation_library">Biblioteka</string>
+    <string name="navigation_search">Szukaj</string>
+
+    <!-- Introduction Screen -->
+    <string name="introduction_title">Scena jest Twoja, Prościej się nie da</string>
+    <string name="introduction_description">Otrzymaj dostęp do swojej biblioteki tekstów piosenek i akordów skądkolwiek.</string>
+    <string name="introduction_continue_as_guest">Kontynuuj jako gość</string>
+    <string name="introduction_sign_in_with_google">Zaloguj się za pomocą Google</string>
+
+    <!-- Library Screen -->
+    <string name="library_header_title">Biblioteka</string>
+    <string name="library_songs_section_title">Piosenki</string>
+    <string name="library_setlists_section_title">Setlisty</string>
+    <string name="library_setlist_songs">Piosenki: %1$d</string>
+    <string name="library_songs_found">Znaleziono: %1$d</string>
+    <string name="library_sort_by_date">Sortuj według: Data dodania</string>
+    <string name="library_add_song_title">Dodaj nową piosenkę</string>
+    <string name="library_add_song_subtitle">Importuj tekst lub obraz</string>
+    <string name="library_add_to_favourites">Dodaj do ulubionych</string>
+    <string name="library_add_setlist">Dodaj setlistę</string>
+    <string name="library_add_setlist_description">Utwórz setlistę, która będzie zawierać zestaw piosenek w określonej kolejności.</string>
+    <string name="library_add_setlist_placeholder">Nazwa setlisty...</string>
+    <string name="library_menu_display_mode">Tryb wyświetlania</string>
+    <string name="library_menu_sync">Wymuś synchronizację</string>
+    <string name="library_menu_sync_description">Wymuś natychmiastowe uruchomienie harmonogramu synchronizacji</string>
+    <string name="library_menu_display_mode_list">Lista</string>
+    <string name="library_menu_display_mode_list_description">Piosenki będą wyświetlane jako zwarta lista</string>
+    <string name="library_menu_display_mode_grid">Siatka</string>
+    <string name="library_menu_display_mode_grid_description">Piosenki będą wyświetlane w siatce z dynamiczną liczbą kolumn</string>
+    <string name="library_menu_login">Zaloguj się przez Google</string>
+    <string name="library_menu_login_description">Pozwala na synchronizację biblioteki z innymi urządzeniami</string>
+    <string name="library_menu_logout">Wyloguj się</string>
+    <string name="library_menu_logout_description">Korzystaj z aplikacji anonimowo</string>
+
+    <!-- Import Song Screen -->
+    <string name="import_header_title">Dodaj nową piosenkę</string>
+    <string name="import_header_title_edit">Edytuj piosenkę</string>
+    <string name="import_song_title_label">Tytuł piosenki</string>
+    <string name="import_song_title_placeholder">Tytuł...</string>
+    <string name="import_artist_label">Wykonawca</string>
+    <string name="import_artist_placeholder">Wykonawca...</string>
+    <string name="import_lyrics_label">Tekst piosenki</string>
+    <string name="import_lyrics_placeholder">Tekst piosenki...</string>
+    <string name="import_lyrics_tip">Wskazówka: Użyj [Akord] dla akordów wewnątrz tekstu lub nazywania sekcji.</string>
+    <string name="import_menu_rescan">Zeskanuj ponownie zdjęcie</string>
+    <string name="import_menu_rescan_description">Importuj obraz z galerii lub zrób zdjęcie ponownie</string>
+    <string name="import_menu_add_to_setlists">Dodaj do setlist</string>
+    <string name="import_menu_add_to_setlists_description">Wybierz setlisty, do których chcesz dodać piosenkę</string>
+    <string name="import_menu_preview">Podgląd</string>
+    <string name="import_menu_preview_description">Pokaż podgląd piosenki z poprawnie wyświetlonymi akordami</string>
+    <string name="import_extraction_in_progress">Trwa analizowanie</string>
+    <string name="import_extraction_in_progress_description">AI ciężko pracuje nad dostarczonym obrazem, aby odczytać tekst i akordy. Może to potrwać kilka sekund.</string>
+    <string name="import_song_imported">Piosenka została zaimportowana</string>
+    <string name="import_changes_saved">Zmiany zostały zapisane</string>
+
+    <!-- Lyrics Screen -->
+    <string name="lyrics_section_label">Tekst</string>
+    <string name="lyrics_text_scale">Skala tekstu\n %1$d%</string>
+    <string name="lyrics_menu_text_scale">Skala tekstu</string>
+    <string name="lyrics_menu_key_offset">Przesunięcie tonacji</string>
+    <string name="lyrics_menu_toggle_fullscreen">Przełącz pełny ekran</string>
+    <string name="lyrics_menu_toggle_fullscreen_description">Przełącz na widok tekstu bez rozpraszaczy</string>
+    <string name="lyrics_menu_wrap_mode">Tryb zawijania</string>
+    <string name="lyrics_menu_display_mode">Tryb wyświetlania</string>
+    <string name="lyrics_menu_edit">Edytuj</string>
+    <string name="lyrics_menu_add_to_setlists">Dodaj do setlist</string>
+    <string name="lyrics_menu_show_queue">Pokaż kolejkę</string>
+    <string name="lyrics_menu_delete">Usuń piosenkę</string>
+    <string name="lyrics_menu_delete_description">Piosenka zostanie przeniesiona do kosza</string>
+    <string name="lyrics_menu_broadcast_to_team">Wyślij do zespołu</string>
+    <string name="lyrics_menu_broadcast_to_team_description">Wyślij powiadomienie o piosence do zespołu</string>
+    <string name="lyrics_wrap_mode_wrap">Zawijaj</string>
+    <string name="lyrics_wrap_mode_wrap_description">Tekst będzie zawijany do nowej linii, jeśli się nie mieści</string>
+    <string name="lyrics_wrap_mode_no_wrap">Nie zawijaj</string>
+    <string name="lyrics_wrap_mode_no_wrap_description">Ekran będzie się przewijał, jeśli tekst się nie mieści</string>
+    <string name="lyrics_display_mode_inline">Nad tekstem</string>
+    <string name="lyrics_display_mode_inline_description">Wszystkie akordy będą wyświetlane nad każdą linią</string>
+    <string name="lyrics_display_mode_side_by_side">Obok siebie</string>
+    <string name="lyrics_display_mode_side_by_side_description">Akordy będą wyświetlane obok tekstu</string>
+    <string name="lyrics_display_mode_both">Oba</string>
+    <string name="lyrics_display_mode_both_description">Akordy będą wyświetlane obok tekstu oraz nad każdą linią</string>
+    <string name="lyrics_display_mode_text_only">Tylko tekst</string>
+    <string name="lyrics_display_mode_text_only_description">Wyświetlany będzie tylko tekst</string>
+    <string name="lyrics_delete_song">Usunąć piosenkę?</string>
+    <string name="lyrics_delete_song_description">Zostanie przeniesiona do kosza, będziesz mógł ją później przywrócić.</string>
+    <string name="lyrics_transpose">Transponuj</string>
+    <string name="lyrics_show_key_offset_fab">Wyświetlaj stały widżet transpozycji na dole ekranu</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Szukaj tytułów, wykonawców i tekstów...</string>
+    <string name="search_last_searches">Ostatnie wyszukiwania</string>
+    <string name="search_delete_the_last_search">Usuń ostatnie wyszukiwanie</string>
+    <string name="search_delete_the_last_search_description">Czy na pewno chcesz usunąć ostatnie wyszukiwanie z historii: %1$s</string>
+    <string name="search_your_library">Twoja biblioteka</string>
+    <string name="search_public_lyrics">Publiczne teksty</string>
+    <string name="search_what_is_public_lyrics">Co to są publiczne teksty?</string>
+    <string name="search_what_is_public_lyrics_description">Używamy ogólnodostępnego zestawu danych tekstów publikowanych przez użytkowników. Nie odpowiadamy za zawartość tego zestawu. Dowiedz się więcej na:</string>
+    <string name="search_allow_public_lyrics_search_rationale">Aby wyświetlać wyniki z sieci, musisz zezwolić na wyszukiwanie publicznych tekstów.\nZestaw danych jest w całości tworzony przez użytkowników, więc nie możemy odpowiadać za jego zawartość.</string>
+    <string name="search_i_understand">Rozumiem</string>
+    <string name="search_turn_it_off">Wyłącz to</string>
+    <string name="search_allow">Zezwól</string>
+    <string name="search_deny">Odmów</string>
+    <string name="search_no_items_found">Nie znaleziono elementów</string>
+    <string name="search_import_public_lyrics">Importuj publiczne teksty</string>
+    <string name="search_import_public_lyrics_description">Importuj tekst do swojej biblioteki. Przejrzyj treść wcześniej, ponieważ jest ona tworzona społecznościowo i nie ma gwarancji jej dokładności.</string>
+    <string name="search_import">Importuj tekst do swojej biblioteki. Przejrzyj treść wcześniej, ponieważ jest ona tworzona społecznościowo i nie ma gwarancji jej dokładności.</string>
+
+    <!-- Setlist Screen -->
+    <string name="setlist_menu_rename">Zmień nazwę</string>
+    <string name="setlist_menu_delete">Usuń setlistę</string>
+    <string name="setlist_menu_delete_description">Setlista zostanie przeniesiona do kosza, ale powiązane piosenki pozostaną nienaruszone</string>
+    <string name="setlist_delete_setlist">Usunąć setlistę?</string>
+    <string name="setlist_delete_setlist_description">Zostanie przeniesiona do kosza, będziesz mógł ją później przywrócić. Wszystkie piosenki powiązane z tą setlistą pozostaną nienaruszone.</string>
+    <string name="setlist_rename_setlist">Zmień nazwę setlisty</string>
+    <string name="setlist_edit_setlist_placeholder">Nazwa setlisty...</string>
+    <string name="setlist_add_song">Dodaj piosenkę do setlisty</string>
+    <string name="setlist_search_songs">Szukaj piosenek</string>
+    <string name="setlist_search_songs_placeholder">Szukaj piosenek po tytule, wykonawcy lub tekście...</string>
+    <string name="setlist_delete_from_setlist">Usuń z setlisty</string>
+    <string name="setlist_song_removed_from_setlist">Piosenka została usunięta z setlisty</string>
+</resources>

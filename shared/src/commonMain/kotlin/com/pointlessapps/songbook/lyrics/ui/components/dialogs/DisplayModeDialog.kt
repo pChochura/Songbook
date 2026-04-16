@@ -68,6 +68,7 @@ internal fun DisplayModeDialog(
         dialogStyle = defaultSongbookDialogStyle().copy(
             label = stringResource(Res.string.common_select_display_mode),
             icon = IconDisplayMode,
+            scrollable = false,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {

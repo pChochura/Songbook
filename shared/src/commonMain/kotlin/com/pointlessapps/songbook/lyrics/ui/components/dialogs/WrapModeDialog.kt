@@ -62,6 +62,7 @@ internal fun WrapModeDialog(
         dialogStyle = defaultSongbookDialogStyle().copy(
             label = stringResource(Res.string.common_select_display_mode),
             icon = IconWrapMode,
+            scrollable = false,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {

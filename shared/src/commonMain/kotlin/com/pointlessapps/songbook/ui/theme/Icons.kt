@@ -37,6 +37,8 @@ import com.pointlessapps.songbook.shared.ic_improve
 import com.pointlessapps.songbook.shared.ic_info
 import com.pointlessapps.songbook.shared.ic_key
 import com.pointlessapps.songbook.shared.ic_library
+import com.pointlessapps.songbook.shared.ic_login
+import com.pointlessapps.songbook.shared.ic_logout
 import com.pointlessapps.songbook.shared.ic_minus
 import com.pointlessapps.songbook.shared.ic_move
 import com.pointlessapps.songbook.shared.ic_move_handle
@@ -132,3 +134,5 @@ val IconHistory = Res.drawable.ic_history
 val IconInfo = Res.drawable.ic_info
 val IconFolders = Res.drawable.ic_folders
 val IconSave = Res.drawable.ic_save
+val IconLogin = Res.drawable.ic_login
+val IconLogout = Res.drawable.ic_logout

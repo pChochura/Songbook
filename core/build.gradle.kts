@@ -64,6 +64,9 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.work.runtime)
+            implementation(libs.androidx.credentials.core)
+            implementation(libs.androidx.credentials.play.auth)
+            implementation(libs.google.id.token)
         }
 
         iosMain.dependencies {

@@ -23,17 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.pointlessapps.songbook.ui.BottomBar
-import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookSnackbar
 import com.pointlessapps.songbook.ui.theme.SongbookTheme
@@ -52,11 +49,14 @@ fun App(
 ) {
     val viewModel = koinViewModel<AppViewModel>()
     val snackbarSate = koinInject<SongbookSnackbarState>()
-    val backstack = rememberNavBackStack(navigationConfig, Route.Library)
-    val navigator = Navigator(backstack)
+    val backstack = rememberNavBackStack(
+        configuration = navigationConfig,
+        if (viewModel.isLoggedIn) Route.Library else Route.Introduction,
+    )
+    val navigator = remember { Navigator(backstack) }
     val bottomBarPadding = remember { BottomBarPadding() }
 
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    viewModel.state.collectWithLifecycle()
 
     snackbarSate.callbackActionsFlow.collectWithLifecycle {
         when (it) {
@@ -74,71 +74,62 @@ fun App(
                 backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
             ),
         ) {
-            AnimatedContent(
-                targetState = state,
-                transitionSpec = { fadeIn() togetherWith fadeOut() using null },
-            ) { state ->
-                SongbookScaffoldLayout(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface),
-                    fab = {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = MaterialTheme.spacing.extraLarge)
-                                .navigationBarsPadding(),
-                            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-                            horizontalAlignment = Alignment.CenterHorizontally,
+            SongbookScaffoldLayout(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface),
+                fab = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = MaterialTheme.spacing.extraLarge)
+                            .navigationBarsPadding(),
+                        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        AnimatedVisibility(
+                            visible = navigator.currentRoute?.hasBottomBar == true,
+                            enter = slideInVertically { it / 2 } + fadeIn(),
+                            exit = slideOutVertically { it / 2 } + fadeOut(),
                         ) {
-                            AnimatedVisibility(
-                                visible = navigator.currentRoute?.hasBottomBar == true,
-                                enter = slideInVertically { it / 2 } + fadeIn(),
-                                exit = slideOutVertically { it / 2 } + fadeOut(),
-                            ) {
-                                BottomBar(
-                                    currentRoute = { navigator.currentRoute },
-                                    onNavigateTo = navigator::bottomNavigationTo,
-                                    onActiveClicked = {
-                                        // TODO
-                                    },
-                                    onLongClicked = {
-                                        // TODO
-                                    },
+                            BottomBar(
+                                currentRoute = { navigator.currentRoute },
+                                onNavigateTo = navigator::bottomNavigationTo,
+                                onActiveClicked = {
+                                    // TODO
+                                },
+                                onLongClicked = {
+                                    // TODO
+                                },
+                            )
+                        }
+
+                        AnimatedContent(
+                            targetState = snackbarSate.currentSnackbarData,
+                            transitionSpec = {
+                                fadeIn() + expandIn(expandFrom = Alignment.Center) togetherWith
+                                        fadeOut() + shrinkOut(shrinkTowards = Alignment.Center) using null
+                            },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            it?.let {
+                                SongbookSnackbar(
+                                    message = it.visuals.message,
+                                    icon = it.visuals.icon,
+                                    actionLabel = it.visuals.actionLabel,
+                                    actionCallback = it::performAction,
+                                    onDismissRequest = it::dismiss,
                                 )
                             }
-
-                            AnimatedContent(
-                                targetState = snackbarSate.currentSnackbarData,
-                                transitionSpec = {
-                                    fadeIn() + expandIn(expandFrom = Alignment.Center) togetherWith
-                                            fadeOut() + shrinkOut(shrinkTowards = Alignment.Center) using null
-                                },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                it?.let {
-                                    SongbookSnackbar(
-                                        message = it.visuals.message,
-                                        icon = it.visuals.icon,
-                                        actionLabel = it.visuals.actionLabel,
-                                        actionCallback = it::performAction,
-                                        onDismissRequest = it::dismiss,
-                                    )
-                                }
-                            }
                         }
-                    },
-                ) { paddingValues ->
-                    LaunchedEffect(paddingValues) {
-                        bottomBarPadding.padding.value = paddingValues.calculateBottomPadding()
                     }
-
-                    if (state.isLoading) {
-                        SongbookLoader(true, scrimAlpha = 1.0f)
-                    } else {
-                        NavDisplay(backstack)
-                    }
+                },
+            ) { paddingValues ->
+                LaunchedEffect(paddingValues) {
+                    bottomBarPadding.padding.value = paddingValues.calculateBottomPadding()
                 }
+
+                NavDisplay(backstack)
             }
         }
     }

@@ -27,6 +27,7 @@ androidx-paging = "3.4.2"
 androidx-datastore = "1.2.1"
 androidx-annotation = "1.10.0"
 androidx-work = "2.11.2"
+androidx-splashscreen = "1.2.0"
 
 # Koin
 koin = "4.2.0"
@@ -40,6 +41,8 @@ supabase = "3.5.0"
 # Misc
 peekaboo = "0.5.2"
 compose-dnd = "0.4.0"
+androidx-credentials = "1.6.0"
+googleid = "1.2.0"
 
 [libraries]
 # AndroidX
@@ -55,6 +58,9 @@ androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "a
 androidx-datastore-prefs = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
+androidx-credentials-core = { module = "androidx.credentials:credentials", version.ref = "androidx-credentials" }
+androidx-credentials-play-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidx-credentials" }
+androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-splashscreen" }
 
 # Compose
 compose-mp-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
@@ -102,6 +108,7 @@ paging-compose = { module = "androidx.paging:paging-compose", version.ref = "and
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
 compose-dnd = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "compose-dnd" }
+google-id-token = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 [plugins]
 # Android
