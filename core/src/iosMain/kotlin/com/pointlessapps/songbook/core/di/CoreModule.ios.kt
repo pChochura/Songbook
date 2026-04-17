@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.pointlessapps.songbook.core.app.di.appModule
+import com.pointlessapps.songbook.core.auth.GoogleAuthManager
+import com.pointlessapps.songbook.core.auth.IosGoogleAuthManager
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.database.AppDatabaseConstructor
 import com.pointlessapps.songbook.core.network.IosNetworkRepository
@@ -35,6 +37,7 @@ internal actual val platformModule = module {
     }
 
     singleOf(::IosNetworkRepository).bind<NetworkRepository>()
+    singleOf(::IosGoogleAuthManager).bind<GoogleAuthManager>()
 
     includes(appModule)
 }

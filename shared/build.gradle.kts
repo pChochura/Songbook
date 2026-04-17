@@ -31,9 +31,7 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = false
-            export(projects.core)
-            export(projects.ai)
+            isStatic = true
         }
     }
 
