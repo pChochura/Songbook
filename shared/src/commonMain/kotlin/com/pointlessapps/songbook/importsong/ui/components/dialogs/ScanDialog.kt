@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.importsong.ui.components.dialogs
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -21,25 +25,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_back
 import com.pointlessapps.songbook.shared.common_cancel
 import com.pointlessapps.songbook.shared.common_enter_manually
 import com.pointlessapps.songbook.shared.common_from_gallery
 import com.pointlessapps.songbook.shared.common_scan_photo
+import com.pointlessapps.songbook.shared.common_take_a_photo
 import com.pointlessapps.songbook.shared.common_take_photo
+import com.pointlessapps.songbook.ui.components.Position
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookButtonOrientation
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
+import com.pointlessapps.songbook.ui.components.SongbookIconButton
+import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonTextStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
+import com.pointlessapps.songbook.ui.theme.IconArrowLeft
 import com.pointlessapps.songbook.ui.theme.IconCamera
 import com.pointlessapps.songbook.ui.theme.IconGallery
 import com.pointlessapps.songbook.ui.theme.IconScan
@@ -50,7 +62,6 @@ import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.ui.camera.CameraMode
 import com.preat.peekaboo.ui.camera.PeekabooCamera
-import com.preat.peekaboo.ui.camera.rememberPeekabooCameraState
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -178,18 +189,70 @@ internal fun ScanDialog(
             }
         }
     } else {
-        PeekabooCamera(
-            state = rememberPeekabooCameraState(
-                initialCameraMode = CameraMode.Back,
-                onCapture = { onImageCaptured(it) },
-            ),
+        Box(
             modifier = Modifier.fillMaxSize(),
-            permissionDeniedContent = {
-                CameraPermissionDeniedDialog(
-                    onOpenSettingsClicked = onOpenSettingsClicked,
-                    onDismissRequest = { isCameraVisible = false },
+            contentAlignment = Alignment.Center,
+        ) {
+            PeekabooCamera(
+                modifier = Modifier.fillMaxSize(),
+                cameraMode = CameraMode.Back,
+                captureIcon = @Composable {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .systemBarsPadding()
+                            .padding(MaterialTheme.spacing.extraLarge),
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        SongbookIconButton(
+                            modifier = Modifier
+                                .size(CAPTURE_ICON_SIZE)
+                                .padding(MaterialTheme.spacing.extraLarge),
+                            icon = IconCamera,
+                            tooltipLabel = Res.string.common_take_a_photo,
+                            onClick = { isCameraVisible = false },
+                            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                outlineColor = Color.Transparent,
+                            ),
+                        )
+                    }
+                },
+                progressIndicator = @Composable { SongbookLoader(true) },
+                onCapture = onImageCaptured,
+                permissionDeniedContent = {
+                    CameraPermissionDeniedDialog(
+                        onOpenSettingsClicked = onOpenSettingsClicked,
+                        onDismissRequest = { isCameraVisible = false },
+                    )
+                },
+            )
+
+            Box(
+                modifier = Modifier
+                    .systemBarsPadding()
+                    .padding(MaterialTheme.spacing.extraLarge)
+                    .align(Alignment.TopStart),
+            ) {
+                SongbookIconButton(
+                    modifier = Modifier
+                        .padding(MaterialTheme.spacing.extraSmall)
+                        .size(TOP_BAR_ICON_SIZE),
+                    icon = IconArrowLeft,
+                    tooltipLabel = Res.string.common_back,
+                    onClick = { isCameraVisible = false },
+                    iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                        tooltipPosition = Position.BELOW,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.7f),
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        outlineColor = Color.Transparent,
+                    ),
                 )
-            },
-        )
+            }
+        }
     }
 }
+
+private val CAPTURE_ICON_SIZE = 76.dp
+private val TOP_BAR_ICON_SIZE = 36.dp
