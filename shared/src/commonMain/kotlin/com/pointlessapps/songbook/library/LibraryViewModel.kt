@@ -100,7 +100,6 @@ internal class LibraryViewModel(
 
     fun logoutClicked() {
         viewModelScope.launch {
-            // TODO show a dialog and warn about losing data
             authRepository.logout()
             syncRepository.clearDatabase()
             eventChannel.send(LibraryEvent.NavigateToIntroduction)

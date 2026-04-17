@@ -48,6 +48,7 @@ import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
 import com.pointlessapps.songbook.library.ui.components.dialogs.AddSetlistDialog
 import com.pointlessapps.songbook.library.ui.components.dialogs.DisplayModeDialog
+import com.pointlessapps.songbook.library.ui.components.dialogs.LogoutDialog
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_app_name
 import com.pointlessapps.songbook.shared.library_setlists_section_title
@@ -159,6 +160,7 @@ internal fun LibraryScreen(
     }
 
     var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isLogoutDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     LibraryOptionsBottomSheet(
         show = isBottomSheetVisible,
@@ -170,7 +172,7 @@ internal fun LibraryScreen(
             when (it) {
                 DisplayMode -> isDisplayModeDialogVisible = true
                 Login -> viewModel.loginClicked()
-                Logout -> viewModel.logoutClicked()
+                Logout -> isLogoutDialogVisible = true
             }
         },
     )
@@ -183,6 +185,17 @@ internal fun LibraryScreen(
                 isDisplayModeDialogVisible = false
             },
             onDismissRequest = { isDisplayModeDialogVisible = false },
+        )
+    }
+
+    if (isLogoutDialogVisible) {
+        LogoutDialog(
+            loginStatus = state.loginStatus,
+            onConfirmClicked = {
+                viewModel.logoutClicked()
+                isLogoutDialogVisible = false
+            },
+            onDismissRequest = { isLogoutDialogVisible = false },
         )
     }
 }

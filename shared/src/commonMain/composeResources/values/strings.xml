@@ -45,6 +45,9 @@
     <string name="common_show">Show</string>
     <string name="common_undo">Undo</string>
     <string name="common_or">Or</string>
+    <string name="common_logout">Logout</string>
+    <string name="common_logout_description">All of the local data is saved remotely, and you can restore it back when logging in on another device.</string>
+    <string name="common_logout_anonymous_description">Your local data will be lost when logging out anonymously. Make sure to create an account if you want to save your data.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
