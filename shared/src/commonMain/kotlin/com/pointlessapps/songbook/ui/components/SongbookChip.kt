@@ -25,7 +25,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 
 @Composable
-fun SongbookChip(
+internal fun SongbookChip(
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -100,7 +100,7 @@ fun SongbookChip(
 }
 
 @Composable
-fun defaultSongbookChipStyle() = SongbookChipStyle(
+internal fun defaultSongbookChipStyle() = SongbookChipStyle(
     containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
     outlineColor = MaterialTheme.colorScheme.outlineVariant,
@@ -113,7 +113,7 @@ fun defaultSongbookChipStyle() = SongbookChipStyle(
     iconAlignment = Alignment.Start,
 )
 
-data class SongbookChipStyle(
+internal data class SongbookChipStyle(
     val containerColor: Color,
     val selectedContainerColor: Color,
     val outlineColor: Color,

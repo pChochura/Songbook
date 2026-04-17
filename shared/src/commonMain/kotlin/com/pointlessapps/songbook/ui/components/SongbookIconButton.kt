@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SongbookIconButton(
+internal fun SongbookIconButton(
     icon: DrawableResource,
     tooltipLabel: StringResource,
     onClick: () -> Unit,
@@ -72,7 +71,7 @@ fun SongbookIconButton(
 }
 
 @Composable
-fun defaultSongbookIconButtonStyle() = SongbookIconButtonStyle(
+internal fun defaultSongbookIconButtonStyle() = SongbookIconButtonStyle(
     containerColor = MaterialTheme.colorScheme.primary,
     disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
     contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -84,7 +83,7 @@ fun defaultSongbookIconButtonStyle() = SongbookIconButtonStyle(
     tooltipPosition = Position.ABOVE,
 )
 
-data class SongbookIconButtonStyle(
+internal data class SongbookIconButtonStyle(
     val containerColor: Color,
     val disabledContainerColor: Color,
     val contentColor: Color,

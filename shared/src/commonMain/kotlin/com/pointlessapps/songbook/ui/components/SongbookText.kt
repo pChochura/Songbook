@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
-fun SongbookText(
+internal fun SongbookText(
     text: String,
     modifier: Modifier = Modifier,
     textStyle: SongbookTextStyle = defaultSongbookTextStyle(),
@@ -25,7 +25,7 @@ fun SongbookText(
 )
 
 @Composable
-fun SongbookText(
+internal fun SongbookText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     textStyle: SongbookTextStyle = defaultSongbookTextStyle(),
@@ -44,7 +44,7 @@ fun SongbookText(
 )
 
 @Composable
-fun defaultSongbookTextStyle() = SongbookTextStyle(
+internal fun defaultSongbookTextStyle() = SongbookTextStyle(
     textColor = MaterialTheme.colorScheme.onSurface,
     disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
     typography = MaterialTheme.typography.bodyMedium,
@@ -54,7 +54,7 @@ fun defaultSongbookTextStyle() = SongbookTextStyle(
     softWrap = true,
 )
 
-data class SongbookTextStyle(
+internal data class SongbookTextStyle(
     val textColor: Color,
     val disabledTextColor: Color,
     val textAlign: TextAlign,

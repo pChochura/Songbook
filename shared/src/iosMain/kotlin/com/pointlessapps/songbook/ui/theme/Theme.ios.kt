@@ -5,7 +5,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 
 @Composable
-actual fun platformColorPalette(
+internal actual fun platformColorPalette(
     lightColorPalette: ColorScheme,
     darkColorPalette: ColorScheme,
 ): ColorScheme = when {

@@ -30,7 +30,7 @@ import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.MEDIUM_CORNER_RADIUS
 
 @Composable
-fun SongbookCard(
+internal fun SongbookCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -94,19 +94,19 @@ fun SongbookCard(
 }
 
 @Composable
-fun defaultSongbookCardStyle() = SongbookCardStyle.Filled(
+internal fun defaultSongbookCardStyle() = SongbookCardStyle.Filled(
     shape = MaterialTheme.shapes.medium,
     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
 )
 
 @Composable
-fun dashedSongbookCardStyle() = SongbookCardStyle.Dashed(
+internal fun dashedSongbookCardStyle() = SongbookCardStyle.Dashed(
     outlineColor = MaterialTheme.colorScheme.outline,
     cornerRadius = MEDIUM_CORNER_RADIUS,
     containerColor = Color.Transparent,
 )
 
-sealed interface SongbookCardStyle {
+internal sealed interface SongbookCardStyle {
     val containerColor: Color
     val shape: Shape
 

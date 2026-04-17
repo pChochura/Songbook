@@ -36,7 +36,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import kotlin.math.max
 
 @Composable
-fun SongbookDialog(
+internal fun SongbookDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     dialogStyle: SongbookDialogStyle = defaultSongbookDialogStyle(),
@@ -120,7 +120,7 @@ fun SongbookDialog(
 }
 
 @Composable
-fun defaultSongbookDialogStyle() = SongbookDialogStyle(
+internal fun defaultSongbookDialogStyle() = SongbookDialogStyle(
     label = "",
     icon = null,
     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -132,7 +132,7 @@ fun defaultSongbookDialogStyle() = SongbookDialogStyle(
     dismissible = SongbookDialogDismissible.Both,
 )
 
-data class SongbookDialogStyle(
+internal data class SongbookDialogStyle(
     val label: String,
     val icon: DrawableResource?,
     val containerColor: Color,
@@ -144,7 +144,7 @@ data class SongbookDialogStyle(
     val dismissible: SongbookDialogDismissible,
 )
 
-enum class SongbookDialogDismissible {
+internal enum class SongbookDialogDismissible {
     None, OnBackPress, OnClickOutside, Both;
 
     fun isDismissibleOnBackPress() = this in setOf(

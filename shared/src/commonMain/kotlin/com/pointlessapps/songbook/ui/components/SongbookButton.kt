@@ -23,7 +23,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 
 @Composable
-fun SongbookButton(
+internal fun SongbookButton(
     label: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -110,7 +110,7 @@ fun SongbookButton(
 }
 
 @Composable
-fun defaultSongbookButtonStyle() = SongbookButtonStyle(
+internal fun defaultSongbookButtonStyle() = SongbookButtonStyle(
     containerColor = MaterialTheme.colorScheme.primary,
     disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
     shape = CircleShape,
@@ -121,12 +121,12 @@ fun defaultSongbookButtonStyle() = SongbookButtonStyle(
 )
 
 @Composable
-fun defaultSongbookButtonTextStyle() = defaultSongbookTextStyle().copy(
+internal fun defaultSongbookButtonTextStyle() = defaultSongbookTextStyle().copy(
     textColor = MaterialTheme.colorScheme.onPrimary,
     typography = MaterialTheme.typography.labelLarge,
 )
 
-data class SongbookButtonStyle(
+internal data class SongbookButtonStyle(
     val containerColor: Color,
     val disabledContainerColor: Color,
     val shape: Shape,
@@ -136,6 +136,6 @@ data class SongbookButtonStyle(
     val enabled: Boolean,
 )
 
-enum class SongbookButtonOrientation { Vertical, Horizontal }
+internal enum class SongbookButtonOrientation { Vertical, Horizontal }
 
 private val ICON_SIZE = 24.dp

@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 
 @Composable
-fun SongbookTextField(
+internal fun SongbookTextField(
     state: TextFieldState,
     modifier: Modifier = Modifier,
     onImeAction: (() -> Unit)? = null,
@@ -63,7 +63,7 @@ fun SongbookTextField(
 }
 
 @Composable
-fun defaultSongbookTextFieldStyle() = SongbookTextFieldStyle(
+internal fun defaultSongbookTextFieldStyle() = SongbookTextFieldStyle(
     keyboardOptions = KeyboardOptions(
         capitalization = KeyboardCapitalization.Sentences,
     ),
@@ -79,7 +79,7 @@ fun defaultSongbookTextFieldStyle() = SongbookTextFieldStyle(
     readOnly = false,
 )
 
-data class SongbookTextFieldStyle(
+internal data class SongbookTextFieldStyle(
     val keyboardOptions: KeyboardOptions,
     val inputTransformation: InputTransformation?,
     val outputTransformation: OutputTransformation?,

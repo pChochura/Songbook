@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayout
 
 @Composable
-fun SongbookScaffoldLayout(
+internal fun SongbookScaffoldLayout(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     fab: @Composable () -> Unit = {},

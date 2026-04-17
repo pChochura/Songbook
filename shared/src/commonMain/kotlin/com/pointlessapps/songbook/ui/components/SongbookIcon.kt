@@ -9,7 +9,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun SongbookIcon(
+internal fun SongbookIcon(
     icon: DrawableResource,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
@@ -22,10 +22,10 @@ fun SongbookIcon(
 )
 
 @Composable
-fun defaultSongbookIconStyle() = SongbookIconStyle(
+internal fun defaultSongbookIconStyle() = SongbookIconStyle(
     tint = MaterialTheme.colorScheme.onSurface,
 )
 
-data class SongbookIconStyle(
+internal data class SongbookIconStyle(
     val tint: Color,
 )

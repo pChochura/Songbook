@@ -29,7 +29,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 
 @Composable
-fun SongbookCheckbox(
+internal fun SongbookCheckbox(
     label: String,
     checked: Boolean,
     onCheckChanged: () -> Unit,
@@ -104,7 +104,7 @@ fun SongbookCheckbox(
 }
 
 @Composable
-fun defaultSongbookCheckboxStyle() = SongbookCheckboxStyle(
+internal fun defaultSongbookCheckboxStyle() = SongbookCheckboxStyle(
     shape = CircleShape,
     containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -116,7 +116,7 @@ fun defaultSongbookCheckboxStyle() = SongbookCheckboxStyle(
     icon = IconDone,
 )
 
-data class SongbookCheckboxStyle(
+internal data class SongbookCheckboxStyle(
     val shape: Shape,
     val containerColor: Color,
     val selectedContainerColor: Color,

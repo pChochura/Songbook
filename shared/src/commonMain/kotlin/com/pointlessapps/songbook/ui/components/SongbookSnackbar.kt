@@ -18,7 +18,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 
 @Composable
-fun SongbookSnackbar(
+internal fun SongbookSnackbar(
     message: String,
     icon: DrawableResource?,
     actionLabel: String?,

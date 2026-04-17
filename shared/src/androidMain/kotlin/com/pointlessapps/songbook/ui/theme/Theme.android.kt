@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
-actual fun platformColorPalette(
+internal actual fun platformColorPalette(
     lightColorPalette: ColorScheme,
     darkColorPalette: ColorScheme,
 ): ColorScheme {

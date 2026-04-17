@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.zIndex
 
 @Composable
-fun SongbookLoader(
+internal fun SongbookLoader(
     enabled: Boolean,
     scrimAlpha: Float = SCRIM_ALPHA,
 ) {

@@ -120,7 +120,7 @@ private fun darkColorPalette() = darkColorScheme(
 )
 
 @Composable
-fun SongbookTheme(
+internal fun SongbookTheme(
     lightColorPalette: ColorScheme = lightColorPalette(),
     darkColorPalette: ColorScheme = darkColorPalette(),
     typography: Typography = typography(),
@@ -137,7 +137,7 @@ fun SongbookTheme(
 )
 
 @Composable
-expect fun platformColorPalette(
+internal expect fun platformColorPalette(
     lightColorPalette: ColorScheme,
     darkColorPalette: ColorScheme,
 ): ColorScheme

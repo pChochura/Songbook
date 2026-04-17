@@ -24,11 +24,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
-enum class Position { ABOVE, BELOW }
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SongbookTooltip(
+internal fun SongbookTooltip(
     position: Position,
     contentDescription: StringResource,
     allowUserInput: Boolean = true,
@@ -80,3 +78,5 @@ fun SongbookTooltip(
         content = content,
     )
 }
+
+internal enum class Position { ABOVE, BELOW }
