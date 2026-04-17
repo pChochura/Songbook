@@ -56,6 +56,7 @@
     <string name="error_setlist_not_found">The setlist was not found</string>
     <string name="error_song_not_found">The song was not found</string>
     <string name="error_unknown_error">An unknown error occurred</string>
+    <string name="error_account_already_linked_error">That account is already linked to another device</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Library</string>

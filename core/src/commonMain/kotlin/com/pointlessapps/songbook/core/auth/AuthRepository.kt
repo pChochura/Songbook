@@ -1,8 +1,11 @@
 package com.pointlessapps.songbook.core.auth
 
+import com.pointlessapps.songbook.core.auth.exceptions.AccountAlreadyLinkedException
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.exception.AuthErrorCode
+import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import kotlinx.coroutines.Dispatchers
@@ -53,8 +56,16 @@ internal class AuthRepositoryImpl(
     override suspend fun linkWithGoogle() = withContext(Dispatchers.Default) {
         val tokens = googleAuthManager.getGoogleTokens() ?: return@withContext
         val (idToken, accessToken) = tokens
-        auth.linkIdentityWithIdToken(Google, idToken) {
-            this.accessToken = accessToken
+        try {
+            auth.linkIdentityWithIdToken(Google, idToken) {
+                this.accessToken = accessToken
+            }
+        } catch (e: AuthRestException) {
+            if (e.errorCode == AuthErrorCode.IdentityAlreadyExists) {
+                throw AccountAlreadyLinkedException()
+            } else {
+                throw e
+            }
         }
         _currentLoginStatusFlow.value = getLoginStatus()
     }

@@ -53,6 +53,7 @@
     <string name="error_setlist_not_found">Nie znaleziono setlisty</string>
     <string name="error_song_not_found">Nie znaleziono piosenki</string>
     <string name="error_unknown_error">Wystąpił nieznany błąd</string>
+    <string name="error_account_already_linked_error">To konto jest już powiązane z innym urządzeniem</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Biblioteka</string>

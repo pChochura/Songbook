@@ -1,8 +1,10 @@
 package com.pointlessapps.songbook.library
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.pointlessapps.songbook.core.auth.AuthRepository
+import com.pointlessapps.songbook.core.auth.exceptions.AccountAlreadyLinkedException
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
@@ -10,6 +12,9 @@ import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.error_account_already_linked_error
+import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.Keep
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
@@ -46,7 +51,7 @@ internal class LibraryViewModel(
     private val setlistRepository: SetlistRepository,
     private val prefsRepository: PrefsRepository,
     private val authRepository: AuthRepository,
-    snackbarState: SongbookSnackbarState,
+    private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -94,7 +99,15 @@ internal class LibraryViewModel(
 
     fun loginClicked() {
         viewModelScope.launch {
-            authRepository.linkWithGoogle()
+            try {
+                authRepository.linkWithGoogle()
+            } catch (_: AccountAlreadyLinkedException) {
+                snackbarState.showSnackbar(
+                    message = Res.string.error_account_already_linked_error,
+                    icon = IconWarning,
+                    duration = SnackbarDuration.Long,
+                )
+            }
         }
     }
 
