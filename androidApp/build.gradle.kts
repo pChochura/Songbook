@@ -1,9 +1,15 @@
 import org.jetbrains.compose.internal.utils.getLocalProperty
 
 plugins {
+    alias(libs.plugins.androidVersionGit)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+}
+
+androidGitVersion {
+    format = "%tag%%-commit%%-dirty%"
+    codeFormat = "MMNNPPBBB"
 }
 
 android {
@@ -14,8 +20,8 @@ android {
         applicationId = "com.pointlessapps.songbook"
         minSdk = libs.versions.sdk.min.get().toInt()
         targetSdk = libs.versions.sdk.target.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = androidGitVersion.code().takeIf { it > 0 } ?: 1
+        versionName = androidGitVersion.name().takeIf { it.isNotEmpty() } ?: "1.0"
     }
     packaging {
         resources {

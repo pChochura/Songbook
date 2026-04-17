@@ -1,13 +1,13 @@
 [versions]
 # Build
-agp = "9.1.0"
+agp = "9.1.1"
 sdk-compile = "36"
 sdk-min = "26"
 sdk-target = "36"
 
 # Kotlin
 kotlin = "2.3.20"
-kotlin-serialization = "1.10.0"
+kotlin-serialization = "1.11.0"
 kotlin-coroutines = "1.10.2"
 ksp = "2.3.6"
 
@@ -30,7 +30,7 @@ androidx-work = "2.11.2"
 androidx-splashscreen = "1.2.0"
 
 # Koin
-koin = "4.2.0"
+koin = "4.2.1"
 
 # Ktor
 ktor = "3.4.2"
@@ -43,6 +43,7 @@ peekaboo = "0.5.2"
 compose-dnd = "0.4.0"
 androidx-credentials = "1.6.0"
 googleid = "1.2.0"
+android-version-git = "0.4.14"
 
 [libraries]
 # AndroidX
@@ -115,6 +116,7 @@ google-id-token = { module = "com.google.android.libraries.identity.googleid:goo
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+androidVersionGit = { id = "com.gladed.androidgitversion", version.ref = "android-version-git" }
 
 # Kotlin
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

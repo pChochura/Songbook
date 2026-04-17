@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.kotlinMultiplatformLibrary) apply false
+    alias(libs.plugins.androidVersionGit) apply false
 }
