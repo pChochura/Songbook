@@ -21,14 +21,11 @@ import com.pointlessapps.songbook.shared.lyrics_display_mode_inline
 import com.pointlessapps.songbook.shared.lyrics_display_mode_side_by_side
 import com.pointlessapps.songbook.shared.lyrics_display_mode_text_only
 import com.pointlessapps.songbook.shared.lyrics_menu_add_to_setlists
-import com.pointlessapps.songbook.shared.lyrics_menu_broadcast_to_team
-import com.pointlessapps.songbook.shared.lyrics_menu_broadcast_to_team_description
 import com.pointlessapps.songbook.shared.lyrics_menu_delete
 import com.pointlessapps.songbook.shared.lyrics_menu_delete_description
 import com.pointlessapps.songbook.shared.lyrics_menu_display_mode
 import com.pointlessapps.songbook.shared.lyrics_menu_edit
 import com.pointlessapps.songbook.shared.lyrics_menu_key_offset
-import com.pointlessapps.songbook.shared.lyrics_menu_show_queue
 import com.pointlessapps.songbook.shared.lyrics_menu_text_scale
 import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen
 import com.pointlessapps.songbook.shared.lyrics_menu_toggle_fullscreen_description
@@ -45,9 +42,7 @@ import com.pointlessapps.songbook.ui.theme.IconDisplayMode
 import com.pointlessapps.songbook.ui.theme.IconEdit
 import com.pointlessapps.songbook.ui.theme.IconFullscreen
 import com.pointlessapps.songbook.ui.theme.IconKey
-import com.pointlessapps.songbook.ui.theme.IconQueue
 import com.pointlessapps.songbook.ui.theme.IconTextSize
-import com.pointlessapps.songbook.ui.theme.IconVoice
 import com.pointlessapps.songbook.ui.theme.IconWrapMode
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
@@ -128,17 +123,18 @@ internal fun LyricsOptionsBottomSheet(
                     .takeIf { state.selectedSetlists.isNotEmpty() },
                 onClick = { onAction(LyricsOptionsBottomSheetAction.AddToSetlists) },
             ),
-            OptionsBottomSheetItem.new(
-                icon = IconQueue,
-                label = Res.string.lyrics_menu_show_queue,
-                onClick = { onAction(LyricsOptionsBottomSheetAction.ShowQueue) },
-            ),
-            OptionsBottomSheetItem.new(
-                icon = IconVoice,
-                label = Res.string.lyrics_menu_broadcast_to_team,
-                description = stringResource(Res.string.lyrics_menu_broadcast_to_team_description),
-                onClick = { onAction(LyricsOptionsBottomSheetAction.Broadcast) },
-            ),
+//            TODO
+//            OptionsBottomSheetItem.new(
+//                icon = IconQueue,
+//                label = Res.string.lyrics_menu_show_queue,
+//                onClick = { onAction(LyricsOptionsBottomSheetAction.ShowQueue) },
+//            ),
+//            OptionsBottomSheetItem.new(
+//                icon = IconVoice,
+//                label = Res.string.lyrics_menu_broadcast_to_team,
+//                description = stringResource(Res.string.lyrics_menu_broadcast_to_team_description),
+//                onClick = { onAction(LyricsOptionsBottomSheetAction.Broadcast) },
+//            ),
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
                 icon = IconDelete,
