@@ -100,6 +100,7 @@ internal class LibraryViewModel(
 
     fun logoutClicked() {
         viewModelScope.launch {
+            // TODO show a dialog and warn about losing data
             authRepository.logout()
             syncRepository.clearDatabase()
             eventChannel.send(LibraryEvent.NavigateToIntroduction)
@@ -110,10 +111,6 @@ internal class LibraryViewModel(
         viewModelScope.launch {
             prefsRepository.setLibraryDisplayMode(mode.name)
         }
-    }
-
-    fun onSyncClicked() {
-        viewModelScope.launch { syncRepository.sync() }
     }
 
     private companion object {

@@ -78,8 +78,6 @@
     <string name="library_add_setlist_description">Utwórz setlistę, która będzie zawierać zestaw piosenek w określonej kolejności.</string>
     <string name="library_add_setlist_placeholder">Nazwa setlisty...</string>
     <string name="library_menu_display_mode">Tryb wyświetlania</string>
-    <string name="library_menu_sync">Wymuś synchronizację</string>
-    <string name="library_menu_sync_description">Wymuś natychmiastowe uruchomienie harmonogramu synchronizacji</string>
     <string name="library_menu_display_mode_list">Lista</string>
     <string name="library_menu_display_mode_list_description">Piosenki będą wyświetlane jako zwarta lista</string>
     <string name="library_menu_display_mode_grid">Siatka</string>

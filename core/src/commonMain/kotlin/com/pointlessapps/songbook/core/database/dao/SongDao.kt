@@ -10,7 +10,7 @@ import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
-import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
+import com.pointlessapps.songbook.core.song.database.mapper.toSearchEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,26 +24,18 @@ internal interface SongDao {
     @Upsert
     suspend fun insertSongs(songs: List<SongEntity>)
 
-    @Transaction
-    suspend fun insertSongsWithSearch(songs: List<SongEntity>, removeExisting: Boolean = false) {
-        if (removeExisting) {
-            deleteSongsWithSearchExcept(songs.map(SongEntity::id))
-        }
-
-        insertSongs(songs)
-        val searchEntities = songs.map { song ->
-            SongSearchEntity(
-                songId = song.id,
-                title = song.title,
-                artist = song.artist,
-                content = song.sections.toLyrics(withChords = false),
-            )
-        }
-        insertSearchIndex(searchEntities)
-    }
-
     @Upsert
     suspend fun insertSearchIndex(entities: List<SongSearchEntity>)
+
+    @Transaction
+    suspend fun insertSongWithSetlists(
+        song: SongEntity,
+        setlistsSongs: List<SetlistSongEntity>,
+    ) {
+        insertSongs(listOf(song))
+        insertSearchIndex(listOf(song.toSearchEntity()))
+        updateSongSetlists(song.id, setlistsSongs)
+    }
 
     @Query("DELETE FROM songs WHERE id = :id")
     suspend fun deleteSong(id: String)
@@ -55,18 +47,6 @@ internal interface SongDao {
     suspend fun deleteSongWithSearch(id: String) {
         deleteSong(id)
         deleteSearchIndex(id)
-    }
-
-    @Query("DELETE FROM songs WHERE id NOT IN (:ids)")
-    suspend fun deleteSongsExcept(ids: List<String>)
-
-    @Query("DELETE FROM songs_search WHERE songId NOT IN (:ids)")
-    suspend fun deleteSearchIndexesExcept(ids: List<String>)
-
-    @Transaction
-    suspend fun deleteSongsWithSearchExcept(ids: List<String>) {
-        deleteSongsExcept(ids)
-        deleteSearchIndexesExcept(ids)
     }
 
     @Query(
@@ -104,17 +84,5 @@ internal interface SongDao {
     suspend fun updateSongSetlists(songId: String, setlistSongs: List<SetlistSongEntity>) {
         deleteSongSetlist(songId)
         insertSetlistSongs(setlistSongs)
-    }
-
-    @Query("DELETE FROM songs")
-    suspend fun clearSongs()
-
-    @Query("DELETE FROM songs_search")
-    suspend fun clearSearchIndex()
-
-    @Transaction
-    suspend fun clear() {
-        clearSongs()
-        clearSearchIndex()
     }
 }

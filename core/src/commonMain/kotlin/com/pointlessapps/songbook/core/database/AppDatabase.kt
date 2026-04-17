@@ -7,6 +7,7 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import com.pointlessapps.songbook.core.database.dao.SetlistDao
 import com.pointlessapps.songbook.core.database.dao.SongDao
+import com.pointlessapps.songbook.core.database.dao.SyncDao
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
@@ -30,6 +31,7 @@ internal abstract class AppDatabase : RoomDatabase() {
     abstract fun songDao(): SongDao
     abstract fun setlistDao(): SetlistDao
     abstract fun syncActionDao(): SyncActionDao
+    abstract fun syncDao(): SyncDao
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")

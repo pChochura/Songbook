@@ -13,15 +13,12 @@ import com.pointlessapps.songbook.shared.library_menu_login
 import com.pointlessapps.songbook.shared.library_menu_login_description
 import com.pointlessapps.songbook.shared.library_menu_logout
 import com.pointlessapps.songbook.shared.library_menu_logout_description
-import com.pointlessapps.songbook.shared.library_menu_sync
-import com.pointlessapps.songbook.shared.library_menu_sync_description
 import com.pointlessapps.songbook.ui.OptionsBottomSheet
 import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
 import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
 import com.pointlessapps.songbook.ui.theme.IconDisplayMode
 import com.pointlessapps.songbook.ui.theme.IconLogin
 import com.pointlessapps.songbook.ui.theme.IconLogout
-import com.pointlessapps.songbook.ui.theme.IconSync
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -38,6 +35,16 @@ internal fun LibraryOptionsBottomSheet(
         items = listOfNotNull(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
+                icon = IconDisplayMode,
+                label = Res.string.library_menu_display_mode,
+                description = when (state.displayMode) {
+                    DisplayMode.List -> stringResource(Res.string.library_menu_display_mode_list)
+                    DisplayMode.Grid -> stringResource(Res.string.library_menu_display_mode_grid)
+                },
+                onClick = { onAction(LibraryOptionsBottomSheetAction.DisplayMode) },
+            ),
+            OptionsBottomSheetItem.Divider,
+            OptionsBottomSheetItem.new(
                 icon = IconLogin,
                 label = Res.string.library_menu_login,
                 description = stringResource(Res.string.library_menu_login_description),
@@ -49,27 +56,10 @@ internal fun LibraryOptionsBottomSheet(
                 description = stringResource(Res.string.library_menu_logout_description),
                 onClick = { onAction(LibraryOptionsBottomSheetAction.Logout) },
             ),
-            OptionsBottomSheetItem.Divider,
-            OptionsBottomSheetItem.new(
-                icon = IconDisplayMode,
-                label = Res.string.library_menu_display_mode,
-                description = when (state.displayMode) {
-                    DisplayMode.List -> stringResource(Res.string.library_menu_display_mode_list)
-                    DisplayMode.Grid -> stringResource(Res.string.library_menu_display_mode_grid)
-                },
-                onClick = { onAction(LibraryOptionsBottomSheetAction.DisplayMode) },
-            ),
-            OptionsBottomSheetItem.Divider,
-            OptionsBottomSheetItem.new(
-                icon = IconSync,
-                label = Res.string.library_menu_sync,
-                description = stringResource(Res.string.library_menu_sync_description),
-                onClick = { onAction(LibraryOptionsBottomSheetAction.Sync) },
-            ),
         ),
     )
 }
 
 internal enum class LibraryOptionsBottomSheetAction {
-    Login, Logout, DisplayMode, Sync
+    DisplayMode, Login, Logout
 }

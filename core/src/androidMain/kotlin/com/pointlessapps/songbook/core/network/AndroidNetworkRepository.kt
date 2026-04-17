@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onStart
 
-internal class NetworkRepositoryImpl(
+internal class AndroidNetworkRepository(
     private val context: Context,
 ) : NetworkRepository {
 

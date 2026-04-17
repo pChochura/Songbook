@@ -43,7 +43,6 @@ import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomShee
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.DisplayMode
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Login
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Logout
-import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Sync
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
@@ -169,10 +168,9 @@ internal fun LibraryScreen(
             isBottomSheetVisible = false
 
             when (it) {
+                DisplayMode -> isDisplayModeDialogVisible = true
                 Login -> viewModel.loginClicked()
                 Logout -> viewModel.logoutClicked()
-                DisplayMode -> isDisplayModeDialogVisible = true
-                Sync -> viewModel.onSyncClicked()
             }
         },
     )

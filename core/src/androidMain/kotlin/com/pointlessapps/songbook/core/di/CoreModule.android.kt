@@ -10,8 +10,8 @@ import com.pointlessapps.songbook.core.auth.AndroidGoogleAuthManager
 import com.pointlessapps.songbook.core.auth.GoogleAuthManager
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.database.AppDatabaseConstructor
+import com.pointlessapps.songbook.core.network.AndroidNetworkRepository
 import com.pointlessapps.songbook.core.network.NetworkRepository
-import com.pointlessapps.songbook.core.network.NetworkRepositoryImpl
 import okio.Path.Companion.toPath
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
@@ -42,7 +42,7 @@ internal actual val platformModule = module {
         )
     }
 
-    singleOf(::NetworkRepositoryImpl).bind<NetworkRepository>()
+    singleOf(::AndroidNetworkRepository).bind<NetworkRepository>()
     single<GoogleAuthManager> {
         AndroidGoogleAuthManager(
             context = androidContext(),

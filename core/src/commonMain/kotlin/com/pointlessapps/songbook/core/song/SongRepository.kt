@@ -95,10 +95,9 @@ internal class SongRepositoryImpl(
                 sections = newSong.sections,
             )
 
-            songDao.insertSongsWithSearch(listOf(song.toEntity()))
-            songDao.updateSongSetlists(
-                songId = song.id,
-                setlistSongs = setlistsIds.mapIndexed { index, setlistId ->
+            songDao.insertSongWithSetlists(
+                song = song.toEntity(),
+                setlistsSongs = setlistsIds.mapIndexed { index, setlistId ->
                     SetlistSongEntity(setlistId, song.id, index)
                 },
             )

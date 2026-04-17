@@ -53,7 +53,7 @@ internal class AppViewModel(
     ) { _, loginStatus -> loginStatus }
         .flatMapLatest { loginStatus ->
             return@flatMapLatest if (loginStatus.isLoggedIn) {
-                syncRepository.observeRemoteAsFlow()
+                syncRepository.performSyncAsFlow()
             } else {
                 emptyFlow()
             }

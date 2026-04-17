@@ -8,8 +8,8 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.pointlessapps.songbook.core.app.di.appModule
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.database.AppDatabaseConstructor
+import com.pointlessapps.songbook.core.network.IosNetworkRepository
 import com.pointlessapps.songbook.core.network.NetworkRepository
-import com.pointlessapps.songbook.core.network.NetworkRepositoryImpl
 import com.pointlessapps.songbook.core.utils.documentDirectory
 import okio.Path.Companion.toPath
 import org.koin.core.module.dsl.singleOf
@@ -34,7 +34,7 @@ internal actual val platformModule = module {
         )
     }
 
-    singleOf(::NetworkRepositoryImpl).bind<NetworkRepository>()
+    singleOf(::IosNetworkRepository).bind<NetworkRepository>()
 
     includes(appModule)
 }

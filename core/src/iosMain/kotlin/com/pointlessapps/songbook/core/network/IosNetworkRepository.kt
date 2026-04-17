@@ -15,7 +15,7 @@ import platform.Network.nw_path_status_satisfied
 import platform.Network.nw_path_t
 import platform.darwin.dispatch_get_main_queue
 
-internal class NetworkRepositoryImpl : NetworkRepository {
+internal class IosNetworkRepository : NetworkRepository {
 
     override val networkStatus: Flow<NetworkStatus> = callbackFlow {
         val monitor = nw_path_monitor_create()

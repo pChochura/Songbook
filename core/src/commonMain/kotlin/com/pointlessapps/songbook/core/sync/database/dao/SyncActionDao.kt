@@ -11,15 +11,9 @@ internal interface SyncActionDao {
     @Query("SELECT * FROM sync_actions ORDER BY createdAt ASC")
     fun getAllActionsFlow(): Flow<List<SyncActionEntity>>
 
-    @Query("SELECT * FROM sync_actions ORDER BY createdAt ASC")
-    suspend fun getAllActions(): List<SyncActionEntity>
-
     @Insert
     suspend fun insertAction(action: SyncActionEntity)
 
     @Query("DELETE FROM sync_actions WHERE id = :id")
     suspend fun deleteAction(id: Long)
-
-    @Query("DELETE FROM sync_actions")
-    suspend fun clearActions()
 }

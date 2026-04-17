@@ -47,45 +47,24 @@ internal interface SetlistDao {
     @Upsert
     suspend fun insertSetlists(setlists: List<SetlistEntity>)
 
-    @Query("DELETE FROM setlists WHERE id NOT IN (:ids)")
-    suspend fun deleteSetlistsExcept(ids: List<String>)
-
-    @Transaction
-    suspend fun replaceSetlists(setlists: List<SetlistEntity>) {
-        deleteSetlistsExcept(setlists.map(SetlistEntity::id))
-        insertSetlists(setlists)
-    }
-
     @Query("UPDATE setlists SET name = :name WHERE id = :id")
     suspend fun updateSetlistName(id: String, name: String)
 
     @Upsert
     suspend fun insertSetlistSongs(setlistSongs: List<SetlistSongEntity>)
 
-    @Query("DELETE FROM setlist_songs WHERE setlist_id NOT IN (:setlistIds)")
-    suspend fun deleteSetlistSongsExcept(setlistIds: List<String>)
-
-    @Transaction
-    suspend fun replaceSetlistSongs(setlistSongs: List<SetlistSongEntity>) {
-        deleteSetlistSongsExcept(setlistSongs.map(SetlistSongEntity::setlistId))
-        insertSetlistSongs(setlistSongs)
-    }
-
     @Transaction
     suspend fun updateSetlistSongs(setlistId: String, setlistSongs: List<SetlistSongEntity>) {
-        deleteSetlistSongs(setlistId)
+        deleteSetlistSongsExcept(setlistId, setlistSongs.map(SetlistSongEntity::songId))
         insertSetlistSongs(setlistSongs)
     }
 
     @Query("DELETE FROM setlist_songs WHERE setlist_id = :setlistId AND song_id = :songId")
     suspend fun deleteSetlistSong(setlistId: String, songId: String)
 
-    @Query("DELETE FROM setlist_songs WHERE setlist_id = :setlistId")
-    suspend fun deleteSetlistSongs(setlistId: String)
+    @Query("DELETE FROM setlist_songs WHERE setlist_id = :setlistId AND song_id NOT IN (:songIds)")
+    suspend fun deleteSetlistSongsExcept(setlistId: String, songIds: List<String>)
 
     @Query("DELETE FROM setlists WHERE id = :id")
     suspend fun deleteSetlist(id: String)
-
-    @Query("DELETE FROM setlists")
-    suspend fun clearSetlists()
 }

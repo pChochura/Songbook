@@ -78,8 +78,6 @@
     <string name="library_add_setlist_description">Create a setlist that will contain a set of songs with a specified order.</string>
     <string name="library_add_setlist_placeholder">Setlist name...</string>
     <string name="library_menu_display_mode">Display mode</string>
-    <string name="library_menu_sync">Force a sync</string>
-    <string name="library_menu_sync_description">Force the schedule of the synchronization to be run immediately</string>
     <string name="library_menu_display_mode_list">List</string>
     <string name="library_menu_display_mode_list_description">The songs will be displayed as a compact list</string>
     <string name="library_menu_display_mode_grid">Grid</string>

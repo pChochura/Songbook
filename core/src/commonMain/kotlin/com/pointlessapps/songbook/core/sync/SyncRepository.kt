@@ -1,7 +1,6 @@
 package com.pointlessapps.songbook.core.sync
 
-import com.pointlessapps.songbook.core.database.dao.SetlistDao
-import com.pointlessapps.songbook.core.database.dao.SongDao
+import com.pointlessapps.songbook.core.database.dao.SyncDao
 import com.pointlessapps.songbook.core.network.NetworkRepository
 import com.pointlessapps.songbook.core.network.model.NetworkStatus
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
@@ -11,6 +10,7 @@ import com.pointlessapps.songbook.core.song.database.mapper.toEntity
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.database.dao.SyncActionDao
 import com.pointlessapps.songbook.core.sync.database.entity.SyncAction
+import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
@@ -34,15 +33,14 @@ import kotlinx.coroutines.flow.onStart
 interface SyncRepository {
     val currentSyncStatusFlow: StateFlow<SyncStatus>
 
-    fun observeRemoteAsFlow(): Flow<Unit>
-    suspend fun sync(): Result<Unit>
+    fun performSyncAsFlow(): Flow<Unit>
+
     suspend fun clearDatabase()
 }
 
 internal class SyncRepositoryImpl(
     supabase: SupabaseClient,
-    private val songDao: SongDao,
-    private val setlistDao: SetlistDao,
+    private val syncDao: SyncDao,
     private val syncActionDao: SyncActionDao,
     private val networkRepository: NetworkRepository,
 ) : SyncRepository {
@@ -55,13 +53,14 @@ internal class SyncRepositoryImpl(
     override val currentSyncStatusFlow: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class, SupabaseExperimental::class)
-    override fun observeRemoteAsFlow() = networkRepository.networkStatus.flatMapLatest { status ->
+    override fun performSyncAsFlow() = networkRepository.networkStatus.flatMapLatest { status ->
         if (status == NetworkStatus.OFFLINE) {
             _syncStatus.value = SyncStatus.OFFLINE
             return@flatMapLatest flowOf(Unit)
         }
 
         combine(
+            syncActionDao.getAllActionsFlow(),
             songsTable.selectAsFlow(primaryKey = Song::id),
             setlistsTable.selectAsFlow(primaryKey = Setlist::id),
             setlistSongsTable.selectAsFlow(
@@ -70,12 +69,18 @@ internal class SyncRepositoryImpl(
                     SetlistSongEntity::songId,
                 ),
             ),
-        ) { songs, setlists, setlistSongs ->
+        ) { syncActions, songs, setlists, setlistSongs ->
             _syncStatus.value = SyncStatus.SYNCING
 
-            saveSongs(songs)
-            saveSetlists(setlists)
-            saveSetlistSongs(setlistSongs)
+            // Make sure local changes are reflected on the remote first
+            // We save the current data only if there were no actions
+            if (!performActions(syncActions)) {
+                saveData(
+                    songs = songs,
+                    setlists = setlists,
+                    setlistSongs = setlistSongs,
+                )
+            }
 
             _syncStatus.value = SyncStatus.SYNCED
         }.onStart {
@@ -86,21 +91,12 @@ internal class SyncRepositoryImpl(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun sync(): Result<Unit> {
-        networkRepository.networkStatus.firstOrNull()?.let {
-            if (it == NetworkStatus.OFFLINE) {
-                _syncStatus.value = SyncStatus.OFFLINE
+    override suspend fun clearDatabase() = syncDao.clear()
 
-                return Result.success(Unit)
-            }
-        }
+    private suspend fun performActions(actions: List<SyncActionEntity>): Boolean {
+        var performedAction = false
 
-        val actions = syncActionDao.getAllActions()
-        if (actions.isEmpty()) return Result.success(Unit)
-
-        return runCatching {
-            _syncStatus.value = SyncStatus.SYNCING
-
+        runCatching {
             actions.forEach { action ->
                 when (val payload = action.syncAction) {
                     is SyncAction.SaveSong -> {
@@ -127,7 +123,14 @@ internal class SyncRepositoryImpl(
                         )
 
                     is SyncAction.UpdateSongSetlists -> {
-                        setlistSongsTable.delete { filter { SetlistSongEntity::songId eq payload.id } }
+                        setlistSongsTable.delete {
+                            filter {
+                                SetlistSongEntity::songId eq payload.id
+                                and(negate = true) {
+                                    SetlistSongEntity::setlistId isIn payload.setlistsIds
+                                }
+                            }
+                        }
                         setlistSongsTable.upsert(
                             payload.setlistsIds.mapIndexed { index, setlistId ->
                                 SetlistSongEntity(setlistId, payload.id, index)
@@ -136,7 +139,14 @@ internal class SyncRepositoryImpl(
                     }
 
                     is SyncAction.UpdateSetlistSongs -> {
-                        setlistSongsTable.delete { filter { SetlistSongEntity::setlistId eq payload.id } }
+                        setlistSongsTable.delete {
+                            filter {
+                                SetlistSongEntity::setlistId eq payload.id
+                                and(negate = true) {
+                                    SetlistSongEntity::songId isIn payload.songsIds
+                                }
+                            }
+                        }
                         setlistSongsTable.upsert(
                             payload.songsIds.mapIndexed { index, songId ->
                                 SetlistSongEntity(payload.id, songId, index)
@@ -157,35 +167,25 @@ internal class SyncRepositoryImpl(
                 }
 
                 syncActionDao.deleteAction(action.id)
+                performedAction = true
             }
-
-            _syncStatus.value = SyncStatus.SYNCED
         }.onFailure {
+            // TODO throw an error and notify the user
             it.printStackTrace()
-            _syncStatus.value = SyncStatus.SYNC_FAILED
         }
+
+        return performedAction
     }
 
-    override suspend fun clearDatabase() {
-        songDao.clear()
-        setlistDao.clearSetlists()
-        syncActionDao.clearActions()
-    }
-
-    private suspend fun saveSongs(songs: List<Song>) {
-        songDao.insertSongsWithSearch(
-            songs = songs.map(Song::toEntity),
-            removeExisting = true,
-        )
-    }
-
-    private suspend fun saveSetlists(setlists: List<Setlist>) {
-        setlistDao.replaceSetlists(setlists.map(Setlist::toEntity))
-    }
-
-    private suspend fun saveSetlistSongs(setlistSongs: List<SetlistSongEntity>) {
-        setlistDao.replaceSetlistSongs(setlistSongs)
-    }
+    private suspend fun saveData(
+        songs: List<Song>,
+        setlists: List<Setlist>,
+        setlistSongs: List<SetlistSongEntity>,
+    ) = syncDao.replaceAll(
+        songs = songs.map(Song::toEntity),
+        setlists = setlists.map(Setlist::toEntity),
+        setlistSongs = setlistSongs,
+    )
 
     private companion object {
         const val SONGS_TABLE = "songs"
