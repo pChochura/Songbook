@@ -66,6 +66,9 @@ internal interface SyncDao {
     @Query("DELETE FROM setlists")
     suspend fun clearSetlists()
 
+    @Query("DELETE FROM setlist_songs")
+    suspend fun clearSetlistSongs()
+
     @Query("DELETE FROM sync_actions")
     suspend fun clearActions()
 
@@ -75,6 +78,7 @@ internal interface SyncDao {
         clearSearchIndex()
 
         clearSetlists()
+        clearSetlistSongs()
 
         clearActions()
     }
