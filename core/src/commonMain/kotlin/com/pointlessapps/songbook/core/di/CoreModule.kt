@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.core.di
 
+import com.pointlessapps.songbook.core.BuildKonfig
 import com.pointlessapps.songbook.core.auth.di.authModule
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.prefs.di.prefsModule
@@ -39,8 +40,8 @@ val coreModule = module {
 
     single<SupabaseClient> {
         createSupabaseClient(
-            supabaseUrl = getProperty("SUPABASE_URL"),
-            supabaseKey = getProperty("SUPABASE_KEY"),
+            supabaseUrl = BuildKonfig.SUPABASE_URL,
+            supabaseKey = BuildKonfig.SUPABASE_KEY,
         ) {
             install(Realtime)
             install(Postgrest)

@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.pointlessapps.songbook.core.BuildKonfig
 import com.pointlessapps.songbook.core.app.di.appModule
 import com.pointlessapps.songbook.core.auth.AndroidGoogleAuthManager
 import com.pointlessapps.songbook.core.auth.GoogleAuthManager
@@ -46,7 +47,7 @@ internal actual val platformModule = module {
     single<GoogleAuthManager> {
         AndroidGoogleAuthManager(
             context = androidContext(),
-            webClientId = getProperty("GOOGLE_WEB_CLIENT_ID"),
+            webClientId = BuildKonfig.GOOGLE_WEB_CLIENT_ID,
         )
     }
 

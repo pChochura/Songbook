@@ -20,7 +20,7 @@ internal class IosNetworkRepository : NetworkRepository {
     override val networkStatus: Flow<NetworkStatus> = callbackFlow {
         val monitor = nw_path_monitor_create()
 
-        nw_path_monitor_set_update_handler(monitor) { path: nw_path_t? ->
+        nw_path_monitor_set_update_handler(monitor) { path: nw_path_t ->
             val status = nw_path_get_status(path)
             if (status == nw_path_status_satisfied) {
                 trySend(NetworkStatus.ONLINE)

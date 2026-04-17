@@ -1,4 +1,6 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -6,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.buildKonfig)
 }
 
 room {
@@ -74,4 +77,30 @@ dependencies {
     add("kspAndroid", libs.room.compiler)
     add("kspIosArm64", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)
+}
+
+buildkonfig {
+    packageName = "com.pointlessapps.songbook.core"
+
+    val props = Properties().apply {
+        load(project.rootProject.file("local.properties").inputStream())
+    }
+
+    defaultConfigs {
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "SUPABASE_URL",
+            props.getProperty("SUPABASE_URL"),
+        )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "SUPABASE_KEY",
+            props.getProperty("SUPABASE_KEY"),
+        )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "GOOGLE_WEB_CLIENT_ID",
+            props.getProperty("GOOGLE_WEB_CLIENT_ID"),
+        )
+    }
 }

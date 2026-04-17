@@ -44,6 +44,7 @@ compose-dnd = "0.4.0"
 androidx-credentials = "1.6.0"
 googleid = "1.2.0"
 android-version-git = "0.4.14"
+build-konfig = "0.18.0"
 
 [libraries]
 # AndroidX
@@ -130,3 +131,6 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-mu
 # Room
 room = { id = "androidx.room", version.ref = "androidx-room" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+# Misc
+buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "build-konfig" }

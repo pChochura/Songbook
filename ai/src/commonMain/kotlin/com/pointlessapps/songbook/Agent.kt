@@ -131,9 +131,9 @@ internal class OllamaAgent(
     }
 }
 
-internal class G4fAgent(
-    override val key: String,
-) : Agent {
+internal class G4fAgent : Agent {
+
+    override val key = ""
 
     private companion object {
         const val BASE_URL = "https://g4f.dev/v1/chat/completions"
