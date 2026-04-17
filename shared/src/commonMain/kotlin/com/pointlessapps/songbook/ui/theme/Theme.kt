@@ -1,6 +1,5 @@
 package com.pointlessapps.songbook.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -122,22 +121,23 @@ private fun darkColorPalette() = darkColorScheme(
 
 @Composable
 fun SongbookTheme(
-    isDarkTheme: Boolean = isSystemInDarkTheme(),
     lightColorPalette: ColorScheme = lightColorPalette(),
     darkColorPalette: ColorScheme = darkColorPalette(),
     typography: Typography = typography(),
     shapes: Shapes = shapes(),
     content: @Composable () -> Unit,
-) {
-    val colorScheme = when {
-        isDarkTheme -> darkColorPalette
-        else -> lightColorPalette
-    }
+) = MaterialTheme(
+    colorScheme = platformColorPalette(
+        lightColorPalette = lightColorPalette,
+        darkColorPalette = darkColorPalette,
+    ),
+    typography = typography,
+    shapes = shapes,
+    content = content,
+)
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = typography,
-        shapes = shapes,
-        content = content,
-    )
-}
+@Composable
+expect fun platformColorPalette(
+    lightColorPalette: ColorScheme,
+    darkColorPalette: ColorScheme,
+): ColorScheme
