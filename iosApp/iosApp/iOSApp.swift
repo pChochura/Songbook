@@ -1,6 +1,5 @@
-import SwiftUI
 import ComposeApp
-import BackgroundTasks
+import SwiftUI
 
 @main
 struct iOSApp: App {
@@ -15,7 +14,7 @@ struct iOSApp: App {
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        IosSyncManager().registerTasks()
+        KoinIOSKt.doInitKoin()
         return true
     }
 }

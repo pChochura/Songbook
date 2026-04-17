@@ -12,14 +12,14 @@ import kotlinx.serialization.modules.polymorphic
 import kotlin.time.Clock
 
 @Entity(tableName = "sync_actions")
-internal data class SyncActionEntity(
+data class SyncActionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val syncAction: SyncAction,
     val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
 )
 
 @Serializable
-internal sealed interface SyncAction {
+sealed interface SyncAction {
     @Keep
     @Serializable
     data class SaveSong(

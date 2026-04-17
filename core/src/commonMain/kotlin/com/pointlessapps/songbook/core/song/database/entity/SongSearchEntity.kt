@@ -5,9 +5,9 @@ import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
 
-@Fts4
+@Fts4(contentEntity = Any::class)
 @Entity(tableName = "songs_search")
-internal data class SongSearchEntity(
+data class SongSearchEntity(
     @PrimaryKey @ColumnInfo(name = "rowid") val id: Int? = null,
     val songId: String,
     val title: String,

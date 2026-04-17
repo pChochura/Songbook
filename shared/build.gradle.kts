@@ -12,10 +12,6 @@ group = "com.pointlessapps.songbook"
 version = "1.0.0"
 
 kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll("-XXLanguage:+ExpectRefinement")
-    }
-
     android {
         namespace = "com.pointlessapps.songbook.shared"
         compileSdk = libs.versions.sdk.compile.get().toInt()
@@ -35,7 +31,9 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = true
+            isStatic = false
+            export(projects.core)
+            export(projects.ai)
         }
     }
 
@@ -69,8 +67,8 @@ kotlin {
 
             implementation(libs.compose.dnd)
 
-            implementation(projects.core)
-            implementation(projects.ai)
+            api(projects.core)
+            api(projects.ai)
         }
 
         androidMain.dependencies {
