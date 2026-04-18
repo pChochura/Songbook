@@ -4,7 +4,7 @@ import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
 
 object LyricsParser {
-    private val sectionHeaderRegex = Regex("""^\[(.*)]$""", RegexOption.IGNORE_CASE)
+    private val sectionHeaderRegex = Regex("""^\[([^]]+)]$""", RegexOption.IGNORE_CASE)
     private val chordRegex = Regex("""\[([^]]+)]""")
 
     fun parseLyrics(lyrics: String): List<Section> {
