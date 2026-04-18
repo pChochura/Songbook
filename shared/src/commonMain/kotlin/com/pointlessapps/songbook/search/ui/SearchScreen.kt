@@ -198,7 +198,7 @@ internal fun SearchScreen(
                         SearchResultCard(
                             modifier = Modifier.animateItem(),
                             result = result,
-                            onClick = { navigator.navigateToLyrics(result.id) },
+                            onClick = { navigator.navigateToLyrics(result.songId) },
                         )
                     }
                 }

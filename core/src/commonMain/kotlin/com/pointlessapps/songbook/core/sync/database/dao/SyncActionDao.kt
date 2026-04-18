@@ -14,6 +14,6 @@ internal interface SyncActionDao {
     @Insert
     suspend fun insertAction(action: SyncActionEntity)
 
-    @Query("DELETE FROM sync_actions WHERE id = :id")
-    suspend fun deleteAction(id: Long)
+    @Query("DELETE FROM sync_actions WHERE id IN (:ids)")
+    suspend fun deleteActions(ids: List<Long>)
 }

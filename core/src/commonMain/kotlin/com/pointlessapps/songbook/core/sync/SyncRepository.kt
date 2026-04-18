@@ -18,17 +18,22 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.realtime.selectAsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 interface SyncRepository {
     val currentSyncStatusFlow: StateFlow<SyncStatus>
@@ -52,7 +57,9 @@ internal class SyncRepositoryImpl(
     private val _syncStatus = MutableStateFlow(SyncStatus.LOCAL)
     override val currentSyncStatusFlow: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class, SupabaseExperimental::class)
+    private val syncMutex = Mutex()
+
+    @OptIn(ExperimentalCoroutinesApi::class, SupabaseExperimental::class, FlowPreview::class)
     override fun performSyncAsFlow() = networkRepository.networkStatus.flatMapLatest { status ->
         if (status == NetworkStatus.OFFLINE) {
             _syncStatus.value = SyncStatus.OFFLINE
@@ -70,33 +77,40 @@ internal class SyncRepositoryImpl(
                 ),
             ),
         ) { syncActions, songs, setlists, setlistSongs ->
-            _syncStatus.value = SyncStatus.SYNCING
-
-            // Make sure local changes are reflected on the remote first
-            // We save the current data only if there were no actions
-            if (!performActions(syncActions)) {
-                saveData(
-                    songs = songs,
-                    setlists = setlists,
-                    setlistSongs = setlistSongs,
-                )
-            }
-
-            _syncStatus.value = SyncStatus.SYNCED
-        }.onStart {
-            _syncStatus.value = SyncStatus.SYNCING
+            SyncPayload(
+                actions = syncActions,
+                songs = songs,
+                setlists = setlists,
+                setlistSongs = setlistSongs,
+            )
+        }.debounce(SYNC_DEBOUNCE).conflate().map {
+            syncMutex.withLock { performSafeSync(it) }
         }.onCompletion {
             it?.printStackTrace()
             _syncStatus.value = if (it != null) SyncStatus.SYNC_FAILED else SyncStatus.LOCAL
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun clearDatabase() = syncDao.clear()
+    private suspend fun performSafeSync(payload: SyncPayload) {
+        _syncStatus.value = SyncStatus.SYNCING
 
-    private suspend fun performActions(actions: List<SyncActionEntity>): Boolean {
-        var performedAction = false
+        if (payload.actions.isNotEmpty()) {
+            processRemoteActions(payload.actions)
+        } else {
+            saveData(
+                songs = payload.songs,
+                setlists = payload.setlists,
+                setlistSongs = payload.setlistSongs,
+            )
+        }
 
-        runCatching {
+        _syncStatus.value = SyncStatus.SYNCED
+    }
+
+    private suspend fun processRemoteActions(actions: List<SyncActionEntity>) {
+        val finishedActionIds = mutableSetOf<Long>()
+
+        val exception = runCatching {
             actions.forEach { action ->
                 when (val payload = action.syncAction) {
                     is SyncAction.SaveSong -> {
@@ -166,15 +180,12 @@ internal class SyncRepositoryImpl(
                         }
                 }
 
-                syncActionDao.deleteAction(action.id)
-                performedAction = true
+                finishedActionIds.add(action.id)
             }
-        }.onFailure {
-            // TODO throw an error and notify the user
-            it.printStackTrace()
-        }
+        }.exceptionOrNull()
 
-        return performedAction
+        syncActionDao.deleteActions(finishedActionIds.toList())
+        exception?.let { throw it }
     }
 
     private suspend fun saveData(
@@ -187,9 +198,20 @@ internal class SyncRepositoryImpl(
         setlistSongs = setlistSongs,
     )
 
+    override suspend fun clearDatabase() = syncDao.clear()
+
+    private data class SyncPayload(
+        val actions: List<SyncActionEntity>,
+        val songs: List<Song>,
+        val setlists: List<Setlist>,
+        val setlistSongs: List<SetlistSongEntity>,
+    )
+
     private companion object {
         const val SONGS_TABLE = "songs"
         const val SETLISTS_TABLE = "setlists"
         const val SETLIST_SONGS_TABLE = "setlist_songs"
+
+        const val SYNC_DEBOUNCE = 2000L
     }
 }

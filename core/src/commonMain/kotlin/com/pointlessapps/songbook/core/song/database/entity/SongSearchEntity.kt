@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
 
-@Fts4(contentEntity = Any::class)
+@Fts4
 @Entity(tableName = "songs_search")
 data class SongSearchEntity(
     @PrimaryKey @ColumnInfo(name = "rowid") val id: Int? = null,

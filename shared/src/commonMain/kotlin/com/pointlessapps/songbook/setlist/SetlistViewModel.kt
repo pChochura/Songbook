@@ -12,7 +12,6 @@ import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
-import com.pointlessapps.songbook.core.sync.model.SyncStatus.SYNCED
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_undo
 import com.pointlessapps.songbook.shared.error_setlist_not_found
@@ -74,7 +73,7 @@ internal class SetlistViewModel(
     private val _transientState = MutableStateFlow(SetlistTransientState())
 
     val state: StateFlow<SetlistState> = combine(
-        syncRepository.currentSyncStatusFlow.onEach { if (it == SYNCED) updateLocalSongs() },
+        syncRepository.currentSyncStatusFlow.onEach { if (it.idle) updateLocalSongs() },
         setlistRepository.getSetlistByIdFlow(id),
         _transientState,
     ) { syncStatus, setlist, transient ->

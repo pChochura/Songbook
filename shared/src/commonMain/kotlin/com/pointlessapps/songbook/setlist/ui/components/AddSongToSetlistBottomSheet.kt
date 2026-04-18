@@ -108,8 +108,8 @@ internal fun AddSongToSetlistBottomSheet(
                     SearchResultCard(
                         modifier = Modifier.animateItem(),
                         result = result,
-                        selected = setlistsSongIds.contains(result.id),
-                        onClick = { onItemClicked(result.id) },
+                        selected = setlistsSongIds.contains(result.songId),
+                        onClick = { onItemClicked(result.songId) },
                     )
                 }
             }

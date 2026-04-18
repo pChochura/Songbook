@@ -28,8 +28,8 @@ internal interface SyncDao {
     @Query("DELETE FROM songs WHERE id NOT IN (:ids)")
     suspend fun deleteSongsExcept(ids: List<String>)
 
-    @Query("DELETE FROM songs_search WHERE songId NOT IN (:ids)")
-    suspend fun deleteSearchIndexesExcept(ids: List<String>)
+    @Query("DELETE FROM songs_search")
+    suspend fun deleteSearchIndexes()
 
     @Query("DELETE FROM setlists WHERE id NOT IN (:ids)")
     suspend fun deleteSetlistsExcept(ids: List<String>)
@@ -43,16 +43,13 @@ internal interface SyncDao {
         setlists: List<SetlistEntity>,
         setlistSongs: List<SetlistSongEntity>,
     ) {
-        val songIds = songs.map(SongEntity::id)
-        deleteSongsExcept(songIds)
-        deleteSearchIndexesExcept(songIds)
-
-        deleteSetlistsExcept(setlists.map(SetlistEntity::id))
         deleteSetlistSongsExcept(setlistSongs.map(SetlistSongEntity::setlistId))
+        deleteSetlistsExcept(setlists.map(SetlistEntity::id))
+        deleteSongsExcept(songs.map(SongEntity::id))
+        deleteSearchIndexes()
 
         insertSongs(songs)
         insertSearchIndex(songs.map(SongEntity::toSearchEntity))
-
         insertSetlists(setlists)
         insertSetlistSongs(setlistSongs)
     }

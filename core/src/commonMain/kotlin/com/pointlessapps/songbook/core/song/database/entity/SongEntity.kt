@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.utils.Keep
 
-@Entity(tableName = "songs")
 @Keep
+@Entity(tableName = "songs")
 internal data class SongEntity(
     @PrimaryKey val id: String,
     val title: String,

@@ -52,7 +52,8 @@ internal interface SongDao {
     @Query(
         """
         SELECT 
-            songId as id,
+            rowid as id,
+            songId,
             title, 
             artist, 
             snippet(songs_search, '<b>', '</b>', '...', -1, 10) as snippet
