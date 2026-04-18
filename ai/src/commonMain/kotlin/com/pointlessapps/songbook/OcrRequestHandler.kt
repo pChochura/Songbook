@@ -11,47 +11,37 @@ import kotlinx.serialization.json.putJsonObject
 import kotlin.io.encoding.Base64
 
 internal fun createOcrPrompt() = """
-### Final Refined Prompt
+**Role:** Expert Music Transcriptionist specializing in Songbook Pro/ChordPro formatting.
 
-**Role:** Act as a music transcription assistant specializing in multi-document batch processing of song sheets.
+**Objective:** Extract song data from one or more song sheets in a single image. Return a JSON array of song objects.
 
-**Task:** Extract information from one or more song sheets in a single image. Distinguish between chords synchronized with specific lines of lyrics and general chord notations or repetition symbols written in the margins.
+**Extraction Logic & Rules:**
 
-**Extraction Rules:**
-
-1.  **Multi-Song Detection:** Identify each distinct song in the image. Return a JSON array of song objects.
-2.  **Title & Artist:** Extract the song title and artist. Sanitize titles by removing leading numbers or punctuation. Use `null` if the artist is missing.
-3.  **Sections & Categorization:** Organize the song into sections (e.g., `verse`, `chorus`, `bridge`, `outro`, `intro`).
-4.  **Sectional Chords & Symbols (Beside Text):** Within each section, include a field `chords_beside`. Capture any chords, progressions, or repetition symbols (e.g., `%`, `x2`, `(bis)`) written in the margins or to the side of that specific section. **Return these as an array of strings.** Use `[]` if none are present.
-5.  **Lyrics & Synced Chords:** For each line within a section:
-    * `text`: The cleaned lyric line (no leading verse numbers).
-    * `chords_above`: Chords written directly over or above the words. **Return these as an array of strings.** Use `[]` if no chords are present.
-6.  **Validation Logic:** Cross-reference all extracted "chords" against standard musical notation (A-G, sharps/flats, minor, 7ths, etc.). If a handwritten character is ambiguous (e.g., an '8' that looks like a 'B'), prioritize the musical interpretation.
+1.  **Multi-Song Detection:** Treat each distinct song as a separate object in the array.
+2.  **Metadata:**
+    * `title`: Cleaned title (no leading numbers).
+    * `artist`: Artist name or `null`.
+    * `chords_beside`: Extract marginal chords or repetition symbols (e.g., `%`, `x2`) appearing to the side of the main text.
+3.  **Songbook Pro Content:** Format the `content` field as a continuous string:
+    * **Sections:** Headers in brackets, e.g., `[Verse]`, `[Chorus]`, `[Bridge]`.
+    * **Solo Annotations:** Treat any "Solo" or "Instrumental" markings as section headers (e.g., `[Solo]`).
+    * **Inline Chords:** Place chords inside brackets `[C]` immediately before or within the lyric line where they are synchronized.
+    * **Cleaning:** Remove leading line numbers or verse markers from the lyrics.
+4.  **Musical Heuristics:** Correct OCR errors using musical context (e.g., prioritize `B7` over `87`).
 
 **Output Format:**
+Return **strictly** a JSON array. No conversational prose.
 
 ```json
 [
   {
     "title": "Song Title",
     "artist": "Artist Name",
-    "sections": [
-      {
-        "type": "verse|chorus|bridge|outro|intro",
-        "chords_beside": ["G", "D7", "%", "x2"],
-        "lines": [
-          {
-            "text": "Lyric line here",
-            "chords_above": ["G", "C"]
-          }
-        ]
-      }
-    ]
+    "chords_beside": ["G", "D7", "%"],
+    "content": "[Intro]\n[G] [D]\n\n[Verse]\nThis is a [G]lyric line with [C]chords\n\n[Solo]\n[Am] [F] [C] [G]"
   }
 ]
 ```
-
-**Constraint:** Return **strictly** the JSON array. No conversational prose or explanations.
 """.trimIndent()
 
 internal fun createG4fRequestBody(

@@ -9,7 +9,6 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.timeout
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -61,7 +60,7 @@ internal class GeminiAgent(
 ) : Agent {
 
     private companion object {
-        const val MODEL = "gemini-2.5-flash-lite"
+        const val MODEL = "gemini-2.5-flash"
         const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
     }
 
@@ -76,22 +75,14 @@ internal class GeminiAgent(
                     mimeType = "image/jpeg",
                 ),
             )
-
-            timeout {
-                requestTimeoutMillis = 30_000L
-                connectTimeoutMillis = 30_000L
-                socketTimeoutMillis = 30_000L
-            }
         }
 
         val body = withContext(Dispatchers.Default) { response.body<OcrResponseBody>() }
         val responseText = body.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
-        return runCatching<List<SongData>?> {
-            responseText?.removeSurrounding(
-                prefix = "```json",
-                suffix = "```",
-            )?.let(jsonInstance::decodeFromString)
-        }.getOrNull()
+        return responseText?.removeSurrounding(
+            prefix = "```json",
+            suffix = "```",
+        )?.let(jsonInstance::decodeFromString)
     }
 }
 
@@ -113,21 +104,13 @@ internal class OllamaAgent(
                     bytes = bytes,
                 ),
             )
-
-            timeout {
-                requestTimeoutMillis = 30_000L
-                connectTimeoutMillis = 30_000L
-                socketTimeoutMillis = 30_000L
-            }
         }
 
         val body = withContext(Dispatchers.Default) { response.body<OllamaResponseBody>() }
-        return runCatching<List<SongData>?> {
-            body.response.removeSurrounding(
-                prefix = "```json",
-                suffix = "```",
-            ).let(jsonInstance::decodeFromString)
-        }.getOrNull()
+        return body.response.removeSurrounding(
+            prefix = "```json",
+            suffix = "```",
+        ).let(jsonInstance::decodeFromString)
     }
 }
 
@@ -148,21 +131,13 @@ internal class G4fAgent : Agent {
                     bytes = bytes,
                 ),
             )
-
-            timeout {
-                requestTimeoutMillis = 30_000L
-                connectTimeoutMillis = 30_000L
-                socketTimeoutMillis = 30_000L
-            }
         }
 
         val body = withContext(Dispatchers.Default) { response.body<G4fResponseBody>() }
         val responseText = body.choices.firstOrNull()?.message?.content
-        return runCatching<List<SongData>?> {
-            responseText?.removeSurrounding(
-                prefix = "```json",
-                suffix = "```",
-            )?.let(jsonInstance::decodeFromString)
-        }.getOrNull()
+        return responseText?.removeSurrounding(
+            prefix = "```json",
+            suffix = "```",
+        )?.let(jsonInstance::decodeFromString)
     }
 }

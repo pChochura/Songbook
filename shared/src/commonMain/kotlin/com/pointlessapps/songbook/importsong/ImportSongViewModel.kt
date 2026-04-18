@@ -207,7 +207,9 @@ internal class ImportSongViewModel(
         extractionJob?.cancel()
         extractionJob = viewModelScope.launch {
             _transientState.update { it.copy(isExtractingInProgress = true) }
-            val result = agent.extractSongData(bytes)
+            val result = runCatching { agent.extractSongData(bytes) }.onFailure {
+                it.printStackTrace()
+            }.getOrNull()
             if (result == null) {
                 snackbarState.showSnackbar(
                     message = getString(Res.string.error_image_extraction_failed),
@@ -221,7 +223,7 @@ internal class ImportSongViewModel(
             val data = result.first()
             titleTextFieldState.setTextAndPlaceCursorAtEnd(data.title.orEmpty())
             artistTextFieldState.setTextAndPlaceCursorAtEnd(data.author.orEmpty())
-            lyricsTextFieldState.setTextAndPlaceCursorAtEnd(data.toLyrics())
+            lyricsTextFieldState.setTextAndPlaceCursorAtEnd(data.content)
             _transientState.update { it.copy(isExtractingInProgress = false) }
         }
     }
