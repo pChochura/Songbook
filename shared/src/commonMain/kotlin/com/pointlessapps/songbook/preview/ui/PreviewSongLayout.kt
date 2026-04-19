@@ -47,9 +47,11 @@ internal fun PreviewSongLayout(
     keyOffset: Int,
     onTextScaleChanged: (Int) -> Unit,
     displayMode: DisplayMode = DisplayMode.Inline,
-    wrapMode: WrapMode = WrapMode.NoWrap,
+    wrapMode: WrapMode = WrapMode.Wrap,
     editable: Boolean = false,
     paddingValues: PaddingValues = PaddingValues(),
+    onChordMoved: (Section, Section.Line, com.pointlessapps.songbook.core.song.model.Chord, Int) -> Unit = { _, _, _, _ -> },
+    onCursorFinalized: (Int) -> Unit = {},
 ) {
     var currentTextScale by remember(textScale) { mutableStateOf(textScale) }
     var chordDetailsDialogData by rememberSaveable { mutableStateOf<String?>(null) }
@@ -120,7 +122,10 @@ internal fun PreviewSongLayout(
                     keyOffset = keyOffset,
                     displayMode = displayMode,
                     wrapMode = wrapMode,
+                    editable = editable,
                     onChordClicked = { chordDetailsDialogData = it },
+                    onChordMoved = onChordMoved,
+                    onCursorFinalized = onCursorFinalized,
                     userScrollEnabled = userScrollEnabled,
                 )
             }

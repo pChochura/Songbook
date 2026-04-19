@@ -193,6 +193,14 @@ internal class LyricsViewModel(
         // TODO
     }
 
+    fun onChordMoved(section: Section, line: Section.Line, chord: com.pointlessapps.songbook.core.song.model.Chord, newPosition: Int) {
+        // TODO: Handle chord moved
+    }
+
+    fun onCursorFinalized(position: Int) {
+        // TODO: Handle cursor finalized
+    }
+
     fun onDeleteSongConfirmClicked() {
         val state = state.value.loaded
 

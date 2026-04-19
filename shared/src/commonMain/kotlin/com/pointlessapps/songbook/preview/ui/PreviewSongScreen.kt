@@ -45,6 +45,7 @@ internal fun PreviewSongScreen(
             sections = sections,
             textScale = textScale,
             keyOffset = keyOffset,
+            editable = true,
             onTextScaleChanged = { textScale = it.coerceIn(MIN_ZOOM, MAX_ZOOM) },
             paddingValues = paddingValues,
         )
