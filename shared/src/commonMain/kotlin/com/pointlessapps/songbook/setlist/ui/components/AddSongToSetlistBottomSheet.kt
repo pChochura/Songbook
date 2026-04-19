@@ -75,80 +75,82 @@ internal fun AddSongToSetlistBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(top = MaterialTheme.spacing.extraLarge),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            SongbookText(
-                text = stringResource(Res.string.setlist_search_songs),
-                textStyle = defaultSongbookTextStyle().copy(
-                    textAlign = TextAlign.Center,
-                    textColor = MaterialTheme.colorScheme.onSurface,
-                    typography = MaterialTheme.typography.titleLarge,
-                ),
-            )
-        }
+        Column(modifier = Modifier.animateContentSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(top = MaterialTheme.spacing.extraLarge),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                SongbookText(
+                    text = stringResource(Res.string.setlist_search_songs),
+                    textStyle = defaultSongbookTextStyle().copy(
+                        textAlign = TextAlign.Center,
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                        typography = MaterialTheme.typography.titleLarge,
+                    ),
+                )
+            }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .animateContentSize()
-                .padding(vertical = MaterialTheme.spacing.medium)
-                .padding(horizontal = MaterialTheme.spacing.extraLarge),
-        ) {
-            items(
-                count = searchResults.itemCount,
-                key = searchResults.itemKey { it.id },
-            ) { index ->
-                val result = searchResults[index]
-                if (result != null) {
-                    SearchResultCard(
-                        modifier = Modifier.animateItem(),
-                        result = result,
-                        selected = setlistsSongIds.contains(result.songId),
-                        onClick = { onItemClicked(result.songId) },
-                    )
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f, fill = false)
+                    .fillMaxWidth()
+                    .padding(vertical = MaterialTheme.spacing.medium)
+                    .padding(horizontal = MaterialTheme.spacing.extraLarge),
+            ) {
+                items(
+                    count = searchResults.itemCount,
+                    key = searchResults.itemKey { it.id },
+                ) { index ->
+                    val result = searchResults[index]
+                    if (result != null) {
+                        SearchResultCard(
+                            modifier = Modifier.animateItem(),
+                            result = result,
+                            selected = setlistsSongIds.contains(result.songId),
+                            onClick = { onItemClicked(result.songId) },
+                        )
+                    }
                 }
             }
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(bottom = MaterialTheme.spacing.extraLarge)
-                .padding(horizontal = MaterialTheme.spacing.extraLarge),
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
-        ) {
-            SongbookTextField(
-                state = textFieldState,
+            Row(
                 modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .border(
-                        width = DEFAULT_BORDER_WIDTH,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = MaterialTheme.shapes.small,
-                    )
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = MaterialTheme.shapes.small,
-                    )
-                    .padding(MaterialTheme.spacing.large),
-                onImeAction = { keyboardController?.hide() },
-                textFieldStyle = defaultSongbookTextFieldStyle().copy(
-                    placeholder = stringResource(Res.string.setlist_search_songs_placeholder),
-                    placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Words,
-                        autoCorrectEnabled = true,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Search,
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = MaterialTheme.spacing.extraLarge)
+                    .padding(horizontal = MaterialTheme.spacing.extraLarge),
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+            ) {
+                SongbookTextField(
+                    state = textFieldState,
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .border(
+                            width = DEFAULT_BORDER_WIDTH,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainer,
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .padding(MaterialTheme.spacing.large),
+                    onImeAction = { keyboardController?.hide() },
+                    textFieldStyle = defaultSongbookTextFieldStyle().copy(
+                        placeholder = stringResource(Res.string.setlist_search_songs_placeholder),
+                        placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            autoCorrectEnabled = true,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Search,
+                        ),
                     ),
-                ),
-            )
+                )
+            }
         }
     }
 }
