@@ -27,7 +27,6 @@ import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.core.setlist.model.Setlist
-import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.lyrics.DisplayMode
 import com.pointlessapps.songbook.lyrics.LyricsEvent
 import com.pointlessapps.songbook.lyrics.LyricsState
@@ -105,8 +104,6 @@ internal fun LyricsScreen(
             onSetlistsSelected = viewModel::onSetlistsSelected,
             onBroadcastToTeamConfirmClicked = viewModel::onBroadcastToTeamConfirmClicked,
             onDeleteSongConfirmClicked = viewModel::onDeleteSongConfirmClicked,
-            onChordMoved = viewModel::onChordMoved,
-            onCursorFinalized = viewModel::onCursorFinalized,
         )
     }
 }
@@ -124,8 +121,6 @@ private fun LyricsScreenContent(
     onSetlistsSelected: (List<Setlist>) -> Unit,
     onBroadcastToTeamConfirmClicked: () -> Unit,
     onDeleteSongConfirmClicked: () -> Unit,
-    onChordMoved: (Section, Section.Line, com.pointlessapps.songbook.core.song.model.Chord, Int) -> Unit,
-    onCursorFinalized: (Int) -> Unit,
 ) {
     var isTopBarVisible by rememberSaveable { mutableStateOf(true) }
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -188,8 +183,6 @@ private fun LyricsScreenContent(
                 displayMode = state.displayMode,
                 wrapMode = state.wrapMode,
                 onTextScaleChanged = onTextScaleChanged,
-                onChordMoved = onChordMoved,
-                onCursorFinalized = onCursorFinalized,
                 paddingValues = paddingValues,
             )
 

@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.lyrics.DisplayMode
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
@@ -50,7 +51,7 @@ internal fun PreviewSongLayout(
     wrapMode: WrapMode = WrapMode.Wrap,
     editable: Boolean = false,
     paddingValues: PaddingValues = PaddingValues(),
-    onChordMoved: (Section, Section.Line, com.pointlessapps.songbook.core.song.model.Chord, Int) -> Unit = { _, _, _, _ -> },
+    onChordMoved: (Section, Section.Line, Chord, Int) -> Unit = { _, _, _, _ -> },
     onCursorFinalized: (Int) -> Unit = {},
 ) {
     var currentTextScale by remember(textScale) { mutableStateOf(textScale) }

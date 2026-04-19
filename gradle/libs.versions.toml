@@ -45,6 +45,7 @@ androidx-credentials = "1.6.0"
 googleid = "1.2.0"
 android-version-git = "0.4.14"
 build-konfig = "0.18.0"
+reorderable = "3.0.0"
 
 [libraries]
 # AndroidX
@@ -111,6 +112,7 @@ peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", ver
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
 compose-dnd = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "compose-dnd" }
 google-id-token = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 [plugins]
 # Android

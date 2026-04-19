@@ -63,6 +63,8 @@ kotlin {
             implementation(libs.peekaboo.ui)
             implementation(libs.peekaboo.image.picker)
 
+            implementation(libs.reorderable)
+
             implementation(libs.compose.dnd)
 
             api(projects.core)
