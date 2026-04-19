@@ -42,6 +42,7 @@ internal fun LyricsSections(
     wrapMode: WrapMode,
     onChordClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
+    userScrollEnabled: Boolean = true,
 ) {
     val textScaleFloat = textScale / 100f
     val fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScaleFloat
@@ -70,7 +71,7 @@ internal fun LyricsSections(
             .fillMaxWidth()
             .then(
                 if (wrapMode == WrapMode.NoWrap || displayMode.shouldShowSideBySide) {
-                    Modifier.horizontalScroll(scrollState)
+                    Modifier.horizontalScroll(scrollState, enabled = userScrollEnabled)
                 } else {
                     Modifier
                 },

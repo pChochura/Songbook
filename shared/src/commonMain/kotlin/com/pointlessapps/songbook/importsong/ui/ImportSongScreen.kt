@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.importsong.ui
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -295,6 +296,8 @@ private fun SongLyricsTextField(
     onDismissChordPopup: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val textFieldScrollState = rememberScrollState()
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
@@ -303,6 +306,7 @@ private fun SongLyricsTextField(
             required = true,
             label = stringResource(Res.string.import_lyrics_label),
             textFieldState = lyricsTextFieldState,
+            textFieldScrollState = textFieldScrollState,
             placeholder = stringResource(Res.string.import_lyrics_placeholder),
             modifier = Modifier.weight(1f),
             outputTransformation = ChordHighlightTransformation,
@@ -311,8 +315,11 @@ private fun SongLyricsTextField(
                 val cursorPosition = lyricsTextFieldState.selection.end
                 textLayoutResultCallback()?.let {
                     val cursorRect = it.getCursorRect(cursorPosition)
+                    val finalRect = cursorRect.copy(
+                        bottom = cursorRect.bottom - textFieldScrollState.value,
+                    )
                     ChordSuggestionPopup(
-                        cursorRect = cursorRect,
+                        cursorRect = finalRect,
                         suggestions = chordSuggestions,
                         onChordSelected = onChordSelected,
                         onDismissRequest = onDismissChordPopup,
@@ -355,6 +362,7 @@ private fun LabeledTextField(
     required: Boolean = false,
     outputTransformation: OutputTransformation? = null,
     modifier: Modifier = Modifier,
+    textFieldScrollState: ScrollState = rememberScrollState(),
     popupContent: @Composable ((() -> TextLayoutResult?) -> Unit)? = null,
 ) {
     Column(
@@ -388,6 +396,7 @@ private fun LabeledTextField(
 
             SongbookTextField(
                 state = textFieldState,
+                scrollState = textFieldScrollState,
                 onTextLayout = {
                     if (onTextLayoutCallback() == null) {
                         onTextLayoutCallback = it

@@ -1,6 +1,8 @@
 package com.pointlessapps.songbook.ui.components
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
@@ -24,11 +26,13 @@ internal fun SongbookTextField(
     modifier: Modifier = Modifier,
     onImeAction: (() -> Unit)? = null,
     onTextLayout: (Density.(() -> TextLayoutResult?) -> Unit)? = null,
+    scrollState: ScrollState = rememberScrollState(),
     textFieldStyle: SongbookTextFieldStyle = defaultSongbookTextFieldStyle(),
 ) {
     BasicTextField(
         modifier = modifier.fillMaxWidth(),
         state = state,
+        scrollState = scrollState,
         keyboardOptions = textFieldStyle.keyboardOptions,
         onKeyboardAction = { onImeAction?.invoke() },
         inputTransformation = textFieldStyle.inputTransformation,

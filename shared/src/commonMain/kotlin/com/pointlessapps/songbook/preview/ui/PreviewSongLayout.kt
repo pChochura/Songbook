@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.preview.ui
 
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.lyrics.DisplayMode
@@ -45,6 +48,7 @@ internal fun PreviewSongLayout(
     onTextScaleChanged: (Int) -> Unit,
     displayMode: DisplayMode = DisplayMode.Inline,
     wrapMode: WrapMode = WrapMode.NoWrap,
+    editable: Boolean = false,
     paddingValues: PaddingValues = PaddingValues(),
 ) {
     var currentTextScale by remember(textScale) { mutableStateOf(textScale) }
@@ -55,6 +59,8 @@ internal fun PreviewSongLayout(
             .coerceIn(MIN_ZOOM, MAX_ZOOM)
     }
 
+    var isPinching by remember { mutableStateOf(false) }
+
     var didTransform by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(transformableState.isTransformInProgress) {
         if (transformableState.isTransformInProgress) {
@@ -64,14 +70,24 @@ internal fun PreviewSongLayout(
         }
     }
 
+    val userScrollEnabled = !isPinching && !transformableState.isTransformInProgress
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    do {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        isPinching = event.changes.size > 1
+                    } while (event.changes.any { it.pressed })
+                    isPinching = false
+                }
+            }
             .transformable(state = transformableState, canPan = { false }),
         contentAlignment = Alignment.TopCenter,
     ) {
         LazyColumn(
-            userScrollEnabled = !transformableState.isTransformInProgress,
+            userScrollEnabled = userScrollEnabled,
             modifier = Modifier
                 .widthIn(max = MAX_WIDTH)
                 .fillMaxSize(),
@@ -105,6 +121,7 @@ internal fun PreviewSongLayout(
                     displayMode = displayMode,
                     wrapMode = wrapMode,
                     onChordClicked = { chordDetailsDialogData = it },
+                    userScrollEnabled = userScrollEnabled,
                 )
             }
         }
