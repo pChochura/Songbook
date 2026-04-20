@@ -1,10 +1,7 @@
 package com.pointlessapps.songbook.preview.ui
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,10 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.lyrics.DisplayMode
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
@@ -34,6 +28,8 @@ import com.pointlessapps.songbook.lyrics.WrapMode
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsSections
 import com.pointlessapps.songbook.lyrics.ui.components.SongHeader
 import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
+import com.pointlessapps.songbook.preview.ui.components.PinchToZoomBox
+import com.pointlessapps.songbook.preview.ui.components.collectIsPinchedToZoomAsState
 import com.pointlessapps.songbook.preview.ui.components.dialogs.ChordDetailsDialog
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
@@ -49,48 +45,31 @@ internal fun PreviewSongLayout(
     onTextScaleChanged: (Int) -> Unit,
     displayMode: DisplayMode = DisplayMode.Inline,
     wrapMode: WrapMode = WrapMode.Wrap,
-    editable: Boolean = false,
     paddingValues: PaddingValues = PaddingValues(),
-    onChordMoved: (Section, Section.Line, Chord, Int) -> Unit = { _, _, _, _ -> },
-    onCursorFinalized: (Int) -> Unit = {},
 ) {
     var currentTextScale by remember(textScale) { mutableStateOf(textScale) }
     var chordDetailsDialogData by rememberSaveable { mutableStateOf<String?>(null) }
-    val transformableState = rememberTransformableState { zoomChange, _, _ ->
-        currentTextScale = (currentTextScale * zoomChange)
-            .roundToInt()
-            .coerceIn(MIN_ZOOM, MAX_ZOOM)
-    }
 
-    var isPinching by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPinchingToZoom by interactionSource.collectIsPinchedToZoomAsState()
 
     var didTransform by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(transformableState.isTransformInProgress) {
-        if (transformableState.isTransformInProgress) {
+    LaunchedEffect(isPinchingToZoom) {
+        if (isPinchingToZoom) {
             didTransform = true
         } else if (didTransform) {
             onTextScaleChanged(currentTextScale)
         }
     }
 
-    val userScrollEnabled = !isPinching && !transformableState.isTransformInProgress
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                awaitEachGesture {
-                    do {
-                        val event = awaitPointerEvent(PointerEventPass.Initial)
-                        isPinching = event.changes.size > 1
-                    } while (event.changes.any { it.pressed })
-                    isPinching = false
-                }
-            }
-            .transformable(state = transformableState, canPan = { false }),
-        contentAlignment = Alignment.TopCenter,
+    PinchToZoomBox(
+        interactionSource = interactionSource,
+        onZoomChanged = {
+            currentTextScale = (currentTextScale * it).roundToInt().coerceIn(MIN_ZOOM, MAX_ZOOM)
+        },
     ) {
         LazyColumn(
-            userScrollEnabled = userScrollEnabled,
+            userScrollEnabled = !isPinchingToZoom,
             modifier = Modifier
                 .widthIn(max = MAX_WIDTH)
                 .fillMaxSize(),
@@ -123,17 +102,15 @@ internal fun PreviewSongLayout(
                     keyOffset = keyOffset,
                     displayMode = displayMode,
                     wrapMode = wrapMode,
-                    editable = editable,
+                    editable = false,
                     onChordClicked = { chordDetailsDialogData = it },
-                    onChordMoved = onChordMoved,
-                    onCursorFinalized = onCursorFinalized,
-                    userScrollEnabled = userScrollEnabled,
+                    userScrollEnabled = !isPinchingToZoom,
                 )
             }
         }
 
         TextScaleOverlay(
-            show = transformableState.isTransformInProgress,
+            show = isPinchingToZoom,
             textScale = currentTextScale,
             modifier = Modifier.align(Alignment.Center),
         )

@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,8 +33,8 @@ internal fun PreviewSongScreen(
     sections: List<Section>,
 ) {
     val navigator = LocalNavigator.current
-    var textScale by remember { mutableIntStateOf(100) }
-    var keyOffset by remember { mutableIntStateOf(0) }
+    var textScale by rememberSaveable { mutableIntStateOf(100) }
+    var keyOffset by rememberSaveable { mutableIntStateOf(0) }
 
     SongbookScaffoldLayout(
         topBar = @Composable { Spacer(Modifier.statusBarsPadding()) },
@@ -45,7 +45,6 @@ internal fun PreviewSongScreen(
             sections = sections,
             textScale = textScale,
             keyOffset = keyOffset,
-            editable = true,
             onTextScaleChanged = { textScale = it.coerceIn(MIN_ZOOM, MAX_ZOOM) },
             paddingValues = paddingValues,
         )
@@ -58,13 +57,14 @@ internal fun PreviewSongScreen(
             contentAlignment = Alignment.TopEnd,
         ) {
             SongbookIconButton(
+                modifier = Modifier.padding(MaterialTheme.spacing.small),
                 icon = IconClose,
                 tooltipLabel = Res.string.common_back,
-                onClick = { navigator.navigateBack() },
+                onClick = navigator::navigateBack,
                 iconButtonStyle = defaultSongbookIconButtonStyle().copy(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                         .copy(alpha = 0.7f),
-                    contentColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
                     outlineColor = Color.Transparent,
                 ),
             )

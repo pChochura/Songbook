@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.lyrics.DisplayMode
@@ -28,8 +29,8 @@ internal fun LyricsSections(
     wrapMode: WrapMode,
     editable: Boolean,
     onChordClicked: (String) -> Unit,
-    onChordMoved: (Section, Section.Line, Chord, Int) -> Unit = { _, _, _, _ -> },
-    onCursorFinalized: (Int) -> Unit = {},
+    onChordMoved: (Int, Chord, Int) -> Unit = { _, _, _ -> },
+    onCursorPlaced: (Int, Int, Rect) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
     userScrollEnabled: Boolean = true,
 ) {
@@ -65,25 +66,32 @@ internal fun LyricsSections(
                     shouldShowInline = displayMode.shouldShowInline,
                     editable = editable,
                     onChordClicked = onChordClicked,
-                    onChordMoved = { line, chord, position ->
-                        onChordMoved(section, line, chord, position)
+                    onChordMoved = { chord, position ->
+                        onChordMoved(section.id, chord, position)
                     },
-                    onCursorFinalized = onCursorFinalized,
+                    onCursorFinalized = onCursorPlaced,
                 )
 
-                displayMode.shouldShowInline -> section.lines.forEach { line ->
-                    InlineLyricsLine(
-                        line = line,
-                        keyOffset = keyOffset,
-                        lineTextStyle = lineTextStyle,
-                        chordChipStyle = chordChipStyle,
-                        editable = editable,
-                        onChordClicked = onChordClicked,
-                        onChordMoved = { chord, position ->
-                            onChordMoved(section, line, chord, position)
-                        },
-                        onCursorFinalized = onCursorFinalized,
-                    )
+                displayMode.shouldShowInline -> {
+                    var currentLineOffset = 0
+                    section.lines.forEach { line ->
+                        val lineOffset = currentLineOffset
+                        InlineLyricsLine(
+                            line = line,
+                            keyOffset = keyOffset,
+                            lineTextStyle = lineTextStyle,
+                            chordChipStyle = chordChipStyle,
+                            editable = editable,
+                            onChordClicked = onChordClicked,
+                            onChordMoved = { chord, position ->
+                                onChordMoved(section.id, chord, position)
+                            },
+                            onCursorFinalized = { position, rect ->
+                                onCursorPlaced(section.id, lineOffset + position, rect)
+                            },
+                        )
+                        currentLineOffset += line.line.length + 1
+                    }
                 }
 
                 else -> section.lines.forEach { line ->

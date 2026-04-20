@@ -22,6 +22,7 @@ internal val importSongModule = module {
             agent = get(named("Gemini")),
             setlistRepository = get(),
             songRepository = get(),
+            prefsRepository = get(),
             appRepository = get(),
             snackbarState = get(),
         )

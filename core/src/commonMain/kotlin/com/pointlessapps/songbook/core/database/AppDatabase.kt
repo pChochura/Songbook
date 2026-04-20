@@ -23,7 +23,7 @@ import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
         SetlistSongEntity::class,
         SyncActionEntity::class,
     ],
-    version = 1,
+    version = 2,
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)

@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.core.song.model
 
 import com.pointlessapps.songbook.core.utils.Keep
 import kotlinx.serialization.Serializable
+import kotlin.uuid.ExperimentalUuidApi
 
 @Keep
 @Serializable
@@ -9,7 +10,7 @@ data class Song(
     val id: String,
     val title: String,
     val artist: String,
-    val sections: List<Section>,
+    val lyrics: String,
 )
 
 @Keep
@@ -18,12 +19,14 @@ data class NewSong(
     val id: String? = null,
     val title: String,
     val artist: String,
-    val sections: List<Section>,
+    val lyrics: String,
 )
 
 @Keep
 @Serializable
+@OptIn(ExperimentalUuidApi::class)
 data class Section(
+    val id: Int,
     val name: String,
     val lyrics: String,
     val chords: List<Chord>,
@@ -41,7 +44,6 @@ data class Section(
             return lyrics.lines().map { lineText ->
                 val lineChords = chords
                     .filter { it.position in currentPos..(currentPos + lineText.length) }
-                    .map { it.copy(position = it.position - currentPos) }
 
                 currentPos += lineText.length + 1
                 Line(lineText, lineChords)
@@ -49,19 +51,22 @@ data class Section(
         }
 
     companion object {
-        fun List<Section>.toLyrics(withChords: Boolean = true): String =
-            joinToString("\n\n") { section ->
-                val lines = section.lines.joinToString("\n") { line ->
-                    val builder = StringBuilder(line.line)
-                    if (withChords) {
-                        line.chords.sortedByDescending { it.position }.forEach { chord ->
-                            builder.insert(chord.position, "[${chord.value}]")
-                        }
-                    }
-                    builder.toString()
+        fun List<Section>.toLyrics(
+            withChords: Boolean = true,
+        ): String = joinToString("\n\n") { section ->
+            val builder = StringBuilder(section.lyrics)
+            if (withChords) {
+                section.chords.sortedByDescending(Chord::position).forEach { chord ->
+                    builder.insert(chord.position, "[${chord.value}]")
                 }
-                "[${section.name}]\n$lines"
             }
+
+            if (section.name.isNotEmpty()) {
+                "[${section.name}]\n$builder"
+            } else {
+                builder.toString()
+            }
+        }
     }
 }
 
@@ -70,4 +75,5 @@ data class Section(
 data class Chord(
     val value: String,
     val position: Int,
+    val linePosition: Int,
 )

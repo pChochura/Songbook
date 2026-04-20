@@ -8,13 +8,16 @@ import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
 import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.app.AppRepository
+import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
+import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_show
 import com.pointlessapps.songbook.shared.error_image_capture_failed
@@ -23,6 +26,7 @@ import com.pointlessapps.songbook.shared.import_changes_saved
 import com.pointlessapps.songbook.shared.import_song_imported
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
+import com.pointlessapps.songbook.utils.Keep
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.Job
@@ -33,6 +37,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -43,11 +48,11 @@ internal sealed interface ImportSongEvent {
     data object DiscardChanges : ImportSongEvent
     data object NavigateBack : ImportSongEvent
     data class NavigateToLyrics(val songId: String) : ImportSongEvent
-    data class NavigateToPreview(
-        val title: String,
-        val artist: String,
-        val sections: List<Section>,
-    ) : ImportSongEvent
+}
+
+@Keep
+internal enum class DisplayMode {
+    Text, Visual
 }
 
 internal data class ImportSongState(
@@ -55,6 +60,9 @@ internal data class ImportSongState(
     val allSetlists: List<Setlist> = emptyList(),
     val selectedSetlists: List<Setlist> = emptyList(),
     val chordSuggestions: List<String> = emptyList(),
+    val displayMode: DisplayMode = DisplayMode.Text,
+    val textScale: Int = 100,
+    val sections: List<Section> = emptyList(),
     val canImport: Boolean = false,
     val isExtractingInProgress: Boolean = false,
     val isLoading: Boolean = false,
@@ -71,6 +79,7 @@ internal class ImportSongViewModel(
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val appRepository: AppRepository,
+    private val prefsRepository: PrefsRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
@@ -79,7 +88,8 @@ internal class ImportSongViewModel(
 
     private data class ImportSongTransientState(
         val selectedSetlists: List<Setlist> = emptyList(),
-        val chordSuggestions: List<String> = emptyList(),
+        val displayMode: DisplayMode = DisplayMode.Text,
+        val textScale: Int = 100,
         val isExtractingInProgress: Boolean = false,
         val isLoading: Boolean = false,
     )
@@ -94,13 +104,17 @@ internal class ImportSongViewModel(
         setlistRepository.getAllSetlistsFlow(),
         snapshotFlow { titleTextFieldState.text }.distinctUntilChanged(),
         snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged(),
+        snapshotFlow { lyricsTextFieldState.selection.end }.distinctUntilChanged(),
         _transientState,
-    ) { allSetlists, titleText, lyricsText, transient ->
+    ) { allSetlists, titleText, lyricsText, lyricsCursor, transient ->
         ImportSongState(
             songId = id,
             allSetlists = allSetlists,
             selectedSetlists = transient.selectedSetlists,
-            chordSuggestions = transient.chordSuggestions,
+            chordSuggestions = calculateChordSuggestions(lyricsText.toString(), lyricsCursor),
+            displayMode = transient.displayMode,
+            textScale = transient.textScale,
+            sections = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString()),
             canImport = titleText.isNotBlank() && lyricsText.isNotBlank(),
             isExtractingInProgress = transient.isExtractingInProgress,
             isLoading = transient.isLoading,
@@ -118,23 +132,8 @@ internal class ImportSongViewModel(
 
     init {
         viewModelScope.launch {
-            snapshotFlow {
-                lyricsTextFieldState.text to lyricsTextFieldState.selection
-            }.collect { (text, selection) ->
-                val cursorPosition = selection.end
-                val textBeforeCursor = text.substring(0, cursorPosition)
-                val lastOpenBracket = textBeforeCursor.lastIndexOf('[')
-                val lastCloseBracket = textBeforeCursor.lastIndexOf(']')
-
-                if (lastOpenBracket != -1 && lastOpenBracket > lastCloseBracket) {
-                    val typedChord = textBeforeCursor.substring(lastOpenBracket + 1)
-                    val suggestions = ChordLibrary.allChords.filter {
-                        it.startsWith(typedChord, ignoreCase = true)
-                    }
-                    _transientState.update { it.copy(chordSuggestions = suggestions) }
-                } else {
-                    _transientState.update { it.copy(chordSuggestions = emptyList()) }
-                }
+            _transientState.update {
+                it.copy(textScale = prefsRepository.getLyricsTextScaleFlow().first())
             }
         }
     }
@@ -147,7 +146,7 @@ internal class ImportSongViewModel(
                     id = state.value.songId,
                     title = titleTextFieldState.text.toString(),
                     artist = artistTextFieldState.text.toString(),
-                    sections = computeSections(),
+                    lyrics = lyricsTextFieldState.text.toString(),
                 ),
                 setlistsIds = state.value.selectedSetlists.map { it.id },
             )
@@ -238,13 +237,15 @@ internal class ImportSongViewModel(
     }
 
     fun onPreviewClicked() {
-        eventChannel.trySend(
-            ImportSongEvent.NavigateToPreview(
-                title = titleTextFieldState.text.toString(),
-                artist = artistTextFieldState.text.toString(),
-                sections = computeSections(),
-            ),
-        )
+        _transientState.update {
+            it.copy(
+                displayMode = if (it.displayMode == DisplayMode.Visual) {
+                    DisplayMode.Text
+                } else {
+                    DisplayMode.Visual
+                },
+            )
+        }
     }
 
     fun onChordSelected(chord: String) {
@@ -254,17 +255,81 @@ internal class ImportSongViewModel(
         val textBeforeCursor = text.substring(0, cursorPosition)
         val lastOpenBracket = textBeforeCursor.lastIndexOf('[')
 
+        val endIndex = Regex("\\S*]").matchAt(text, cursorPosition)
+            ?.range?.last?.inc() ?: cursorPosition
+
         if (lastOpenBracket != -1) {
             lyricsTextFieldState.edit {
-                replace(lastOpenBracket, cursorPosition, "[$chord]")
+                replace(lastOpenBracket, endIndex, "[$chord]")
             }
         }
-        _transientState.update { it.copy(chordSuggestions = emptyList()) }
     }
 
-    fun onDismissChordPopup() {
-        _transientState.update { it.copy(chordSuggestions = emptyList()) }
+    fun onChordMoved(
+        sectionId: Int,
+        chord: Chord,
+        newPosition: Int,
+    ) {
+        val sections = state.value.sections.toMutableList()
+        val sectionIndex = sections.indexOfFirst { it.id == sectionId }
+        if (sectionIndex == -1) return
+        val section = sections[sectionIndex]
+        sections[sectionIndex] = section.copy(
+            chords = section.chords.map {
+                if (it == chord) {
+                    it.copy(
+                        position = it.position - it.linePosition + newPosition,
+                        linePosition = newPosition,
+                    )
+                } else {
+                    it
+                }
+            },
+        )
+        lyricsTextFieldState.setTextAndPlaceCursorAtEnd(sections.toLyrics())
     }
 
-    private fun computeSections() = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString())
+    fun onChordInserted(
+        sectionId: Int,
+        position: Int,
+        chord: String,
+    ) {
+        val sections = state.value.sections.toMutableList()
+        val sectionIndex = sections.indexOfFirst { it.id == sectionId }
+        if (sectionIndex == -1) return
+        val section = sections[sectionIndex]
+
+        val linesBefore = section.lyrics.substring(0, position).lines()
+        val linePosition = linesBefore.last().length
+
+        val newChord = Chord(
+            value = chord,
+            position = position,
+            linePosition = linePosition,
+        )
+
+        sections[sectionIndex] = section.copy(
+            chords = (section.chords + newChord).sortedBy { it.position },
+        )
+        lyricsTextFieldState.setTextAndPlaceCursorAtEnd(sections.toLyrics())
+    }
+
+    private fun calculateChordSuggestions(
+        text: String,
+        cursorPosition: Int,
+    ): List<String> {
+        val textBeforeCursor = text.substring(0, cursorPosition)
+        val lastOpenBracket = textBeforeCursor.lastIndexOf('[')
+        val lastCloseBracket = textBeforeCursor.lastIndexOf(']')
+
+        if (lastOpenBracket != -1 && lastOpenBracket > lastCloseBracket) {
+            val typedChord = textBeforeCursor.substring(lastOpenBracket + 1)
+            val suggestions = ChordLibrary.allChords.filter {
+                it.startsWith(typedChord, ignoreCase = true)
+            }
+            return suggestions
+        }
+
+        return emptyList()
+    }
 }

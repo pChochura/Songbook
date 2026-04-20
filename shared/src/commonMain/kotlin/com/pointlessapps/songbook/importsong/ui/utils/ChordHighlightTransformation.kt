@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 
-private val bracketRegex = "\\[(.*?)]".toRegex()
+private val bracketRegex = "\\[([^\\[\\]]*?)]".toRegex()
 internal val ChordHighlightTransformation: OutputTransformation
     @Composable
     get() {

@@ -21,12 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
@@ -36,6 +40,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pointlessapps.songbook.core.song.ChordLibrary
+import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.ui.components.SongbookChip
 import com.pointlessapps.songbook.ui.components.SongbookChipStyle
@@ -54,8 +59,8 @@ internal fun SideBySideLyricsSection(
     shouldShowInline: Boolean,
     editable: Boolean,
     onChordClicked: (String) -> Unit,
-    onChordMoved: (Section.Line, com.pointlessapps.songbook.core.song.model.Chord, Int) -> Unit,
-    onCursorFinalized: (Int) -> Unit,
+    onChordMoved: (Chord, Int) -> Unit,
+    onCursorFinalized: (Int, Int, Rect) -> Unit,
 ) {
     val lineSpacing = MaterialTheme.spacing.small
     val chordMargin = MaterialTheme.spacing.extraHuge
@@ -66,7 +71,9 @@ internal fun SideBySideLyricsSection(
     Layout(
         modifier = Modifier.fillMaxWidth(),
         content = {
+            var currentLineOffset = 0
             section.lines.forEach { line ->
+                val lineOffset = currentLineOffset
                 when {
                     shouldShowInline -> InlineLyricsLine(
                         line = line,
@@ -75,10 +82,10 @@ internal fun SideBySideLyricsSection(
                         chordChipStyle = chordChipStyle,
                         editable = editable,
                         onChordClicked = onChordClicked,
-                        onChordMoved = { chord, position ->
-                            onChordMoved(line, chord, position)
+                        onChordMoved = onChordMoved,
+                        onCursorFinalized = { index, rect ->
+                            onCursorFinalized(section.id, lineOffset + index, rect)
                         },
-                        onCursorFinalized = onCursorFinalized,
                     )
 
                     else -> TextOnlyLyricsLine(
@@ -86,6 +93,8 @@ internal fun SideBySideLyricsSection(
                         lineTextStyle = lineTextStyle,
                     )
                 }
+
+                currentLineOffset += line.line.length + 1
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(colSpacing),
@@ -158,8 +167,8 @@ internal fun InlineLyricsLine(
     chordChipStyle: SongbookChipStyle,
     editable: Boolean,
     onChordClicked: (String) -> Unit,
-    onChordMoved: (com.pointlessapps.songbook.core.song.model.Chord, Int) -> Unit,
-    onCursorFinalized: (Int) -> Unit,
+    onChordMoved: (Chord, Int) -> Unit,
+    onCursorFinalized: (Int, Rect) -> Unit,
 ) {
     val textMeasurer = rememberTextMeasurer()
     val currentTextStyle = remember(line.chords.isEmpty(), lineTextStyle) {
@@ -179,9 +188,12 @@ internal fun InlineLyricsLine(
     val density = LocalDensity.current
     val cursorBaseHeightPx = with(density) { lineTextStyle.typography.fontSize.toPx() * 2f }
 
+    var layoutCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+
     Layout(
         modifier = Modifier
             .fillMaxWidth()
+            .onGloballyPositioned { layoutCoordinates = it }
             .cursorDrag(
                 enabled = editable,
                 textLayoutResult = textLayoutResultState,
@@ -191,6 +203,7 @@ internal fun InlineLyricsLine(
                 cursorYAnim = cursorYAnim,
                 cursorAlphaAnim = cursorAlphaAnim,
                 onCursorFinalized = onCursorFinalized,
+                layoutCoordinates = layoutCoordinates,
             ),
         content = {
             SongbookText(
@@ -258,12 +271,12 @@ internal fun InlineLyricsLine(
             textPlaceable.placeRelative(0, 0)
             chordPlaceables.forEachIndexed { index, placeable ->
                 val chord = line.chords[index]
-                val lineIndex = textLayoutResult.getLineForOffset(chord.position)
+                val lineIndex = textLayoutResult.getLineForOffset(chord.linePosition)
                 val horizontalPosition = if (index == draggingChordIdx) {
                     draggingChordX
                 } else {
                     textLayoutResult.getHorizontalPosition(
-                        offset = chord.position,
+                        offset = chord.linePosition,
                         usePrimaryDirection = true,
                     )
                 }
@@ -340,56 +353,66 @@ private fun Modifier.cursorDrag(
     cursorXAnim: Animatable<Float, *>,
     cursorYAnim: Animatable<Float, *>,
     cursorAlphaAnim: Animatable<Float, *>,
-    onCursorFinalized: (Int) -> Unit,
-): Modifier = if (!enabled) this else pointerInput(textLayoutResult, textPosition) {
-    val layoutResult = textLayoutResult ?: return@pointerInput
-    var currentIndex = 0
-    coroutineScope {
-        detectDragGesturesAfterLongPress(
-            onDragStart = { startOffset ->
-                currentIndex = layoutResult.getOffsetForPosition(startOffset - textPosition)
-                val x = layoutResult.getHorizontalPosition(currentIndex, true)
-                val lineIdx = layoutResult.getLineForOffset(currentIndex)
-                val y = layoutResult.getLineBottom(lineIdx) - cursorBaseHeightPx
+    onCursorFinalized: (Int, Rect) -> Unit,
+    layoutCoordinates: LayoutCoordinates?,
+): Modifier =
+    if (!enabled) this else pointerInput(textLayoutResult, textPosition, layoutCoordinates) {
+        val layoutResult = textLayoutResult ?: return@pointerInput
+        var currentIndex = 0
+        var cursorRect = Rect.Zero
+        coroutineScope {
+            detectDragGesturesAfterLongPress(
+                onDragStart = { startOffset ->
+                    currentIndex = layoutResult.getOffsetForPosition(startOffset - textPosition)
+                    val x = layoutResult.getHorizontalPosition(currentIndex, true)
+                    val lineIdx = layoutResult.getLineForOffset(currentIndex)
+                    val y = layoutResult.getLineBottom(lineIdx) - cursorBaseHeightPx
 
-                launch { cursorAlphaAnim.snapTo(1f) }
-                launch { cursorXAnim.snapTo(x) }
-                launch { cursorYAnim.snapTo(y) }
-            },
-            onDrag = { change, _ ->
-                currentIndex = layoutResult.getOffsetForPosition(change.position - textPosition)
-                val x = layoutResult.getHorizontalPosition(currentIndex, true)
-                val lineIdx = layoutResult.getLineForOffset(currentIndex)
-                val y = layoutResult.getLineBottom(lineIdx) - cursorBaseHeightPx
-                launch {
-                    cursorXAnim.animateTo(x, spring(stiffness = 1200f))
-                }
-                launch { cursorYAnim.snapTo(y) }
-            },
-            onDragEnd = {
-                onCursorFinalized(currentIndex)
-                launch { cursorAlphaAnim.animateTo(0f) }
-            },
-            onDragCancel = {
-                launch { cursorAlphaAnim.animateTo(0f) }
-            },
-        )
+                    launch { cursorAlphaAnim.snapTo(1f) }
+                    launch { cursorXAnim.snapTo(x) }
+                    launch { cursorYAnim.snapTo(y) }
+                },
+                onDrag = { change, _ ->
+                    currentIndex = layoutResult.getOffsetForPosition(change.position - textPosition)
+                    val x = layoutResult.getHorizontalPosition(currentIndex, true)
+                    val lineIdx = layoutResult.getLineForOffset(currentIndex)
+                    val y = layoutResult.getLineBottom(lineIdx) - cursorBaseHeightPx
+
+                    cursorRect = layoutCoordinates?.let {
+                        val localOffset = textPosition + Offset(x, y)
+                        val windowOffset = it.positionInWindow() + localOffset
+                        Rect(windowOffset, Size(0f, cursorBaseHeightPx))
+                    } ?: Rect.Zero
+
+                    launch {
+                        cursorXAnim.animateTo(x, spring(stiffness = 1200f))
+                    }
+                    launch { cursorYAnim.snapTo(y) }
+                },
+                onDragEnd = {
+                    onCursorFinalized(currentIndex, cursorRect)
+                    launch { cursorAlphaAnim.animateTo(0f) }
+                },
+                onDragCancel = {
+                    launch { cursorAlphaAnim.animateTo(0f) }
+                },
+            )
+        }
     }
-}
 
 private fun Modifier.chordDrag(
     enabled: Boolean,
     index: Int,
-    chord: com.pointlessapps.songbook.core.song.model.Chord,
+    chord: Chord,
     textLayoutResult: TextLayoutResult?,
     onDraggingChanged: (Int?, Float) -> Unit,
-    onChordMoved: (com.pointlessapps.songbook.core.song.model.Chord, Int) -> Unit,
+    onChordMoved: (Chord, Int) -> Unit,
 ): Modifier = if (!enabled) this else pointerInput(chord, textLayoutResult) {
     val layoutResult = textLayoutResult ?: return@pointerInput
     var draggingChordX = 0f
     detectDragGesturesAfterLongPress(
         onDragStart = {
-            draggingChordX = layoutResult.getHorizontalPosition(chord.position, true)
+            draggingChordX = layoutResult.getHorizontalPosition(chord.linePosition, true)
             onDraggingChanged(index, draggingChordX)
         },
         onDrag = { _, dragAmount ->

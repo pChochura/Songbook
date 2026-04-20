@@ -27,7 +27,7 @@ internal fun ChordSuggestionPopup(
     cursorRect: Rect,
     suggestions: List<String>,
     onChordSelected: (String) -> Unit,
-    onDismissRequest: () -> Unit,
+    onDismissRequest: () -> Unit = {},
 ) {
     Popup(
         offset = IntOffset(

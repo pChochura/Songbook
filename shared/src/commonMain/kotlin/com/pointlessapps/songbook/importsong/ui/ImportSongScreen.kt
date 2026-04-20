@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.importsong.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,12 +24,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
@@ -38,8 +42,13 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
+import com.pointlessapps.songbook.core.song.model.Chord
+import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.importsong.DisplayMode.Text
+import com.pointlessapps.songbook.importsong.DisplayMode.Visual
 import com.pointlessapps.songbook.importsong.ImportSongEvent
 import com.pointlessapps.songbook.importsong.ImportSongViewModel
+import com.pointlessapps.songbook.importsong.ui.components.ChordInputPopup
 import com.pointlessapps.songbook.importsong.ui.components.ChordSuggestionPopup
 import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheet
 import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheetAction.AddToSetlists
@@ -49,6 +58,9 @@ import com.pointlessapps.songbook.importsong.ui.components.dialogs.ConfirmDiscar
 import com.pointlessapps.songbook.importsong.ui.components.dialogs.ExtractingInProgressDialog
 import com.pointlessapps.songbook.importsong.ui.components.dialogs.ScanDialog
 import com.pointlessapps.songbook.importsong.ui.utils.ChordHighlightTransformation
+import com.pointlessapps.songbook.lyrics.DisplayMode
+import com.pointlessapps.songbook.lyrics.WrapMode
+import com.pointlessapps.songbook.lyrics.ui.components.LyricsSections
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_cancel
 import com.pointlessapps.songbook.shared.common_import_song
@@ -99,11 +111,6 @@ internal fun ImportSongScreen(
             is ImportSongEvent.DiscardChanges -> isDiscardChangesDialogVisible = true
             is ImportSongEvent.NavigateBack -> navigator.navigateBack()
             is ImportSongEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.songId)
-            is ImportSongEvent.NavigateToPreview -> navigator.navigateToPreview(
-                title = event.title,
-                artist = event.artist,
-                sections = event.sections,
-            )
         }
     }
 
@@ -162,13 +169,25 @@ internal fun ImportSongScreen(
                 )
             }
 
-            SongLyricsTextField(
-                lyricsTextFieldState = viewModel.lyricsTextFieldState,
-                chordSuggestions = state.chordSuggestions,
-                onChordSelected = viewModel::onChordSelected,
-                onDismissChordPopup = viewModel::onDismissChordPopup,
+            AnimatedContent(
                 modifier = Modifier.weight(1f),
-            )
+                targetState = state.displayMode,
+            ) { displayMode ->
+                when (displayMode) {
+                    Text -> SongLyricsTextField(
+                        lyricsTextFieldState = viewModel.lyricsTextFieldState,
+                        chordSuggestions = state.chordSuggestions,
+                        onChordSelected = viewModel::onChordSelected,
+                    )
+
+                    Visual -> SongLyricsVisualEditor(
+                        textScale = state.textScale,
+                        sections = state.sections,
+                        onChordMoved = viewModel::onChordMoved,
+                        onChordInserted = viewModel::onChordInserted,
+                    )
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -293,7 +312,6 @@ private fun SongLyricsTextField(
     lyricsTextFieldState: TextFieldState,
     chordSuggestions: List<String>,
     onChordSelected: (String) -> Unit,
-    onDismissChordPopup: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val textFieldScrollState = rememberScrollState()
@@ -322,7 +340,6 @@ private fun SongLyricsTextField(
                         cursorRect = finalRect,
                         suggestions = chordSuggestions,
                         onChordSelected = onChordSelected,
-                        onDismissRequest = onDismissChordPopup,
                     )
                 }
             },
@@ -350,6 +367,53 @@ private fun SongLyricsTextField(
                 ),
             )
         }
+    }
+}
+
+@Composable
+private fun SongLyricsVisualEditor(
+    textScale: Int,
+    sections: List<Section>,
+    onChordMoved: (Int, Chord, Int) -> Unit,
+    onChordInserted: (Int, Int, String) -> Unit,
+) {
+    var isChordInputVisible by rememberSaveable { mutableStateOf(false) }
+    var cursorRect by remember { mutableStateOf(Rect.Zero) }
+    var cursorPosition by remember { mutableIntStateOf(0) }
+    var cursorSectionId by remember { mutableIntStateOf(0) }
+
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            LyricsSections(
+                sections = sections,
+                textScale = textScale,
+                keyOffset = 0,
+                displayMode = DisplayMode.Inline,
+                wrapMode = WrapMode.NoWrap,
+                editable = true,
+                onChordClicked = {
+                    // TODO
+                },
+                onChordMoved = onChordMoved,
+                onCursorPlaced = { sectionId, position, rect ->
+                    cursorSectionId = sectionId
+                    cursorPosition = position
+                    cursorRect = rect
+                    isChordInputVisible = true
+                },
+            )
+        }
+    }
+
+    if (isChordInputVisible) {
+        ChordInputPopup(
+            cursorRect = cursorRect,
+            onChordSelected = { chord ->
+                onChordInserted(cursorSectionId, cursorPosition, chord)
+                isChordInputVisible = false
+            },
+            onDismissRequest = { isChordInputVisible = false },
+        )
     }
 }
 

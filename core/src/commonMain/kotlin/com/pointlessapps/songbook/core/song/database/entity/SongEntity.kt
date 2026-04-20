@@ -2,7 +2,6 @@ package com.pointlessapps.songbook.core.song.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.utils.Keep
 
 @Keep
@@ -11,5 +10,5 @@ internal data class SongEntity(
     @PrimaryKey val id: String,
     val title: String,
     val artist: String,
-    val sections: List<Section>,
+    val lyrics: String,
 )

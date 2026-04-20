@@ -92,7 +92,7 @@ internal class SongRepositoryImpl(
                 id = newSong.id ?: Uuid.random().toString(),
                 title = newSong.title,
                 artist = newSong.artist,
-                sections = newSong.sections,
+                lyrics = newSong.lyrics,
             )
 
             songDao.insertSongWithSetlists(

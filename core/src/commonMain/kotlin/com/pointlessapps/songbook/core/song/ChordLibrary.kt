@@ -57,7 +57,7 @@ class ChordLibrary {
 
         val allChords: List<String> = chromaticScale.flatten().flatMap { note ->
             commonSuffixToInternal.keys.map { suffix -> "$note$suffix" }
-        }.distinct()
+        }.distinct().sorted()
 
         private fun transposeNote(note: String, offset: Int): String {
             val match = rootNoteRegex.find(note) ?: return note

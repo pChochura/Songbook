@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
+import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
@@ -120,7 +121,7 @@ internal class LyricsViewModel(
             songId = songId,
             title = song.title,
             artist = song.artist,
-            sections = song.sections,
+            sections = LyricsParser.parseLyrics(song.lyrics),
             textScale = textScale,
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
             wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,

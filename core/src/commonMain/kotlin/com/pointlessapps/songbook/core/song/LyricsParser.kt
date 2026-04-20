@@ -28,6 +28,7 @@ object LyricsParser {
 
             sections.add(
                 Section(
+                    id = sections.size,
                     name = currentSectionName,
                     lyrics = finalLyrics,
                     chords = finalChords,
@@ -56,6 +57,7 @@ object LyricsParser {
                         Chord(
                             value = chordValue,
                             position = currentSectionLyrics.length + (if (currentSectionLyrics.isNotEmpty()) 1 else 0) + chordPosInLine,
+                            linePosition = chordPosInLine,
                         ),
                     )
 
