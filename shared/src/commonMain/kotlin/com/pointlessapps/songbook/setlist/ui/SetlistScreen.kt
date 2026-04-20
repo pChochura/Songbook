@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -163,7 +164,10 @@ private fun SetlistScreenContent(
                 onAddSongToSetlistClicked(it)
             }
         },
-        onDismissRequest = { isAddSongToSetlistBottomSheetVisible = false },
+        onDismissRequest = {
+            isAddSongToSetlistBottomSheetVisible = false
+            songSearchQueryTextFieldState.clearText()
+        },
     )
 
     var isRenameSetlistDialogVisible by rememberSaveable { mutableStateOf(false) }

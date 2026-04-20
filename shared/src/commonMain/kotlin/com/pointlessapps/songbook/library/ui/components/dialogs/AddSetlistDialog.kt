@@ -11,7 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -53,9 +53,7 @@ internal fun AddSetlistDialog(
     val nameTextFieldState = rememberTextFieldState()
     val isConfirmEnabled by remember { derivedStateOf { nameTextFieldState.text.isNotEmpty() } }
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
+    SideEffect { focusRequester.requestFocus() }
 
     SongbookDialog(
         onDismissRequest = onDismissRequest,

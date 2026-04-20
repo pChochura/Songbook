@@ -30,9 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -68,9 +65,6 @@ internal fun AddSongToSetlistBottomSheet(
     onItemClicked: (String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     SongbookBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
@@ -127,7 +121,6 @@ internal fun AddSongToSetlistBottomSheet(
                 SongbookTextField(
                     state = textFieldState,
                     modifier = Modifier
-                        .focusRequester(focusRequester)
                         .border(
                             width = DEFAULT_BORDER_WIDTH,
                             color = MaterialTheme.colorScheme.outlineVariant,
@@ -138,7 +131,6 @@ internal fun AddSongToSetlistBottomSheet(
                             shape = MaterialTheme.shapes.small,
                         )
                         .padding(MaterialTheme.spacing.large),
-                    onImeAction = { keyboardController?.hide() },
                     textFieldStyle = defaultSongbookTextFieldStyle().copy(
                         placeholder = stringResource(Res.string.setlist_search_songs_placeholder),
                         placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
