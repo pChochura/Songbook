@@ -144,11 +144,13 @@ internal fun ImportSongScreen(
                 .padding(paddingValues)
                 .imePadding()
                 .navigationBarsPadding()
-                .padding(MaterialTheme.spacing.extraLarge),
+                .padding(vertical = MaterialTheme.spacing.extraLarge),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.spacing.extraLarge),
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             ) {
                 LabeledTextField(
@@ -189,7 +191,9 @@ internal fun ImportSongScreen(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.spacing.extraLarge),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
             ) {
@@ -311,12 +315,11 @@ private fun SongLyricsTextField(
     lyricsTextFieldState: TextFieldState,
     chordSuggestions: List<String>,
     onChordSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val textFieldScrollState = rememberScrollState()
 
     Column(
-        modifier = modifier,
+        modifier = Modifier.padding(horizontal = MaterialTheme.spacing.extraLarge),
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
     ) {
         LabeledTextField(
@@ -388,6 +391,9 @@ private fun SongLyricsVisualEditor(
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             LyricsSections(
+                modifier = Modifier.padding(
+                    horizontal = MaterialTheme.spacing.extraLarge,
+                ),
                 sections = sections,
                 textScale = textScale,
                 keyOffset = 0,
