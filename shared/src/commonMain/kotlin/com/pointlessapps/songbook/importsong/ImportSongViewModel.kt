@@ -309,7 +309,8 @@ internal class ImportSongViewModel(
         )
 
         sections[sectionIndex] = section.copy(
-            chords = (section.chords + newChord).sortedBy { it.position },
+            chords = (section.chords.filter { it.position != newChord.position } + newChord)
+                .sortedBy { it.position },
         )
         lyricsTextFieldState.setTextAndPlaceCursorAtEnd(sections.toLyrics())
     }

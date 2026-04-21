@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.CircularProgressIndicator
@@ -124,11 +125,11 @@ internal fun AddSongToSetlistBottomSheet(
                         .border(
                             width = DEFAULT_BORDER_WIDTH,
                             color = MaterialTheme.colorScheme.outlineVariant,
-                            shape = MaterialTheme.shapes.small,
+                            shape = CircleShape,
                         )
                         .background(
                             color = MaterialTheme.colorScheme.surfaceContainer,
-                            shape = MaterialTheme.shapes.small,
+                            shape = CircleShape,
                         )
                         .padding(MaterialTheme.spacing.large),
                     textFieldStyle = defaultSongbookTextFieldStyle().copy(

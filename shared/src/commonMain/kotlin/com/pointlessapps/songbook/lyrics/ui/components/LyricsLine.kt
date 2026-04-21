@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
@@ -58,7 +59,7 @@ internal fun SideBySideLyricsSection(
     chordChipStyle: SongbookChipStyle,
     shouldShowInline: Boolean,
     editable: Boolean,
-    onChordClicked: (String) -> Unit,
+    onChordClicked: (Chord, Rect) -> Unit,
     onChordMoved: (Chord, Int) -> Unit,
     onCursorFinalized: (Int, Int, Rect) -> Unit,
 ) {
@@ -101,11 +102,15 @@ internal fun SideBySideLyricsSection(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     line.chords.forEach { chord ->
+                        var rect by remember { mutableStateOf(Rect.Zero) }
                         SongbookChip(
                             label = ChordLibrary.transpose(chord.value, keyOffset),
                             isSelected = false,
-                            onClick = { onChordClicked(chord.value) },
+                            onClick = { onChordClicked(chord, rect) },
                             chipStyle = chordChipStyle,
+                            modifier = Modifier.onGloballyPositioned {
+                                rect = it.boundsInWindow()
+                            },
                         )
                     }
                 }
@@ -166,7 +171,7 @@ internal fun InlineLyricsLine(
     lineTextStyle: SongbookTextStyle,
     chordChipStyle: SongbookChipStyle,
     editable: Boolean,
-    onChordClicked: (String) -> Unit,
+    onChordClicked: (Chord, Rect) -> Unit,
     onChordMoved: (Chord, Int) -> Unit,
     onCursorFinalized: (Int, Rect) -> Unit,
 ) {
@@ -215,22 +220,27 @@ internal fun InlineLyricsLine(
                 },
             )
             line.chords.forEachIndexed { index, chord ->
+                var rect by remember { mutableStateOf(Rect.Zero) }
                 SongbookChip(
                     label = ChordLibrary.transpose(chord.value, keyOffset),
                     isSelected = false,
-                    onClick = { onChordClicked(chord.value) },
+                    onClick = { onChordClicked(chord, rect) },
                     chipStyle = chordChipStyle,
-                    modifier = Modifier.chordDrag(
-                        enabled = editable,
-                        index = index,
-                        chord = chord,
-                        textLayoutResult = textLayoutResultState,
-                        onDraggingChanged = { idx, x ->
-                            draggingChordIdx = idx
-                            draggingChordX = x
-                        },
-                        onChordMoved = onChordMoved,
-                    ),
+                    modifier = Modifier
+                        .onGloballyPositioned {
+                            rect = it.boundsInWindow()
+                        }
+                        .chordDrag(
+                            enabled = editable,
+                            index = index,
+                            chord = chord,
+                            textLayoutResult = textLayoutResultState,
+                            onDraggingChanged = { idx, x ->
+                                draggingChordIdx = idx
+                                draggingChordX = x
+                            },
+                            onChordMoved = onChordMoved,
+                        ),
                 )
             }
             Cursor(

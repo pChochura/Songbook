@@ -28,7 +28,7 @@ internal fun LyricsSections(
     displayMode: DisplayMode,
     wrapMode: WrapMode,
     editable: Boolean,
-    onChordClicked: (String) -> Unit,
+    onChordClicked: (Int, Chord, Rect) -> Unit,
     onChordMoved: (Int, Chord, Int) -> Unit = { _, _, _ -> },
     onCursorPlaced: (Int, Int, Rect) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
@@ -65,7 +65,9 @@ internal fun LyricsSections(
                     chordChipStyle = chordChipStyle,
                     shouldShowInline = displayMode.shouldShowInline,
                     editable = editable,
-                    onChordClicked = onChordClicked,
+                    onChordClicked = { chord, rect ->
+                        onChordClicked(section.id, chord, rect)
+                    },
                     onChordMoved = { chord, position ->
                         onChordMoved(section.id, chord, position)
                     },
@@ -82,7 +84,9 @@ internal fun LyricsSections(
                             lineTextStyle = lineTextStyle,
                             chordChipStyle = chordChipStyle,
                             editable = editable,
-                            onChordClicked = onChordClicked,
+                            onChordClicked = { chord, rect ->
+                                onChordClicked(section.id, chord, rect)
+                            },
                             onChordMoved = { chord, position ->
                                 onChordMoved(section.id, chord, position)
                             },

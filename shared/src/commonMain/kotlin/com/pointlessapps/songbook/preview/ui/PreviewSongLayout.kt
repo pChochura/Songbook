@@ -103,7 +103,7 @@ internal fun PreviewSongLayout(
                     displayMode = displayMode,
                     wrapMode = wrapMode,
                     editable = false,
-                    onChordClicked = { chordDetailsDialogData = it },
+                    onChordClicked = { _, chord, _ -> chordDetailsDialogData = chord.value },
                     userScrollEnabled = !isPinchingToZoom,
                 )
             }

@@ -1,8 +1,10 @@
 package com.pointlessapps.songbook.importsong.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,6 +12,8 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -29,13 +35,20 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.pointlessapps.songbook.core.song.ChordLibrary
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.common_search_chord_placeholder
 import com.pointlessapps.songbook.ui.components.SongbookText
+import com.pointlessapps.songbook.ui.components.SongbookTextField
+import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.spacing
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ChordInputPopup(
     cursorRect: Rect,
+    selectedChord: String?,
     onChordSelected: (String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -65,7 +78,7 @@ internal fun ChordInputPopup(
         ),
         onDismissRequest = onDismissRequest,
     ) {
-        LazyVerticalGrid(
+        Column(
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -76,34 +89,70 @@ internal fun ChordInputPopup(
                     maxWidth = 300.dp,
                 )
                 .fillMaxSize(),
-            columns = GridCells.Adaptive(60.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            items(chords, key = { it }) { chord ->
-                Box(
-                    modifier = Modifier
-                        .animateItem()
-                        .aspectRatio(1f)
-                        .clip(MaterialTheme.shapes.large)
-                        .clickable(
-                            onClick = { onChordSelected(chord) },
-                            role = Role.Button,
+            LazyVerticalGrid(
+                modifier = Modifier.weight(1f),
+                columns = GridCells.Adaptive(60.dp),
+            ) {
+                items(chords, key = { it }) { chord ->
+                    Box(
+                        modifier = Modifier
+                            .animateItem()
+                            .aspectRatio(1f)
+                            .clip(MaterialTheme.shapes.large)
+                            .then(
+                                if (chord == selectedChord) {
+                                    Modifier.background(MaterialTheme.colorScheme.primaryContainer)
+                                } else {
+                                    Modifier
+                                },
+                            )
+                            .clickable(
+                                onClick = { onChordSelected(chord) },
+                                role = Role.Button,
+                            )
+                            .padding(
+                                vertical = MaterialTheme.spacing.medium,
+                                horizontal = MaterialTheme.spacing.medium,
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        SongbookText(
+                            text = chord,
+                            textStyle = defaultSongbookTextStyle().copy(
+                                typography = MaterialTheme.typography.bodyMedium,
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                            ),
                         )
-                        .padding(
-                            vertical = MaterialTheme.spacing.medium,
-                            horizontal = MaterialTheme.spacing.medium,
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    SongbookText(
-                        text = chord,
-                        textStyle = defaultSongbookTextStyle().copy(
-                            typography = MaterialTheme.typography.bodyMedium,
-                            textColor = MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center,
-                        ),
-                    )
+                    }
                 }
             }
+
+            SongbookTextField(
+                state = queryTextFieldState,
+                modifier = Modifier
+                    .padding(MaterialTheme.spacing.medium)
+                    .border(
+                        width = DEFAULT_BORDER_WIDTH,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape,
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        shape = CircleShape,
+                    )
+                    .padding(MaterialTheme.spacing.medium),
+                textFieldStyle = defaultSongbookTextFieldStyle().copy(
+                    placeholder = stringResource(Res.string.common_search_chord_placeholder),
+                    placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Search,
+                    ),
+                ),
+            )
         }
     }
 }

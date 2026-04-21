@@ -24,7 +24,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -377,10 +376,14 @@ private fun SongLyricsVisualEditor(
     onChordMoved: (Int, Chord, Int) -> Unit,
     onChordInserted: (Int, Int, String) -> Unit,
 ) {
-    var isChordInputVisible by rememberSaveable { mutableStateOf(false) }
-    var cursorRect by remember { mutableStateOf(Rect.Zero) }
-    var cursorPosition by remember { mutableIntStateOf(0) }
-    var cursorSectionId by remember { mutableIntStateOf(0) }
+    data class ChordInputPopupData(
+        val selectedChord: String?,
+        val sectionId: Int,
+        val cursorRect: Rect,
+        val cursorPosition: Int,
+    )
+
+    var chordInputPopupData by rememberSaveable { mutableStateOf<ChordInputPopupData?>(null) }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
@@ -391,28 +394,36 @@ private fun SongLyricsVisualEditor(
                 displayMode = DisplayMode.Inline,
                 wrapMode = WrapMode.NoWrap,
                 editable = true,
-                onChordClicked = {
-                    // TODO
+                onChordClicked = { sectionId, chord, rect ->
+                    chordInputPopupData = ChordInputPopupData(
+                        selectedChord = chord.value,
+                        sectionId = sectionId,
+                        cursorRect = rect,
+                        cursorPosition = chord.position,
+                    )
                 },
                 onChordMoved = onChordMoved,
                 onCursorPlaced = { sectionId, position, rect ->
-                    cursorSectionId = sectionId
-                    cursorPosition = position
-                    cursorRect = rect
-                    isChordInputVisible = true
+                    chordInputPopupData = ChordInputPopupData(
+                        selectedChord = null,
+                        sectionId = sectionId,
+                        cursorRect = rect,
+                        cursorPosition = position,
+                    )
                 },
             )
         }
     }
 
-    if (isChordInputVisible) {
+    chordInputPopupData?.let {
         ChordInputPopup(
-            cursorRect = cursorRect,
+            cursorRect = it.cursorRect,
+            selectedChord = it.selectedChord,
             onChordSelected = { chord ->
-                onChordInserted(cursorSectionId, cursorPosition, chord)
-                isChordInputVisible = false
+                onChordInserted(it.sectionId, it.cursorPosition, chord)
+                chordInputPopupData = null
             },
-            onDismissRequest = { isChordInputVisible = false },
+            onDismissRequest = { chordInputPopupData = null },
         )
     }
 }

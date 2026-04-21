@@ -49,6 +49,7 @@
     <string name="common_logout_description">Twoje dane są zapisane w chmurze. Możesz je przywrócić później, gdy zalogujesz się ponownie na innym urządzeniu</string>
     <string name="common_logout_anonymous_description">Twoje lokalne dane zostaną utracone, wylogowując się anonimowo. Upewnij się, czy nie chcesz założyć konta przed wylogowaniem się, aby zachować dane.</string>
     <string name="common_take_a_photo">Zrób zdjęcie</string>
+    <string name="common_search_chord_placeholder">Wyszukaj akordu...</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">Wystąpił błąd podczas inicjalizacji aplikacji. Proszę uruchom aplikację ponownie</string>
