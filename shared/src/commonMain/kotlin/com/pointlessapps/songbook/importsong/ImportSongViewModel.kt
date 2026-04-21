@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -103,10 +104,14 @@ internal class ImportSongViewModel(
     val state: StateFlow<ImportSongState> = combine(
         setlistRepository.getAllSetlistsFlow(),
         snapshotFlow { titleTextFieldState.text }.distinctUntilChanged(),
-        snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged(),
-        snapshotFlow { lyricsTextFieldState.selection.end }.distinctUntilChanged(),
+        snapshotFlow {
+            lyricsTextFieldState.text to lyricsTextFieldState.selection.end
+        }.distinctUntilChanged(),
+        snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged().map {
+            LyricsParser.parseLyrics(it.toString())
+        }.distinctUntilChanged(),
         _transientState,
-    ) { allSetlists, titleText, lyricsText, lyricsCursor, transient ->
+    ) { allSetlists, titleText, (lyricsText, lyricsCursor), sections, transient ->
         ImportSongState(
             songId = id,
             allSetlists = allSetlists,
@@ -114,7 +119,7 @@ internal class ImportSongViewModel(
             chordSuggestions = calculateChordSuggestions(lyricsText.toString(), lyricsCursor),
             displayMode = transient.displayMode,
             textScale = transient.textScale,
-            sections = LyricsParser.parseLyrics(lyricsTextFieldState.text.toString()),
+            sections = sections,
             canImport = titleText.isNotBlank() && lyricsText.isNotBlank(),
             isExtractingInProgress = transient.isExtractingInProgress,
             isLoading = transient.isLoading,
@@ -286,7 +291,10 @@ internal class ImportSongViewModel(
                 }
             },
         )
-        lyricsTextFieldState.setTextAndPlaceCursorAtEnd(sections.toLyrics())
+        lyricsTextFieldState.edit {
+            replace(0, length, sections.toLyrics())
+            placeCursorBeforeCharAt(0)
+        }
     }
 
     fun onChordInserted(
@@ -312,7 +320,10 @@ internal class ImportSongViewModel(
             chords = (section.chords.filter { it.position != newChord.position } + newChord)
                 .sortedBy { it.position },
         )
-        lyricsTextFieldState.setTextAndPlaceCursorAtEnd(sections.toLyrics())
+        lyricsTextFieldState.edit {
+            replace(0, length, sections.toLyrics())
+            placeCursorBeforeCharAt(0)
+        }
     }
 
     private fun calculateChordSuggestions(

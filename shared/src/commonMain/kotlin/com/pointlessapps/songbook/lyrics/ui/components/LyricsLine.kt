@@ -28,15 +28,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -175,7 +172,6 @@ internal fun InlineLyricsLine(
     onChordMoved: (Chord, Int) -> Unit,
     onCursorFinalized: (Int, Rect) -> Unit,
 ) {
-    val textMeasurer = rememberTextMeasurer()
     val currentTextStyle = remember(line.chords.isEmpty(), lineTextStyle) {
         calculateInlineTextStyle(line, lineTextStyle)
     }
@@ -219,29 +215,31 @@ internal fun InlineLyricsLine(
                     textPosition = it.positionInParent()
                 },
             )
-            line.chords.forEachIndexed { index, chord ->
-                var rect by remember { mutableStateOf(Rect.Zero) }
-                SongbookChip(
-                    label = ChordLibrary.transpose(chord.value, keyOffset),
-                    isSelected = false,
-                    onClick = { onChordClicked(chord, rect) },
-                    chipStyle = chordChipStyle,
-                    modifier = Modifier
-                        .onGloballyPositioned {
-                            rect = it.boundsInWindow()
-                        }
-                        .chordDrag(
-                            enabled = editable,
-                            index = index,
-                            chord = chord,
-                            textLayoutResult = textLayoutResultState,
-                            onDraggingChanged = { idx, x ->
-                                draggingChordIdx = idx
-                                draggingChordX = x
-                            },
-                            onChordMoved = onChordMoved,
-                        ),
-                )
+            if (textLayoutResultState != null) {
+                line.chords.forEachIndexed { index, chord ->
+                    var rect by remember { mutableStateOf(Rect.Zero) }
+                    SongbookChip(
+                        label = ChordLibrary.transpose(chord.value, keyOffset),
+                        isSelected = false,
+                        onClick = { onChordClicked(chord, rect) },
+                        chipStyle = chordChipStyle,
+                        modifier = Modifier
+                            .onGloballyPositioned {
+                                rect = it.boundsInWindow()
+                            }
+                            .chordDrag(
+                                enabled = editable,
+                                index = index,
+                                chord = chord,
+                                textLayoutResult = textLayoutResultState,
+                                onDraggingChanged = { idx, x ->
+                                    draggingChordIdx = idx
+                                    draggingChordX = x
+                                },
+                                onChordMoved = onChordMoved,
+                            ),
+                    )
+                }
             }
             Cursor(
                 xAnim = cursorXAnim,
@@ -251,25 +249,17 @@ internal fun InlineLyricsLine(
             )
         },
     ) { measurables, constraints ->
-        val textMeasurable = measurables[0]
-        val chordMeasurables = measurables.subList(1, 1 + line.chords.size)
-        val cursorMeasurable = measurables.last()
+        val textPlaceable = measurables[0].measure(constraints)
 
-        val textLayoutResult: TextLayoutResult = textMeasurer.measure(
-            text = AnnotatedString(line.line),
-            style = currentTextStyle.typography.merge(
-                TextStyle(
-                    color = currentTextStyle.textColor,
-                    textAlign = currentTextStyle.textAlign,
-                ),
-            ),
-            constraints = constraints,
-            softWrap = currentTextStyle.softWrap,
-            overflow = currentTextStyle.textOverflow,
-            maxLines = currentTextStyle.maxLines,
+        val textLayoutResult = textLayoutResultState ?: return@Layout layout(
+            width = textPlaceable.width,
+            height = textPlaceable.height,
+            placementBlock = { textPlaceable.placeRelative(0, 0) },
         )
 
-        val textPlaceable = textMeasurable.measure(constraints)
+        val chordMeasurables = measurables.subList(1, measurables.lastIndex)
+        val cursorMeasurable = measurables.last()
+
         val chordPlaceables = chordMeasurables.map {
             it.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }

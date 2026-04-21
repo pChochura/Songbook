@@ -1,11 +1,15 @@
 package com.pointlessapps.songbook.core.song.model
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.pointlessapps.songbook.core.utils.Keep
 import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 
 @Keep
 @Serializable
+@Stable
+@Immutable
 data class Song(
     val id: String,
     val title: String,
@@ -15,6 +19,8 @@ data class Song(
 
 @Keep
 @Serializable
+@Stable
+@Immutable
 data class NewSong(
     val id: String? = null,
     val title: String,
@@ -25,6 +31,8 @@ data class NewSong(
 @Keep
 @Serializable
 @OptIn(ExperimentalUuidApi::class)
+@Stable
+@Immutable
 data class Section(
     val id: Int,
     val name: String,
@@ -33,6 +41,8 @@ data class Section(
 ) {
     @Keep
     @Serializable
+    @Stable
+    @Immutable
     data class Line(
         val line: String,
         val chords: List<Chord>,
@@ -72,6 +82,8 @@ data class Section(
 
 @Keep
 @Serializable
+@Stable
+@Immutable
 data class Chord(
     val value: String,
     val position: Int,
