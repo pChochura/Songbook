@@ -29,7 +29,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun SetlistSongItem(
     song: Song,
-    onLyricsClicked: (String) -> Unit,
+    onLyricsClicked: (Song) -> Unit,
     onRemoveSongFromSetlistClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -49,7 +49,7 @@ internal fun SetlistSongItem(
         SongCard(
             song = song,
             displayMode = DisplayMode.List,
-            onClick = { onLyricsClicked(song.id) },
+            onClick = { onLyricsClicked(song) },
         )
     }
 }

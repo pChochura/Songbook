@@ -146,6 +146,8 @@
     <string name="lyrics_delete_song_description">Zostanie przeniesiona do kosza, będziesz mógł ją później przywrócić.</string>
     <string name="lyrics_transpose">Transponuj</string>
     <string name="lyrics_show_key_offset_fab">Wyświetlaj stały widżet transpozycji na dole ekranu</string>
+    <string name="lyrics_no_previous_song">To jest pierwsza piosenka</string>
+    <string name="lyrics_no_next_song">To jest ostatnia piosenka</string>
 
     <!-- Search Screen -->
     <string name="search_placeholder">Szukaj tytułów, wykonawców i tekstów...</string>

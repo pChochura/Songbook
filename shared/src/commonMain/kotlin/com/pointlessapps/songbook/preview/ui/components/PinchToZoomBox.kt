@@ -23,6 +23,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 internal fun PinchToZoomBox(
     interactionSource: MutableInteractionSource,
     onZoomChanged: (zoomChange: Float) -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val transformableState = rememberTransformableState { zoomChange, _, _ ->
@@ -30,7 +31,7 @@ internal fun PinchToZoomBox(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .pointerInput(Unit) {
                 awaitEachGesture {

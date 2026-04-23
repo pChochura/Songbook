@@ -36,6 +36,7 @@ import com.pointlessapps.songbook.ui.components.SongbookSnackbar
 import com.pointlessapps.songbook.ui.theme.SongbookTheme
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction.AddSongToSetlist
+import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction.LoadToQueueAndOpen
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction.NavigateTo
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -61,6 +62,7 @@ fun App(
     snackbarSate.callbackActionsFlow.collectWithLifecycle {
         when (it) {
             is NavigateTo -> navigator.navigateTo(it.route)
+            is LoadToQueueAndOpen -> TODO()
             is AddSongToSetlist -> viewModel.addSongToSetlist(it.setlistId, it.songId, it.order)
         }
     }

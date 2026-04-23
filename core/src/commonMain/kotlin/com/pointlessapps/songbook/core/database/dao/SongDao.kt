@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface SongDao {
-    @Query("SELECT * FROM songs")
+    @Query("SELECT * FROM songs ORDER BY title ASC")
     fun getAllSongs(): PagingSource<Int, SongEntity>
 
     @Query("SELECT * FROM songs WHERE id = :id")

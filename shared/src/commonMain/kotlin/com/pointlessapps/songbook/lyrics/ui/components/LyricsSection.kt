@@ -1,11 +1,14 @@
 package com.pointlessapps.songbook.lyrics.ui.components
 
+import androidx.compose.foundation.OverscrollEffect
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -33,20 +36,23 @@ internal fun LyricsSections(
     onCursorPlaced: (Int, Int, Rect) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier,
     userScrollEnabled: Boolean = true,
+    scrollState: ScrollState = rememberScrollState(),
+    overscrollEffect: OverscrollEffect? = null,
 ) {
     val lineTextStyle = calculateLineTextStyle(textScale, wrapMode)
     val chordChipStyle = calculateChordChipStyle(textScale)
 
-    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .then(if (overscrollEffect != null) Modifier.overscroll(overscrollEffect) else Modifier)
             .then(
                 if (wrapMode == WrapMode.NoWrap || displayMode.shouldShowSideBySide) {
-                    Modifier.horizontalScroll(scrollState, enabled = userScrollEnabled)
-                } else {
-                    Modifier
-                },
+                    Modifier.horizontalScroll(
+                        state = scrollState,
+                        enabled = userScrollEnabled,
+                    )
+                } else Modifier,
             )
             .then(modifier),
         verticalArrangement = Arrangement.spacedBy(

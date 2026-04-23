@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
+import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.PublicLyricsRepository
 import com.pointlessapps.songbook.core.song.SongRepository
@@ -16,6 +17,9 @@ import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
+import com.pointlessapps.songbook.shared.Res
+import com.pointlessapps.songbook.shared.error_song_not_found
+import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +33,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -37,9 +42,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
+import kotlin.time.Duration.Companion.milliseconds
 
 internal sealed interface SearchEvent {
     data object NavigateBack : SearchEvent
+    data object NavigateToLyrics : SearchEvent
     data class NavigateToImportSong(
         val title: String,
         val artist: String,
@@ -65,10 +73,11 @@ internal data class SearchState(
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 internal class SearchViewModel(
     syncRepository: SyncRepository,
+    private val queueManager: QueueManager,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
     private val publicLyricsRepository: PublicLyricsRepository,
-    snackbarState: SongbookSnackbarState,
+    private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
     private val eventChannel = Channel<SearchEvent>()
@@ -86,7 +95,7 @@ internal class SearchViewModel(
     val searchResults: Flow<PagingData<SongSearchResult>> = snapshotFlow {
         queryTextFieldState.text
     }.distinctUntilChanged()
-        .debounce(SEARCH_QUERY_DEBOUNCE)
+        .debounce(SEARCH_QUERY_DEBOUNCE.milliseconds)
         .filter { it.isNotEmpty() }
         .onEach { _transientState.update { it.copy(isLoadingYourLibrary = true) } }
         .flatMapLatest { songRepository.searchSongs(it.toString()) }
@@ -98,7 +107,7 @@ internal class SearchViewModel(
     }.combine(
         _transientState.map { it.showPublicLyrics }.distinctUntilChanged(),
     ) { query, show -> query to show }
-        .debounce(SEARCH_QUERY_DEBOUNCE)
+        .debounce(SEARCH_QUERY_DEBOUNCE.milliseconds)
         .transformLatest { (query, show) ->
             if (show != true || query.isEmpty()) {
                 _transientState.update { it.copy(isLoadingPublicLyrics = false) }
@@ -147,10 +156,25 @@ internal class SearchViewModel(
         }
     }
 
-    fun onBackClicked() {
+    fun onLyricsClicked(songSearchResult: SongSearchResult) {
         viewModelScope.launch {
-            eventChannel.send(SearchEvent.NavigateBack)
+            val song = songRepository.getSongByIdFlow(songSearchResult.songId).first()
+            if (song == null) {
+                snackbarState.showSnackbar(
+                    message = getString(Res.string.error_song_not_found),
+                    icon = IconWarning,
+                )
+
+                return@launch
+            }
+
+            queueManager.setQueue(listOf(song), song)
+            eventChannel.send(SearchEvent.NavigateToLyrics)
         }
+    }
+
+    fun onBackClicked() {
+        eventChannel.trySend(SearchEvent.NavigateBack)
     }
 
     fun onClearClicked() {

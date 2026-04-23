@@ -5,22 +5,14 @@ import com.pointlessapps.songbook.setlist.SetlistViewModel
 import com.pointlessapps.songbook.setlist.ui.SetlistScreen
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 internal val setlistModule = module {
-    viewModel { (id: String) ->
-        SetlistViewModel(
-            id = id,
-            syncRepository = get(),
-            setlistRepository = get(),
-            songRepository = get(),
-            snackbarState = get(),
-        )
-    }
+    viewModelOf(::SetlistViewModel)
 
     navigation<Route.Setlist> { route ->
         SetlistScreen(

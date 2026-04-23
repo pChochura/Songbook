@@ -63,7 +63,7 @@ internal fun SetlistScreen(
     viewModel.events.collectWithLifecycle {
         when (it) {
             is SetlistEvent.NavigateBack -> navigator.navigateBack()
-            is SetlistEvent.NavigateToLyrics -> navigator.navigateToLyrics(it.songId)
+            is SetlistEvent.NavigateToLyrics -> navigator.navigateToLyrics()
         }
     }
 
@@ -89,7 +89,7 @@ private fun SetlistScreenContent(
     state: SetlistState.Loaded,
     songSearchQueryTextFieldState: TextFieldState,
     songSearchResults: LazyPagingItems<SongSearchResult>,
-    onLyricsClicked: (String) -> Unit,
+    onLyricsClicked: (Song) -> Unit,
     onNameChanged: (String) -> Unit,
     onDeleteSetlistConfirmClicked: () -> Unit,
     onAddSongToSetlistClicked: (String) -> Unit,
@@ -117,7 +117,10 @@ private fun SetlistScreenContent(
         LazyColumn(
             state = lazyListState,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues.add(MaterialTheme.spacing.huge),
+            contentPadding = paddingValues.add(
+                vertical = MaterialTheme.spacing.huge,
+                horizontal = MaterialTheme.spacing.large,
+            ),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {

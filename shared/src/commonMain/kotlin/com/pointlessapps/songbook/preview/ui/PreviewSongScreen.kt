@@ -53,7 +53,7 @@ internal fun PreviewSongScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .padding(all = MaterialTheme.spacing.huge),
+                .padding(MaterialTheme.spacing.huge),
             contentAlignment = Alignment.TopEnd,
         ) {
             SongbookIconButton(

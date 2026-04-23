@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.lyrics
 
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
+import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.LyricsParser
@@ -16,11 +17,14 @@ import com.pointlessapps.songbook.shared.error_song_not_found
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -62,6 +66,8 @@ internal sealed interface LyricsState {
         val isOcrActive: Boolean = false,
         val displayMode: DisplayMode = DisplayMode.Inline,
         val wrapMode: WrapMode = WrapMode.NoWrap,
+        val previousSongTitle: String? = null,
+        val nextSongTitle: String? = null,
         val showKeyOffsetFab: Boolean = true,
         val allSetlists: List<Setlist> = emptyList(),
         val selectedSetlists: List<Setlist> = emptyList(),
@@ -77,8 +83,8 @@ internal sealed interface LyricsState {
 }
 
 internal class LyricsViewModel(
-    songId: String,
     syncRepository: SyncRepository,
+    private val queueManager: QueueManager,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
     private val setlistRepository: SetlistRepository,
@@ -92,21 +98,11 @@ internal class LyricsViewModel(
 
     private val _transientState = MutableStateFlow(LyricsTransientState())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<LyricsState> = combine(
-        syncRepository.currentSyncStatusFlow,
-        setlistRepository.getAllSetlistsFlow(),
-        songRepository.getSongSetlistsById(songId),
-        prefsRepository.getLyricsTextScaleFlow(),
-        prefsRepository.getLyricsDisplayModeFlow(),
-        prefsRepository.getLyricsWrapModeFlow(),
-        prefsRepository.getShowKeyOffsetFabFlow(),
-        songRepository.getSongByIdFlow(songId),
-        _transientState,
-    ) { syncStatus, allSetlists, selectedSetlists, textScale, displayMode, wrapMode, showKeyOffsetFab, song, transient ->
-        if (transient.isLoading) {
-            return@combine LyricsState.Loading
-        }
-
+        queueManager.queueFlow,
+        queueManager.currentSongFlow,
+    ) { queue, songId -> queue to songId }.flatMapLatest { (queue, song) ->
         if (song == null) {
             snackbarState.showSnackbar(
                 message = getString(Res.string.error_song_not_found),
@@ -114,23 +110,40 @@ internal class LyricsViewModel(
             )
             eventChannel.trySend(LyricsEvent.NavigateBack)
 
-            return@combine LyricsState.Loading
+            return@flatMapLatest flowOf(LyricsState.Loading)
         }
 
-        LyricsState.Loaded(
-            songId = songId,
-            title = song.title,
-            artist = song.artist,
-            sections = LyricsParser.parseLyrics(song.lyrics),
-            textScale = textScale,
-            displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
-            wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
-            keyOffset = transient.keyOffset,
-            showKeyOffsetFab = showKeyOffsetFab,
-            allSetlists = allSetlists,
-            selectedSetlists = selectedSetlists,
-            syncStatus = syncStatus,
-        )
+        combine(
+            syncRepository.currentSyncStatusFlow,
+            setlistRepository.getAllSetlistsFlow(),
+            songRepository.getSongSetlistsById(song.id),
+            prefsRepository.getLyricsTextScaleFlow(),
+            prefsRepository.getLyricsDisplayModeFlow(),
+            prefsRepository.getLyricsWrapModeFlow(),
+            prefsRepository.getShowKeyOffsetFabFlow(),
+            _transientState,
+        ) { syncStatus, allSetlists, selectedSetlists, textScale, displayMode, wrapMode, showKeyOffsetFab, transient ->
+            if (transient.isLoading) {
+                return@combine LyricsState.Loading
+            }
+
+            LyricsState.Loaded(
+                songId = song.id,
+                title = song.title,
+                artist = song.artist,
+                sections = LyricsParser.parseLyrics(song.lyrics),
+                textScale = textScale,
+                displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
+                wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
+                keyOffset = transient.keyOffset,
+                previousSongTitle = queueManager.peekPreviousSong()?.title,
+                nextSongTitle = queueManager.peekNextSong()?.title,
+                showKeyOffsetFab = showKeyOffsetFab,
+                allSetlists = allSetlists,
+                selectedSetlists = selectedSetlists,
+                syncStatus = syncStatus,
+            )
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -139,6 +152,14 @@ internal class LyricsViewModel(
 
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
+
+    fun onPreviousSongRequested() {
+        queueManager.goToPreviousSong()
+    }
+
+    fun onNextSongRequested() {
+        queueManager.goToNextSong()
+    }
 
     fun onEditSongClicked() {
         val state = state.value.loaded

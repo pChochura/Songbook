@@ -6,7 +6,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
-import com.pointlessapps.songbook.Route
 import com.pointlessapps.songbook.core.app.AppRepository
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
@@ -48,7 +47,6 @@ import org.jetbrains.compose.resources.getString
 internal sealed interface ImportSongEvent {
     data object DiscardChanges : ImportSongEvent
     data object NavigateBack : ImportSongEvent
-    data class NavigateToLyrics(val songId: String) : ImportSongEvent
 }
 
 @Keep
@@ -162,9 +160,7 @@ internal class ImportSongViewModel(
                 null -> snackbarState.showSnackbar(
                     message = getString(Res.string.import_song_imported),
                     actionLabel = getString(Res.string.common_show),
-                    callbackAction = SongbookSnackbarCallbackAction.NavigateTo(
-                        Route.Lyrics(id),
-                    ),
+                    callbackAction = SongbookSnackbarCallbackAction.LoadToQueueAndOpen(id),
                     duration = SnackbarDuration.Long,
                 )
 

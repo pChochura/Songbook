@@ -94,6 +94,8 @@ internal fun LyricsScreen(
         LyricsState.Loading -> SongbookLoader(true)
         is LyricsState.Loaded -> LyricsScreenContent(
             state = state,
+            onPreviousSongRequested = viewModel::onPreviousSongRequested,
+            onNextSongRequested = viewModel::onNextSongRequested,
             onNavigateBack = navigator::navigateBack,
             onEditSongClicked = viewModel::onEditSongClicked,
             onTextScaleChanged = viewModel::onTextScaleChanged,
@@ -111,6 +113,8 @@ internal fun LyricsScreen(
 @Composable
 private fun LyricsScreenContent(
     state: LyricsState.Loaded,
+    onPreviousSongRequested: () -> Unit,
+    onNextSongRequested: () -> Unit,
     onNavigateBack: () -> Unit,
     onEditSongClicked: () -> Unit,
     onTextScaleChanged: (Int) -> Unit,
@@ -183,6 +187,10 @@ private fun LyricsScreenContent(
                 displayMode = state.displayMode,
                 wrapMode = state.wrapMode,
                 onTextScaleChanged = onTextScaleChanged,
+                previousSongTitle = state.previousSongTitle,
+                nextSongTitle = state.nextSongTitle,
+                onPreviousSongRequested = onPreviousSongRequested,
+                onNextSongRequested = onNextSongRequested,
                 paddingValues = paddingValues,
             )
 
@@ -191,16 +199,17 @@ private fun LyricsScreenContent(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(paddingValues)
-                    .padding(all = MaterialTheme.spacing.huge),
+                    .padding(MaterialTheme.spacing.huge),
             ) {
                 SongbookIconButton(
+                    modifier = Modifier.padding(MaterialTheme.spacing.small),
                     icon = IconClose,
                     tooltipLabel = Res.string.common_close_fullscreen,
                     onClick = { isTopBarVisible = true },
                     iconButtonStyle = defaultSongbookIconButtonStyle().copy(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                             .copy(alpha = 0.7f),
-                        contentColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                         outlineColor = Color.Transparent,
                     ),
                 )

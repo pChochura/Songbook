@@ -149,6 +149,7 @@ internal data class SongbookSnackbarVisuals(
 
 internal sealed interface SongbookSnackbarCallbackAction {
     data class NavigateTo(val route: Route) : SongbookSnackbarCallbackAction
+    data class LoadToQueueAndOpen(val songId: String) : SongbookSnackbarCallbackAction
     data class AddSongToSetlist(
         val setlistId: String,
         val songId: String,

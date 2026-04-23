@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
@@ -39,10 +40,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import kotlin.time.Duration.Companion.milliseconds
 
 internal sealed interface SetlistEvent {
     data object NavigateBack : SetlistEvent
-    data class NavigateToLyrics(val songId: String) : SetlistEvent
+    data object NavigateToLyrics : SetlistEvent
 }
 
 internal sealed interface SetlistState {
@@ -60,6 +62,7 @@ internal sealed interface SetlistState {
 internal class SetlistViewModel(
     private val id: String,
     syncRepository: SyncRepository,
+    private val queueManager: QueueManager,
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val snackbarState: SongbookSnackbarState,
@@ -106,15 +109,21 @@ internal class SetlistViewModel(
     val songSearchResults: Flow<PagingData<SongSearchResult>> = snapshotFlow {
         songSearchQueryTextFieldState.text
     }.distinctUntilChanged()
-        .debounce(SEARCH_QUERY_DEBOUNCE)
+        .debounce(SEARCH_QUERY_DEBOUNCE.milliseconds)
         .flatMapLatest { songRepository.searchSongs(it.toString()) }
         .cachedIn(viewModelScope)
 
     private val eventChannel = Channel<SetlistEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    fun onLyricsClicked(id: String) {
-        eventChannel.trySend(SetlistEvent.NavigateToLyrics(id))
+    fun onLyricsClicked(song: Song) {
+        viewModelScope.launch {
+            queueManager.setQueue(
+                songs = state.value.loaded.songs,
+                currentSong = song,
+            )
+            eventChannel.send(SetlistEvent.NavigateToLyrics)
+        }
     }
 
     fun onNameChanged(name: String) {

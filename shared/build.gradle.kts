@@ -64,6 +64,7 @@ kotlin {
             implementation(libs.peekaboo.image.picker)
 
             implementation(libs.reorderable)
+            implementation(libs.overscrolled)
 
             implementation(libs.compose.dnd)
 

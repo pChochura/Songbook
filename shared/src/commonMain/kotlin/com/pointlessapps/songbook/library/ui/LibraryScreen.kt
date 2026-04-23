@@ -80,7 +80,7 @@ internal fun LibraryScreen(
         when (event) {
             is LibraryEvent.NavigateToIntroduction -> navigator.navigateToIntroduction()
             is LibraryEvent.NavigateToImportSong -> navigator.navigateToImportSong()
-            is LibraryEvent.NavigateToLyrics -> navigator.navigateToLyrics(event.id)
+            is LibraryEvent.NavigateToLyrics -> navigator.navigateToLyrics()
             is LibraryEvent.NavigateToSetlist -> navigator.navigateToSetlist(event.id)
         }
     }
@@ -103,7 +103,10 @@ internal fun LibraryScreen(
                 GridCells.Fixed(1)
             },
             modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues.add(MaterialTheme.spacing.huge),
+            contentPadding = paddingValues.add(
+                vertical = MaterialTheme.spacing.huge,
+                horizontal = MaterialTheme.spacing.large,
+            ),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
@@ -143,12 +146,15 @@ internal fun LibraryScreen(
                         modifier = Modifier.animateItem(),
                         song = result,
                         displayMode = state.displayMode,
-                        onClick = { viewModel.onLyricsClicked(result.id) },
+                        onClick = { viewModel.onLyricsClicked(result) },
                     )
                 }
             }
 
-            item(key = "add_song_button") {
+            item(
+                key = "add_song_button",
+                span = { GridItemSpan(maxLineSpan) },
+            ) {
                 AddSongCard(
                     modifier = Modifier.animateItem(),
                     onClick = viewModel::onImportSongClicked,

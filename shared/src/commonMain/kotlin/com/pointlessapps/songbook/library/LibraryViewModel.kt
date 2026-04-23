@@ -7,9 +7,11 @@ import com.pointlessapps.songbook.core.auth.AuthRepository
 import com.pointlessapps.songbook.core.auth.exceptions.AccountAlreadyLinkedException
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
+import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
+import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.shared.Res
@@ -31,7 +33,7 @@ import kotlinx.coroutines.launch
 internal sealed interface LibraryEvent {
     data object NavigateToIntroduction : LibraryEvent
     data object NavigateToImportSong : LibraryEvent
-    data class NavigateToLyrics(val id: String) : LibraryEvent
+    data object NavigateToLyrics : LibraryEvent
     data class NavigateToSetlist(val id: String) : LibraryEvent
 }
 
@@ -46,6 +48,7 @@ internal data class LibraryState(
 )
 
 internal class LibraryViewModel(
+    private val queueManager: QueueManager,
     private val syncRepository: SyncRepository,
     private val songRepository: SongRepository,
     private val setlistRepository: SetlistRepository,
@@ -82,8 +85,11 @@ internal class LibraryViewModel(
         eventChannel.trySend(LibraryEvent.NavigateToImportSong)
     }
 
-    fun onLyricsClicked(id: String) {
-        eventChannel.trySend(LibraryEvent.NavigateToLyrics(id))
+    fun onLyricsClicked(song: Song) {
+        viewModelScope.launch {
+            queueManager.setQueue(listOf(song), song)
+            eventChannel.send(LibraryEvent.NavigateToLyrics)
+        }
     }
 
     fun onSetlistClicked(id: String) {

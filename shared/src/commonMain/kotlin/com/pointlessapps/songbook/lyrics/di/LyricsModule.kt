@@ -6,7 +6,6 @@ import com.pointlessapps.songbook.lyrics.ui.LyricsScreen
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
 
@@ -14,11 +13,7 @@ import org.koin.dsl.navigation3.navigation
 internal val lyricsModule = module {
     viewModelOf(::LyricsViewModel)
 
-    navigation<Route.Lyrics> { route ->
-        LyricsScreen(
-            viewModel = koinViewModel(key = route.toString()) {
-                parametersOf(route.songId)
-            },
-        )
+    navigation<Route.Lyrics> {
+        LyricsScreen(viewModel = koinViewModel())
     }
 }

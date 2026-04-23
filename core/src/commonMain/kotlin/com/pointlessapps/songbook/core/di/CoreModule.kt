@@ -4,6 +4,7 @@ import com.pointlessapps.songbook.core.BuildKonfig
 import com.pointlessapps.songbook.core.auth.di.authModule
 import com.pointlessapps.songbook.core.database.AppDatabase
 import com.pointlessapps.songbook.core.prefs.di.prefsModule
+import com.pointlessapps.songbook.core.queue.di.queueModule
 import com.pointlessapps.songbook.core.setlist.di.setlistModule
 import com.pointlessapps.songbook.core.song.di.songModule
 import com.pointlessapps.songbook.core.sync.di.syncModule
@@ -59,4 +60,5 @@ val coreModule = module {
     includes(songModule)
     includes(setlistModule)
     includes(prefsModule)
+    includes(queueModule)
 }

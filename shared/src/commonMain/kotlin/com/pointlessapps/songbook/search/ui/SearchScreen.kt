@@ -111,6 +111,7 @@ internal fun SearchScreen(
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
             is SearchEvent.NavigateBack -> navigator.navigateBack()
+            is SearchEvent.NavigateToLyrics -> navigator.navigateToLyrics()
             is SearchEvent.NavigateToImportSong -> navigator.navigateToImportSong(
                 title = event.title,
                 artist = event.artist,
@@ -198,7 +199,7 @@ internal fun SearchScreen(
                         SearchResultCard(
                             modifier = Modifier.animateItem(),
                             result = result,
-                            onClick = { navigator.navigateToLyrics(result.songId) },
+                            onClick = { viewModel.onLyricsClicked(result) },
                         )
                     }
                 }
