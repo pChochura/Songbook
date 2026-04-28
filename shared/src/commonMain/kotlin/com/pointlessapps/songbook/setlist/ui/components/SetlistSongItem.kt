@@ -42,8 +42,10 @@ internal fun SetlistSongItem(
         enableDismissFromStartToEnd = false,
         backgroundContent = { SetlistSwipeToDismissBackground() },
         onDismiss = {
-            coroutineScope.launch { swipeToDismissState.reset() }
-            onRemoveSongFromSetlistClicked(song.id)
+            coroutineScope.launch {
+                swipeToDismissState.reset()
+                onRemoveSongFromSetlistClicked(song.id)
+            }
         },
     ) {
         SongCard(
