@@ -100,6 +100,8 @@ internal fun PreviewSongLayout(
             previousSongTitle = previousSongTitle
                 ?: stringResource(Res.string.lyrics_no_previous_song),
             nextSongTitle = nextSongTitle ?: stringResource(Res.string.lyrics_no_next_song),
+            canScrollPrevious = previousSongTitle != null,
+            canScrollNext = nextSongTitle != null,
         ),
     )
 
@@ -194,6 +196,8 @@ internal fun PreviewSongLayout(
 private fun rememberSwipeEffectNode(
     previousSongTitle: String,
     nextSongTitle: String,
+    canScrollPrevious: Boolean,
+    canScrollNext: Boolean,
 ): OverscrolledEffectNode {
     val textMeasurer = rememberTextMeasurer()
 
@@ -225,17 +229,24 @@ private fun rememberSwipeEffectNode(
         ),
     )
 
+    val canScrollPrevious by rememberUpdatedState(canScrollPrevious)
+    val canScrollNext by rememberUpdatedState(canScrollNext)
+
     return remember {
         createOverscrolledEffectNode { currentProgress ->
             object : Modifier.Node(), DrawModifierNode {
                 override fun ContentDrawScope.draw() {
                     val (offset, progress, side) = currentProgress()
+                    val fromStart = side == Direction.FromStart
+
+                    if (fromStart && !canScrollPrevious || !fromStart && !canScrollNext) {
+                        return drawContent()
+                    }
 
                     translate(left = offset * 0.4f) {
                         this@draw.drawContent()
                     }
 
-                    val fromStart = side == Direction.FromStart
                     val textLayout = if (fromStart) previousSongTextLayout else nextSongTextLayout
                     val containerSize = Size(
                         width = textLayout.size.width + 2 * padding,
