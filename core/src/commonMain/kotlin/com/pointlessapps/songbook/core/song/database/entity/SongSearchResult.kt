@@ -1,5 +1,8 @@
 package com.pointlessapps.songbook.core.song.database.entity
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class SongSearchResult(
     val id: Int,
     val songId: String,

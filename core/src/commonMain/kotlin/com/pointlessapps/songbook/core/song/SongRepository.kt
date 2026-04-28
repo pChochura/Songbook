@@ -18,6 +18,8 @@ import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.database.dao.SyncActionDao
 import com.pointlessapps.songbook.core.sync.database.entity.SyncAction
 import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +34,7 @@ interface SongRepository {
     fun getAllSongs(): Flow<PagingData<Song>>
     fun getSongByIdFlow(id: String): Flow<Song?>
     fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>
-    fun getSongSetlistsById(id: String): Flow<List<Setlist>>
+    fun getSongSetlistsById(id: String): Flow<ImmutableList<Setlist>>
 
     suspend fun updateSongSetlists(id: String, setlistsIds: List<String>)
     suspend fun saveSong(newSong: NewSong, setlistsIds: List<String>): String
@@ -50,7 +52,7 @@ internal class SongRepositoryImpl(
         pagingSourceFactory = { songDao.getAllSongs() },
     ).flow.map { pagingData ->
         pagingData.map(SongEntity::toDomain)
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(Dispatchers.Default)
 
     override fun getSongByIdFlow(id: String) = songDao.getSongByIdFlow(id)
         .map { it?.toDomain() }
@@ -66,7 +68,7 @@ internal class SongRepositoryImpl(
     }
 
     override fun getSongSetlistsById(id: String) = songDao.getSongSetlistsById(id)
-        .map { it.map(SetlistEntity::toDomain) }
+        .map { it.map(SetlistEntity::toDomain).toImmutableList() }
         .flowOn(Dispatchers.IO)
 
     override suspend fun updateSongSetlists(id: String, setlistsIds: List<String>) {

@@ -58,6 +58,7 @@ import com.pointlessapps.songbook.shared.lyrics_no_next_song
 import com.pointlessapps.songbook.shared.lyrics_no_previous_song
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -65,7 +66,7 @@ import kotlin.math.roundToInt
 internal fun PreviewSongLayout(
     title: String,
     artist: String,
-    sections: List<Section>,
+    sections: ImmutableList<Section>,
     textScale: Int,
     keyOffset: Int,
     onTextScaleChanged: (Int) -> Unit,

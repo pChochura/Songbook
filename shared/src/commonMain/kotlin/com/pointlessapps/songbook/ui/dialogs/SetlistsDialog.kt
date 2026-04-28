@@ -40,12 +40,15 @@ import com.pointlessapps.songbook.ui.theme.IconAddFolder
 import com.pointlessapps.songbook.ui.theme.IconDone
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.rememberSnapshotMapSaver
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun SetlistsDialog(
-    setlists: Map<Setlist, Boolean>,
-    onSetlistsSelected: (List<Setlist>) -> Unit,
+    setlists: ImmutableMap<Setlist, Boolean>,
+    onSetlistsSelected: (ImmutableList<Setlist>) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val currentlySelectedSetlists = rememberSaveable(saver = rememberSnapshotMapSaver()) {
@@ -97,7 +100,11 @@ internal fun SetlistsDialog(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.common_confirm),
             onClick = {
-                onSetlistsSelected(currentlySelectedSetlists.filterValues { it }.keys.toList())
+                onSetlistsSelected(
+                    currentlySelectedSetlists
+                        .filterValues { it }.keys
+                        .toImmutableList(),
+                )
             },
             buttonStyle = defaultSongbookButtonStyle().copy(
                 containerColor = MaterialTheme.colorScheme.primary,

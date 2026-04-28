@@ -3,6 +3,7 @@ package com.pointlessapps.songbook.ui.components
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -54,6 +55,7 @@ internal fun defaultSongbookTextStyle() = SongbookTextStyle(
     softWrap = true,
 )
 
+@Stable
 internal data class SongbookTextStyle(
     val textColor: Color,
     val disabledTextColor: Color,

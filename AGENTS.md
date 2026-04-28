@@ -66,6 +66,7 @@ internal sealed interface TempEvent {
     data class ShowSnackbar(@StringRes val message: Int) : TempEvent
 }
 
+@Stable
 internal data class TempState(
     val email: String = "",
     val password: String = "",

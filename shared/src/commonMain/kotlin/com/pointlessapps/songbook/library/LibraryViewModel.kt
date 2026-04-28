@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.library
 
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.pointlessapps.songbook.core.auth.AuthRepository
@@ -14,12 +15,14 @@ import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
+import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.error_account_already_linked_error
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.Keep
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
@@ -40,8 +43,9 @@ internal sealed interface LibraryEvent {
 @Keep
 internal enum class DisplayMode { List, Grid }
 
+@Stable
 internal data class LibraryState(
-    val setlists: List<Setlist> = emptyList(),
+    val setlists: ImmutableList<Setlist> = emptyImmutableList(),
     val displayMode: DisplayMode = DisplayMode.Grid,
     val syncStatus: SyncStatus = SyncStatus.LOCAL,
     val loginStatus: LoginStatus = LoginStatus.ANONYMOUS,

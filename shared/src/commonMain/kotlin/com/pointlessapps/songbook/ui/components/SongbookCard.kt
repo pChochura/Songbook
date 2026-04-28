@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,15 +107,18 @@ internal fun dashedSongbookCardStyle() = SongbookCardStyle.Dashed(
     containerColor = Color.Transparent,
 )
 
+@Stable
 internal sealed interface SongbookCardStyle {
     val containerColor: Color
     val shape: Shape
 
+    @Stable
     data class Filled(
         override val shape: Shape,
         override val containerColor: Color,
     ) : SongbookCardStyle
 
+    @Stable
     data class Dashed(
         val outlineColor: Color,
         val cornerRadius: Dp,

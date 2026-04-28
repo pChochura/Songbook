@@ -65,6 +65,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
 import com.pointlessapps.songbook.utils.syncingTopBarButton
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -208,7 +209,7 @@ internal fun LibraryScreen(
 
 @Composable
 private fun LazyGridItemScope.SetlistsRow(
-    setlists: List<Setlist>,
+    setlists: ImmutableList<Setlist>,
     onSetlistClicked: (String) -> Unit,
     onAddSetlistClicked: (String) -> Unit,
 ) {

@@ -9,6 +9,7 @@ sdk-target = "37"
 kotlin = "2.3.21"
 kotlin-serialization = "1.11.0"
 kotlin-coroutines = "1.10.2"
+kotlin-immutable = "0.4.0"
 ksp = "2.3.6"
 
 # Compose
@@ -94,6 +95,7 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 # Kotlin
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlinx-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-immutable" }
 
 # Supabase
 supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }

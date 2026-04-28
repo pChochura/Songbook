@@ -1,6 +1,9 @@
 package com.pointlessapps.songbook.core.queue
 
 import com.pointlessapps.songbook.core.song.model.Song
+import com.pointlessapps.songbook.core.utils.emptyImmutableList
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,7 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 interface QueueManager {
-    val queueFlow: StateFlow<List<Song>>
+    val queueFlow: StateFlow<ImmutableList<Song>>
     val currentSongFlow: StateFlow<Song?>
 
     suspend fun setQueue(songs: List<Song>, currentSong: Song)
@@ -27,7 +30,7 @@ interface QueueManager {
 internal class QueueManagerImpl : QueueManager {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    private val _queueFlow = MutableStateFlow<List<Song>>(emptyList())
+    private val _queueFlow = MutableStateFlow<ImmutableList<Song>>(emptyImmutableList())
     override val queueFlow = _queueFlow.asStateFlow()
 
     private val _currentSongIndexFlow = MutableStateFlow(-1)
@@ -41,7 +44,7 @@ internal class QueueManagerImpl : QueueManager {
     )
 
     override suspend fun setQueue(songs: List<Song>, currentSong: Song) {
-        _queueFlow.value = songs
+        _queueFlow.value = songs.toImmutableList()
         _currentSongIndexFlow.value = songs.indexOf(currentSong)
     }
 

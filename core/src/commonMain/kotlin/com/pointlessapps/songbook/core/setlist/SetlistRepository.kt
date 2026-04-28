@@ -13,6 +13,8 @@ import com.pointlessapps.songbook.core.sync.database.dao.SyncActionDao
 import com.pointlessapps.songbook.core.sync.database.entity.SyncAction
 import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -23,9 +25,9 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 interface SetlistRepository {
-    fun getAllSetlistsFlow(limit: Long = Long.MAX_VALUE): Flow<List<Setlist>>
+    fun getAllSetlistsFlow(limit: Long = Long.MAX_VALUE): Flow<ImmutableList<Setlist>>
     fun getSetlistByIdFlow(id: String): Flow<Setlist?>
-    fun getSetlistsSongsById(id: String): Flow<List<Song>>
+    fun getSetlistsSongsById(id: String): Flow<ImmutableList<Song>>
 
     suspend fun addSetlist(name: String): String
     suspend fun deleteSetlist(id: String)
@@ -42,7 +44,7 @@ internal class SetlistRepositoryImpl(
 ) : SetlistRepository {
 
     override fun getAllSetlistsFlow(limit: Long) = setlistDao.getAllSetlistsFlow(limit)
-        .map { it.map(SetlistWithCount::toDomain) }
+        .map { it.map(SetlistWithCount::toDomain).toImmutableList() }
         .flowOn(Dispatchers.IO)
 
     override fun getSetlistByIdFlow(id: String) = setlistDao.getSetlistByIdFlow(id)
@@ -50,7 +52,7 @@ internal class SetlistRepositoryImpl(
         .flowOn(Dispatchers.IO)
 
     override fun getSetlistsSongsById(id: String) = setlistDao.getSetlistSongsById(id)
-        .map { it.map(SongEntity::toDomain) }
+        .map { it.map(SongEntity::toDomain).toImmutableList() }
         .flowOn(Dispatchers.IO)
 
     override suspend fun addSetlist(name: String) = withContext(Dispatchers.IO) {

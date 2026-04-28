@@ -13,6 +13,7 @@ import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
 import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
 import com.pointlessapps.songbook.ui.theme.IconDelete
 import com.pointlessapps.songbook.ui.theme.IconEdit
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -26,7 +27,7 @@ internal fun SetlistOptionsBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
         header = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
-        items = listOf(
+        items = persistentListOf(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
                 icon = IconEdit,

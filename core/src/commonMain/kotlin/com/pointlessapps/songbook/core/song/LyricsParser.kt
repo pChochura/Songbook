@@ -2,12 +2,14 @@ package com.pointlessapps.songbook.core.song
 
 import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.Section
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 object LyricsParser {
     private val sectionHeaderRegex = Regex("""^\[([^]]+)]$""", RegexOption.IGNORE_CASE)
     private val chordRegex = Regex("""\[([^]]+)]""")
 
-    fun parseLyrics(lyrics: String): List<Section> {
+    fun parseLyrics(lyrics: String): ImmutableList<Section> {
         val sections = mutableListOf<Section>()
 
         var currentSectionName = ""
@@ -31,7 +33,7 @@ object LyricsParser {
                     id = sections.size,
                     name = currentSectionName,
                     lyrics = finalLyrics,
-                    chords = finalChords,
+                    chords = finalChords.toImmutableList(),
                 ),
             )
 
@@ -75,6 +77,6 @@ object LyricsParser {
 
         emitSection()
 
-        return sections
+        return sections.toImmutableList()
     }
 }

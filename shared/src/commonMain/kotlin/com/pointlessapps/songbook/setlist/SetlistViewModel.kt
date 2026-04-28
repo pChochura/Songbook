@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.setlist
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -13,6 +14,7 @@ import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
+import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_undo
 import com.pointlessapps.songbook.shared.error_setlist_not_found
@@ -22,6 +24,8 @@ import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -47,11 +51,15 @@ internal sealed interface SetlistEvent {
     data object NavigateToLyrics : SetlistEvent
 }
 
+@Stable
 internal sealed interface SetlistState {
+    @Stable
     data object Loading : SetlistState
+
+    @Stable
     data class Loaded(
         val setlist: Setlist,
-        val songs: List<Song>,
+        val songs: ImmutableList<Song>,
         val syncStatus: SyncStatus = SyncStatus.LOCAL,
     ) : SetlistState
 
@@ -68,8 +76,9 @@ internal class SetlistViewModel(
     private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
+    @Stable
     private data class SetlistTransientState(
-        val localSongs: List<Song> = emptyList(),
+        val localSongs: ImmutableList<Song> = emptyImmutableList(),
         val isLoading: Boolean = false,
     )
 
@@ -141,7 +150,7 @@ internal class SetlistViewModel(
         val song = songs.removeAt(fromIndex)
         songs.add(toIndex, song)
 
-        _transientState.update { it.copy(localSongs = songs) }
+        _transientState.update { it.copy(localSongs = songs.toImmutableList()) }
     }
 
     fun onReorderDone() {
@@ -177,7 +186,11 @@ internal class SetlistViewModel(
             setlistRepository.removeSongFromSetlist(state.setlist.id, id)
             val songIndex = _transientState.value.localSongs.indexOfFirst { it.id == id }
             _transientState.update {
-                it.copy(localSongs = it.localSongs.filter { song -> song.id != id })
+                it.copy(
+                    localSongs = it.localSongs
+                        .filter { song -> song.id != id }
+                        .toImmutableList(),
+                )
             }
             snackbarState.showSnackbar(
                 message = getString(Res.string.setlist_song_removed_from_setlist),

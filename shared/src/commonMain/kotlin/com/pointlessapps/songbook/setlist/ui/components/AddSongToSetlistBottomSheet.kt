@@ -55,6 +55,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconDone
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.collections.immutable.ImmutableSet
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -62,7 +63,7 @@ internal fun AddSongToSetlistBottomSheet(
     show: Boolean,
     textFieldState: TextFieldState,
     searchResults: LazyPagingItems<SongSearchResult>,
-    setlistsSongIds: Set<String>,
+    setlistsSongIds: ImmutableSet<String>,
     onItemClicked: (String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {

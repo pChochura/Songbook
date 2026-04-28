@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -132,6 +133,7 @@ internal fun defaultSongbookDialogStyle() = SongbookDialogStyle(
     dismissible = SongbookDialogDismissible.Both,
 )
 
+@Stable
 internal data class SongbookDialogStyle(
     val label: String,
     val icon: DrawableResource?,

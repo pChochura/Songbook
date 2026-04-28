@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.introduction
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.auth.AuthRepository
 import com.pointlessapps.songbook.utils.BaseViewModel
@@ -15,6 +16,7 @@ internal sealed interface IntroductionEvent {
     data object NavigateToLibrary : IntroductionEvent
 }
 
+@Stable
 internal data class IntroductionState(
     val isLoading: Boolean = false,
 )

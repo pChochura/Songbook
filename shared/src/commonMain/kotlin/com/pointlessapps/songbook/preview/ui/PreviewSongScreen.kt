@@ -25,12 +25,13 @@ import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun PreviewSongScreen(
     title: String,
     artist: String,
-    sections: List<Section>,
+    sections: ImmutableList<Section>,
 ) {
     val navigator = LocalNavigator.current
     var textScale by rememberSaveable { mutableIntStateOf(100) }

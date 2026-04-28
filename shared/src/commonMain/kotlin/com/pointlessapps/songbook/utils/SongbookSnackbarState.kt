@@ -4,6 +4,7 @@ import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarVisuals
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -23,6 +24,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import kotlin.coroutines.resume
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 internal class SongbookSnackbarState {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -124,12 +127,13 @@ internal class SongbookSnackbarState {
     }
 
     private fun SnackbarDuration.toMillis() = when (this) {
-        SnackbarDuration.Short -> 4000L
-        SnackbarDuration.Long -> 10000L
-        SnackbarDuration.Indefinite -> Long.MAX_VALUE
+        SnackbarDuration.Short -> 4.seconds
+        SnackbarDuration.Long -> 10.seconds
+        SnackbarDuration.Indefinite -> Duration.INFINITE
     }
 }
 
+@Stable
 internal data class SongbookSnackbarData(
     override val visuals: SongbookSnackbarVisuals,
     private val continuation: CancellableContinuation<SnackbarResult>,
@@ -139,6 +143,7 @@ internal data class SongbookSnackbarData(
         continuation.resume(SnackbarResult.ActionPerformed)
 }
 
+@Stable
 internal data class SongbookSnackbarVisuals(
     override val message: String,
     override val actionLabel: String?,

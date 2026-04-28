@@ -1,11 +1,14 @@
 package com.pointlessapps.songbook.core.song
 
 import com.pointlessapps.songbook.core.song.model.PublicLyrics
+import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -14,22 +17,22 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 interface PublicLyricsRepository {
-    fun searchPublicLyrics(query: String): Flow<List<PublicLyrics>>
+    fun searchPublicLyrics(query: String): Flow<ImmutableList<PublicLyrics>>
 }
 
 internal class PublicLyricsRepositoryImpl(
     private val httpClient: HttpClient,
 ) : PublicLyricsRepository {
 
-    override fun searchPublicLyrics(query: String): Flow<List<PublicLyrics>> = flow {
+    override fun searchPublicLyrics(query: String): Flow<ImmutableList<PublicLyrics>> = flow {
         runCatching {
             val response = httpClient.get(PUBLIC_LYRICS_URL) {
                 parameter("q", query)
                 header("User-Agent", USER_AGENT)
             }
             val results: List<PublicLyrics> = withContext(Dispatchers.Default) { response.body() }
-            emit(results)
-        }.getOrElse { emit(emptyList()) }
+            emit(results.toImmutableList())
+        }.getOrElse { emit(emptyImmutableList()) }
     }.flowOn(Dispatchers.IO)
 
     private companion object {

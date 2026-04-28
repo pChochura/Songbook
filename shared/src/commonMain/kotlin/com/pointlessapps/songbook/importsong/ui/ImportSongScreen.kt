@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -93,6 +94,7 @@ import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconHelp
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.collectWithLifecycle
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -312,7 +314,7 @@ internal fun ImportSongScreen(
 @Composable
 private fun SongLyricsTextField(
     lyricsTextFieldState: TextFieldState,
-    chordSuggestions: List<String>,
+    chordSuggestions: ImmutableList<String>,
     onChordSelected: (String) -> Unit,
 ) {
     val textFieldScrollState = rememberScrollState()
@@ -374,10 +376,11 @@ private fun SongLyricsTextField(
 @Composable
 private fun SongLyricsVisualEditor(
     textScale: Int,
-    sections: List<Section>,
+    sections: ImmutableList<Section>,
     onChordMoved: (Int, Chord, Int) -> Unit,
     onChordInserted: (Int, Int, String) -> Unit,
 ) {
+    @Stable
     data class ChordInputPopupData(
         val selectedChord: String?,
         val sectionId: Int,

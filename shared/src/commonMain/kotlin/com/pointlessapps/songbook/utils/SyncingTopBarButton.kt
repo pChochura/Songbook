@@ -20,6 +20,7 @@ import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.theme.IconSync
 import com.pointlessapps.songbook.ui.theme.IconSyncFailed
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun syncingTopBarButton(syncStatus: SyncStatus): TopBarButton? {
@@ -29,7 +30,7 @@ internal fun syncingTopBarButton(syncStatus: SyncStatus): TopBarButton? {
         if (syncStatus != SyncStatus.SYNCED) {
             alpha.snapTo(1f)
         } else {
-            delay(500)
+            delay(500.milliseconds)
             alpha.animateTo(0f, tween(300))
         }
     }

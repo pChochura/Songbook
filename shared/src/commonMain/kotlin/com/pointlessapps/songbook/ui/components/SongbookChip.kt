@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -113,6 +114,7 @@ internal fun defaultSongbookChipStyle() = SongbookChipStyle(
     iconAlignment = Alignment.Start,
 )
 
+@Stable
 internal data class SongbookChipStyle(
     val containerColor: Color,
     val selectedContainerColor: Color,

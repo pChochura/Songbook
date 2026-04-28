@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.compose.mp.ui.tooling.preview)
 
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.immutable)
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose)

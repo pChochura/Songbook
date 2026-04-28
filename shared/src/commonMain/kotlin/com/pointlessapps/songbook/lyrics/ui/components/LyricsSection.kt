@@ -22,10 +22,11 @@ import com.pointlessapps.songbook.lyrics.WrapMode
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun LyricsSections(
-    sections: List<Section>,
+    sections: ImmutableList<Section>,
     textScale: Int,
     keyOffset: Int,
     displayMode: DisplayMode,

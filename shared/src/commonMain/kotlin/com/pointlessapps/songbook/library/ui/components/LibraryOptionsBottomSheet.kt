@@ -2,6 +2,7 @@ package com.pointlessapps.songbook.library.ui.components
 
 import androidx.compose.runtime.Composable
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
+import com.pointlessapps.songbook.core.utils.persistentListOfNotNull
 import com.pointlessapps.songbook.library.DisplayMode
 import com.pointlessapps.songbook.library.LibraryState
 import com.pointlessapps.songbook.shared.Res
@@ -32,7 +33,7 @@ internal fun LibraryOptionsBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
         header = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
-        items = listOfNotNull(
+        items = persistentListOfNotNull(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
                 icon = IconDisplayMode,

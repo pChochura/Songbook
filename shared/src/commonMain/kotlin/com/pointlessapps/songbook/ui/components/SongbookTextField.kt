@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -83,6 +84,7 @@ internal fun defaultSongbookTextFieldStyle() = SongbookTextFieldStyle(
     readOnly = false,
 )
 
+@Stable
 internal data class SongbookTextFieldStyle(
     val keyboardOptions: KeyboardOptions,
     val inputTransformation: InputTransformation?,

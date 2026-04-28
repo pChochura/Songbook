@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.time.Duration.Companion.seconds
 
 interface SyncRepository {
     val currentSyncStatusFlow: StateFlow<SyncStatus>
@@ -212,6 +213,6 @@ internal class SyncRepositoryImpl(
         const val SETLISTS_TABLE = "setlists"
         const val SETLIST_SONGS_TABLE = "setlist_songs"
 
-        const val SYNC_DEBOUNCE = 2000L
+        val SYNC_DEBOUNCE = 2.seconds
     }
 }

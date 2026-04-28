@@ -17,7 +17,7 @@ room {
 
 kotlin {
     sourceSets.configureEach {
-        languageSettings.optIn("kotlin.expectactual.ExperimentalExpectActualAnnotations")
+        languageSettings.optIn("kotlin.expectactual.ExpectActualClasses")
     }
 
     android {

@@ -3,6 +3,7 @@ package com.pointlessapps.songbook.search
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -17,11 +18,14 @@ import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
+import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.error_song_not_found
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -57,13 +61,14 @@ internal sealed interface SearchEvent {
     data class NavigateToPreview(
         val title: String,
         val artist: String,
-        val sections: List<Section>,
+        val sections: ImmutableList<Section>,
     ) : SearchEvent
 }
 
+@Stable
 internal data class SearchState(
-    val lastSearches: List<String> = emptyList(),
-    val publicLyrics: List<PublicLyrics> = emptyList(),
+    val lastSearches: ImmutableList<String> = emptyImmutableList(),
+    val publicLyrics: ImmutableList<PublicLyrics> = emptyImmutableList(),
     val showPublicLyrics: Boolean? = null,
     val isLoadingYourLibrary: Boolean = false,
     val isLoadingPublicLyrics: Boolean = false,
@@ -83,6 +88,7 @@ internal class SearchViewModel(
     private val eventChannel = Channel<SearchEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    @Stable
     private data class SearchTransientState(
         val showPublicLyrics: Boolean? = null,
         val isLoadingYourLibrary: Boolean = false,
@@ -95,23 +101,23 @@ internal class SearchViewModel(
     val searchResults: Flow<PagingData<SongSearchResult>> = snapshotFlow {
         queryTextFieldState.text
     }.distinctUntilChanged()
-        .debounce(SEARCH_QUERY_DEBOUNCE.milliseconds)
+        .debounce(SEARCH_QUERY_DEBOUNCE)
         .filter { it.isNotEmpty() }
         .onEach { _transientState.update { it.copy(isLoadingYourLibrary = true) } }
         .flatMapLatest { songRepository.searchSongs(it.toString()) }
         .onEach { _transientState.update { it.copy(isLoadingYourLibrary = false) } }
         .cachedIn(viewModelScope)
 
-    private val publicLyricsSearchFlow: Flow<List<PublicLyrics>> = snapshotFlow {
+    private val publicLyricsSearchFlow: Flow<ImmutableList<PublicLyrics>> = snapshotFlow {
         queryTextFieldState.text
     }.combine(
         _transientState.map { it.showPublicLyrics }.distinctUntilChanged(),
     ) { query, show -> query to show }
-        .debounce(SEARCH_QUERY_DEBOUNCE.milliseconds)
+        .debounce(SEARCH_QUERY_DEBOUNCE)
         .transformLatest { (query, show) ->
             if (show != true || query.isEmpty()) {
                 _transientState.update { it.copy(isLoadingPublicLyrics = false) }
-                emit(emptyList())
+                emit(emptyImmutableList())
                 return@transformLatest
             }
 
@@ -135,7 +141,7 @@ internal class SearchViewModel(
         _transientState,
     ) { syncStatus, lastSearches, publicLyrics, transient ->
         SearchState(
-            lastSearches = lastSearches.toList(),
+            lastSearches = lastSearches.toImmutableList(),
             publicLyrics = publicLyrics,
             showPublicLyrics = transient.showPublicLyrics,
             isLoadingYourLibrary = transient.isLoadingYourLibrary,
@@ -236,6 +242,6 @@ internal class SearchViewModel(
     }
 
     private companion object {
-        const val SEARCH_QUERY_DEBOUNCE = 300L
+        val SEARCH_QUERY_DEBOUNCE = 3.milliseconds
     }
 }

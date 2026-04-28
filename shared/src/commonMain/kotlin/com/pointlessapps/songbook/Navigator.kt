@@ -15,6 +15,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.utils.Keep
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -62,7 +63,7 @@ internal sealed interface Route : NavKey {
     data class PreviewSong(
         val title: String,
         val artist: String,
-        val sections: List<Section>,
+        val sections: ImmutableList<Section>,
     ) : Route
 
     @Keep
@@ -166,7 +167,7 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
         backStack.add(Route.ImportSong(id, title, artist, lyrics))
     }
 
-    fun navigateToPreview(title: String, artist: String, sections: List<Section>) {
+    fun navigateToPreview(title: String, artist: String, sections: ImmutableList<Section>) {
         backStack.add(Route.PreviewSong(title, artist, sections))
     }
 

@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,7 @@ import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -37,7 +39,7 @@ import org.jetbrains.compose.resources.stringResource
 internal fun OptionsBottomSheet(
     show: Boolean,
     onDismissRequest: () -> Unit,
-    items: List<OptionsBottomSheetItem>,
+    items: ImmutableList<OptionsBottomSheetItem>,
     header: @Composable () -> Unit = { },
 ) {
     SongbookBottomSheet(
@@ -121,7 +123,9 @@ internal fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem.Button) {
     }
 }
 
+@Stable
 internal sealed interface OptionsBottomSheetItem {
+    @Stable
     data class Button(
         val icon: DrawableResource?,
         val label: StringResource,

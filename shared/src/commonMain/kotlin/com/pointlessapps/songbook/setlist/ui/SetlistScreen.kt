@@ -49,6 +49,7 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
 import com.pointlessapps.songbook.utils.syncingTopBarButton
+import kotlinx.collections.immutable.toImmutableSet
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -154,7 +155,7 @@ private fun SetlistScreenContent(
         }
     }
 
-    val setlistsSongIds = remember(state.songs) { state.songs.map(Song::id).toSet() }
+    val setlistsSongIds = remember(state.songs) { state.songs.map(Song::id).toImmutableSet() }
     AddSongToSetlistBottomSheet(
         show = isAddSongToSetlistBottomSheetVisible,
         textFieldState = songSearchQueryTextFieldState,

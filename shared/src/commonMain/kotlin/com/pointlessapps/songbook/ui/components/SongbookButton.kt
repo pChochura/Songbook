@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -126,6 +127,7 @@ internal fun defaultSongbookButtonTextStyle() = defaultSongbookTextStyle().copy(
     typography = MaterialTheme.typography.labelLarge,
 )
 
+@Stable
 internal data class SongbookButtonStyle(
     val containerColor: Color,
     val disabledContainerColor: Color,

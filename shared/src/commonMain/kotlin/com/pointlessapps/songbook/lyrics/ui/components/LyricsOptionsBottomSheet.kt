@@ -45,6 +45,7 @@ import com.pointlessapps.songbook.ui.theme.IconKey
 import com.pointlessapps.songbook.ui.theme.IconTextSize
 import com.pointlessapps.songbook.ui.theme.IconWrapMode
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -63,7 +64,7 @@ internal fun LyricsOptionsBottomSheet(
                 artist = state.artist,
             )
         },
-        items = listOf(
+        items = persistentListOf(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
                 icon = IconEdit,

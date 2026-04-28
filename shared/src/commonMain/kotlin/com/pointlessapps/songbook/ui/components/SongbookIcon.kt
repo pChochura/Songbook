@@ -3,6 +3,7 @@ package com.pointlessapps.songbook.ui.components
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.DrawableResource
@@ -26,6 +27,7 @@ internal fun defaultSongbookIconStyle() = SongbookIconStyle(
     tint = MaterialTheme.colorScheme.onSurface,
 )
 
+@Stable
 internal data class SongbookIconStyle(
     val tint: Color,
 )

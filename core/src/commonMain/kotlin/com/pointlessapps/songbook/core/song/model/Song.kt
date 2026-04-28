@@ -3,6 +3,8 @@ package com.pointlessapps.songbook.core.song.model
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.pointlessapps.songbook.core.utils.Keep
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -37,7 +39,7 @@ data class Section(
     val id: Int,
     val name: String,
     val lyrics: String,
-    val chords: List<Chord>,
+    val chords: ImmutableList<Chord>,
 ) {
     @Keep
     @Serializable
@@ -45,10 +47,10 @@ data class Section(
     @Immutable
     data class Line(
         val line: String,
-        val chords: List<Chord>,
+        val chords: ImmutableList<Chord>,
     )
 
-    val lines: List<Line>
+    val lines: ImmutableList<Line>
         get() {
             var currentPos = 0
             return lyrics.lines().map { lineText ->
@@ -56,8 +58,8 @@ data class Section(
                     .filter { it.position in currentPos..(currentPos + lineText.length) }
 
                 currentPos += lineText.length + 1
-                Line(lineText, lineChords)
-            }
+                Line(lineText, lineChords.toImmutableList())
+            }.toImmutableList()
         }
 
     companion object {

@@ -15,6 +15,7 @@ import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
 import com.pointlessapps.songbook.ui.theme.IconAddFolder
 import com.pointlessapps.songbook.ui.theme.IconScan
 import com.pointlessapps.songbook.ui.theme.IconVisibility
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -28,7 +29,7 @@ internal fun ImportSongOptionsBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
         header = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
-        items = listOf(
+        items = persistentListOf(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(
                 icon = IconAddFolder,

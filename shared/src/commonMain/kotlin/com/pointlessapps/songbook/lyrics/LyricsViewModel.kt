@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.lyrics
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.queue.QueueManager
@@ -12,11 +13,15 @@ import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.Keep
+import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.error_song_not_found
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,11 +61,12 @@ internal enum class DisplayMode {
 internal enum class WrapMode { Wrap, NoWrap }
 
 internal sealed interface LyricsState {
+    @Stable
     data class Loaded(
         val songId: String,
         val title: String = "",
         val artist: String = "",
-        val sections: List<Section> = emptyList(),
+        val sections: ImmutableList<Section> = emptyImmutableList(),
         val textScale: Int = 100,
         val keyOffset: Int = 0,
         val isOcrActive: Boolean = false,
@@ -69,12 +75,13 @@ internal sealed interface LyricsState {
         val previousSongTitle: String? = null,
         val nextSongTitle: String? = null,
         val showKeyOffsetFab: Boolean = true,
-        val allSetlists: List<Setlist> = emptyList(),
-        val selectedSetlists: List<Setlist> = emptyList(),
+        val allSetlists: ImmutableList<Setlist> = emptyImmutableList(),
+        val selectedSetlists: ImmutableList<Setlist> = emptyImmutableList(),
         val syncStatus: SyncStatus = SyncStatus.LOCAL,
     ) : LyricsState {
-        val setlistsSelection =
+        val setlistsSelection: ImmutableMap<Setlist, Boolean> =
             allSetlists.associateWith { it.id in selectedSetlists.map(Setlist::id) }
+                .toImmutableMap()
     }
 
     data object Loading : LyricsState
@@ -91,6 +98,7 @@ internal class LyricsViewModel(
     private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
+    @Stable
     private data class LyricsTransientState(
         val keyOffset: Int = 0,
         val isLoading: Boolean = false,

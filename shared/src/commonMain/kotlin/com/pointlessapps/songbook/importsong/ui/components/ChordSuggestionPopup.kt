@@ -21,11 +21,12 @@ import androidx.compose.ui.window.Popup
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun ChordSuggestionPopup(
     cursorRect: Rect,
-    suggestions: List<String>,
+    suggestions: ImmutableList<String>,
     onChordSelected: (String) -> Unit,
     onDismissRequest: () -> Unit = {},
 ) {

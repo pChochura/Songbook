@@ -3,6 +3,7 @@ package com.pointlessapps.songbook.importsong
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
@@ -17,6 +18,7 @@ import com.pointlessapps.songbook.core.song.model.Chord
 import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
+import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.shared.Res
 import com.pointlessapps.songbook.shared.common_show
 import com.pointlessapps.songbook.shared.error_image_capture_failed
@@ -28,6 +30,10 @@ import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.Keep
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
@@ -54,19 +60,21 @@ internal enum class DisplayMode {
     Text, Visual
 }
 
+@Stable
 internal data class ImportSongState(
     val songId: String? = null,
-    val allSetlists: List<Setlist> = emptyList(),
-    val selectedSetlists: List<Setlist> = emptyList(),
-    val chordSuggestions: List<String> = emptyList(),
+    val allSetlists: ImmutableList<Setlist> = emptyImmutableList(),
+    val selectedSetlists: ImmutableList<Setlist> = emptyImmutableList(),
+    val chordSuggestions: ImmutableList<String> = emptyImmutableList(),
     val displayMode: DisplayMode = DisplayMode.Text,
     val textScale: Int = 100,
-    val sections: List<Section> = emptyList(),
+    val sections: ImmutableList<Section> = emptyImmutableList(),
     val canImport: Boolean = false,
     val isExtractingInProgress: Boolean = false,
     val isLoading: Boolean = false,
 ) {
-    val setlistsSelection = allSetlists.associateWith { it in selectedSetlists }
+    val setlistsSelection: ImmutableMap<Setlist, Boolean> =
+        allSetlists.associateWith { it in selectedSetlists }.toImmutableMap()
 }
 
 internal class ImportSongViewModel(
@@ -85,8 +93,9 @@ internal class ImportSongViewModel(
     val showScanDialog: Boolean =
         id == null && title.isNullOrEmpty() && artist.isNullOrEmpty() && lyrics.isNullOrEmpty()
 
+    @Stable
     private data class ImportSongTransientState(
-        val selectedSetlists: List<Setlist> = emptyList(),
+        val selectedSetlists: ImmutableList<Setlist> = emptyImmutableList(),
         val displayMode: DisplayMode = DisplayMode.Text,
         val textScale: Int = 100,
         val isExtractingInProgress: Boolean = false,
@@ -186,7 +195,7 @@ internal class ImportSongViewModel(
         eventChannel.trySend(ImportSongEvent.NavigateBack)
     }
 
-    fun onSetlistsSelected(setlists: List<Setlist>) {
+    fun onSetlistsSelected(setlists: ImmutableList<Setlist>) {
         _transientState.update {
             it.copy(selectedSetlists = setlists)
         }
@@ -285,7 +294,7 @@ internal class ImportSongViewModel(
                 } else {
                     it
                 }
-            },
+            }.toImmutableList(),
         )
         lyricsTextFieldState.edit {
             replace(0, length, sections.toLyrics())
@@ -314,7 +323,7 @@ internal class ImportSongViewModel(
 
         sections[sectionIndex] = section.copy(
             chords = (section.chords.filter { it.position != newChord.position } + newChord)
-                .sortedBy { it.position },
+                .sortedBy { it.position }.toImmutableList(),
         )
         lyricsTextFieldState.edit {
             replace(0, length, sections.toLyrics())
@@ -325,7 +334,7 @@ internal class ImportSongViewModel(
     private fun calculateChordSuggestions(
         text: String,
         cursorPosition: Int,
-    ): List<String> {
+    ): ImmutableList<String> {
         val textBeforeCursor = text.substring(0, cursorPosition)
         val lastOpenBracket = textBeforeCursor.lastIndexOf('[')
         val lastCloseBracket = textBeforeCursor.lastIndexOf(']')
@@ -335,9 +344,9 @@ internal class ImportSongViewModel(
             val suggestions = ChordLibrary.allChords.filter {
                 it.startsWith(typedChord, ignoreCase = true)
             }
-            return suggestions
+            return suggestions.toImmutableList()
         }
 
-        return emptyList()
+        return emptyImmutableList()
     }
 }

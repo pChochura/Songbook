@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface PrefsRepository {
-    fun getLastSearchesFlow(): Flow<Set<String>>
+    fun getLastSearchesFlow(): Flow<ImmutableSet<String>>
     suspend fun addLastSearch(search: String)
     suspend fun removeLastSearch(search: String)
 
@@ -50,7 +52,7 @@ internal class PrefsRepositoryImpl(
     private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
 
     override fun getLastSearchesFlow() = dataStore.data.map { preferences ->
-        preferences[lastSearchesKey].orEmpty()
+        preferences[lastSearchesKey].orEmpty().toImmutableSet()
     }.flowOn(Dispatchers.IO)
 
     override suspend fun addLastSearch(search: String) {
