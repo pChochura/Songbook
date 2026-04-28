@@ -23,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.core.setlist.model.Setlist
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_confirm
-import com.pointlessapps.songbook.shared.import_menu_add_to_setlists
-import com.pointlessapps.songbook.shared.import_menu_add_to_setlists_description
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_confirm
+import com.pointlessapps.songbook.shared.ui.import_menu_add_to_setlists
+import com.pointlessapps.songbook.shared.ui.import_menu_add_to_setlists_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible

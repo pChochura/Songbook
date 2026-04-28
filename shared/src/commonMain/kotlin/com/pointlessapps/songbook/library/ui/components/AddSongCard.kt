@@ -8,9 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.library_add_song_subtitle
-import com.pointlessapps.songbook.shared.library_add_song_title
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.library_add_song_subtitle
+import com.pointlessapps.songbook.shared.ui.library_add_song_title
 import com.pointlessapps.songbook.ui.components.SongbookCard
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText

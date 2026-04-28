@@ -35,8 +35,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.pointlessapps.songbook.core.song.ChordLibrary
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_search_chord_placeholder
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_search_chord_placeholder
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.SongbookTextField
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextFieldStyle

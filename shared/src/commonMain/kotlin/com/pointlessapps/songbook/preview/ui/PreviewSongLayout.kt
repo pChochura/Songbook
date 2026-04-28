@@ -53,9 +53,9 @@ import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
 import com.pointlessapps.songbook.preview.ui.components.PinchToZoomBox
 import com.pointlessapps.songbook.preview.ui.components.collectIsPinchedToZoomAsState
 import com.pointlessapps.songbook.preview.ui.components.dialogs.ChordDetailsDialog
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.lyrics_no_next_song
-import com.pointlessapps.songbook.shared.lyrics_no_previous_song
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.lyrics_no_next_song
+import com.pointlessapps.songbook.shared.ui.lyrics_no_previous_song
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import kotlinx.collections.immutable.ImmutableList

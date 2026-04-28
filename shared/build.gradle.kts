@@ -19,10 +19,6 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
-
-        androidResources {
-            enable = true
-        }
     }
 
     listOf(
@@ -71,14 +67,11 @@ kotlin {
 
             api(projects.core)
             api(projects.ai)
+            api(projects.shared.ui)
         }
 
         androidMain.dependencies {
             implementation(libs.compose.mp.ui.tooling)
         }
     }
-}
-
-compose.resources {
-    packageOfResClass = "com.pointlessapps.songbook.shared"
 }

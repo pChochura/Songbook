@@ -15,10 +15,10 @@ import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_undo
-import com.pointlessapps.songbook.shared.error_setlist_not_found
-import com.pointlessapps.songbook.shared.setlist_song_removed_from_setlist
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_undo
+import com.pointlessapps.songbook.shared.ui.error_setlist_not_found
+import com.pointlessapps.songbook.shared.ui.setlist_song_removed_from_setlist
 import com.pointlessapps.songbook.ui.theme.IconInfo
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel

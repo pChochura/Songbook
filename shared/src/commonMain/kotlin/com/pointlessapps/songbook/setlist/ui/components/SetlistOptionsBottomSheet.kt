@@ -3,11 +3,11 @@ package com.pointlessapps.songbook.setlist.ui.components
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.pointlessapps.songbook.setlist.SetlistState
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_menu
-import com.pointlessapps.songbook.shared.setlist_menu_delete
-import com.pointlessapps.songbook.shared.setlist_menu_delete_description
-import com.pointlessapps.songbook.shared.setlist_menu_rename
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_menu
+import com.pointlessapps.songbook.shared.ui.setlist_menu_delete
+import com.pointlessapps.songbook.shared.ui.setlist_menu_delete_description
+import com.pointlessapps.songbook.shared.ui.setlist_menu_rename
 import com.pointlessapps.songbook.ui.OptionsBottomSheet
 import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
 import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader

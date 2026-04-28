@@ -1,8 +1,8 @@
 package com.pointlessapps.songbook.utils
 
 import androidx.lifecycle.ViewModel
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.error_unknown_error
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.error_unknown_error
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope

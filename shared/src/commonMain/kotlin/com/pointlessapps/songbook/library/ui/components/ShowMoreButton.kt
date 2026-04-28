@@ -5,8 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_show_all
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_show_all
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.theme.IconArrowRight

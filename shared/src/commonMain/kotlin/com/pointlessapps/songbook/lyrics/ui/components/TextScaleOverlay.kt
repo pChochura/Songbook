@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.lyrics_text_scale
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.lyrics_text_scale
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing

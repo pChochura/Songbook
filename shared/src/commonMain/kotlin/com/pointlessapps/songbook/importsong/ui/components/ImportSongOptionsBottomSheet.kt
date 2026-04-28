@@ -2,13 +2,13 @@ package com.pointlessapps.songbook.importsong.ui.components
 
 import androidx.compose.runtime.Composable
 import com.pointlessapps.songbook.importsong.ImportSongState
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_menu
-import com.pointlessapps.songbook.shared.import_menu_add_to_setlists
-import com.pointlessapps.songbook.shared.import_menu_preview
-import com.pointlessapps.songbook.shared.import_menu_preview_description
-import com.pointlessapps.songbook.shared.import_menu_rescan
-import com.pointlessapps.songbook.shared.import_menu_rescan_description
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_menu
+import com.pointlessapps.songbook.shared.ui.import_menu_add_to_setlists
+import com.pointlessapps.songbook.shared.ui.import_menu_preview
+import com.pointlessapps.songbook.shared.ui.import_menu_preview_description
+import com.pointlessapps.songbook.shared.ui.import_menu_rescan
+import com.pointlessapps.songbook.shared.ui.import_menu_rescan_description
 import com.pointlessapps.songbook.ui.OptionsBottomSheet
 import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
 import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader

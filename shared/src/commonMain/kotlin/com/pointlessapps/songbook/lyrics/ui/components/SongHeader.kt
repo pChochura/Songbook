@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_unknown
-import com.pointlessapps.songbook.shared.common_unnamed
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_unknown
+import com.pointlessapps.songbook.shared.ui.common_unnamed
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.spacing

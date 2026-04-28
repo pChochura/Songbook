@@ -13,11 +13,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_confirm
-import com.pointlessapps.songbook.shared.common_decrement
-import com.pointlessapps.songbook.shared.common_increment
-import com.pointlessapps.songbook.shared.common_select_text_scale
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_confirm
+import com.pointlessapps.songbook.shared.ui.common_decrement
+import com.pointlessapps.songbook.shared.ui.common_increment
+import com.pointlessapps.songbook.shared.ui.common_select_text_scale
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible

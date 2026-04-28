@@ -16,10 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.library.DisplayMode
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_unknown
-import com.pointlessapps.songbook.shared.common_unnamed
-import com.pointlessapps.songbook.shared.library_add_to_favourites
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_unknown
+import com.pointlessapps.songbook.shared.ui.common_unnamed
+import com.pointlessapps.songbook.shared.ui.library_add_to_favourites
 import com.pointlessapps.songbook.ui.components.SongbookCard
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookIconButton

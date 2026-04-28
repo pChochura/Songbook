@@ -11,10 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.pointlessapps.songbook.core.song.model.PublicLyrics
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_unknown
-import com.pointlessapps.songbook.shared.common_unnamed
-import com.pointlessapps.songbook.shared.import_menu_preview
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_unknown
+import com.pointlessapps.songbook.shared.ui.common_unnamed
+import com.pointlessapps.songbook.shared.ui.import_menu_preview
 import com.pointlessapps.songbook.ui.components.SongbookCard
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookText

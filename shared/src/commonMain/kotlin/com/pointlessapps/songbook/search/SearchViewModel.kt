@@ -19,8 +19,8 @@ import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.error_song_not_found
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.error_song_not_found
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState

@@ -6,8 +6,8 @@ import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.sync.SyncRepository
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.error_initilizing_error
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.error_initilizing_error
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState

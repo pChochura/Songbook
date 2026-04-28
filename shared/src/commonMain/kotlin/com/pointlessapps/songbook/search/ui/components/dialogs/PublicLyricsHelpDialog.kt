@@ -17,11 +17,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.search_i_understand
-import com.pointlessapps.songbook.shared.search_turn_it_off
-import com.pointlessapps.songbook.shared.search_what_is_public_lyrics
-import com.pointlessapps.songbook.shared.search_what_is_public_lyrics_description
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.search_i_understand
+import com.pointlessapps.songbook.shared.ui.search_turn_it_off
+import com.pointlessapps.songbook.shared.ui.search_what_is_public_lyrics
+import com.pointlessapps.songbook.shared.ui.search_what_is_public_lyrics_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible

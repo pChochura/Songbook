@@ -11,11 +11,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_offline
-import com.pointlessapps.songbook.shared.common_sync_failed
-import com.pointlessapps.songbook.shared.common_synced
-import com.pointlessapps.songbook.shared.common_syncing
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_offline
+import com.pointlessapps.songbook.shared.ui.common_sync_failed
+import com.pointlessapps.songbook.shared.ui.common_synced
+import com.pointlessapps.songbook.shared.ui.common_syncing
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.theme.IconSync
 import com.pointlessapps.songbook.ui.theme.IconSyncFailed

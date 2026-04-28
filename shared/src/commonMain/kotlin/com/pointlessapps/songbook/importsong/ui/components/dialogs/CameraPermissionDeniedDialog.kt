@@ -11,11 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_camera_permission
-import com.pointlessapps.songbook.shared.common_camera_permission_description
-import com.pointlessapps.songbook.shared.common_cancel
-import com.pointlessapps.songbook.shared.common_open_settings
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_camera_permission
+import com.pointlessapps.songbook.shared.ui.common_camera_permission_description
+import com.pointlessapps.songbook.shared.ui.common_cancel
+import com.pointlessapps.songbook.shared.ui.common_open_settings
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible

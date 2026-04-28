@@ -35,11 +35,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.core.song.ChordLibrary
 import com.pointlessapps.songbook.core.song.model.ChordPosition
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_dismiss
-import com.pointlessapps.songbook.shared.common_next
-import com.pointlessapps.songbook.shared.common_no_chord_visualization
-import com.pointlessapps.songbook.shared.common_previous
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_dismiss
+import com.pointlessapps.songbook.shared.ui.common_next
+import com.pointlessapps.songbook.shared.ui.common_no_chord_visualization
+import com.pointlessapps.songbook.shared.ui.common_previous
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible

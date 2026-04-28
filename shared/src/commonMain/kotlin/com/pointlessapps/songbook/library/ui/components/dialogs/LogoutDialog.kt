@@ -12,11 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_cancel
-import com.pointlessapps.songbook.shared.common_logout
-import com.pointlessapps.songbook.shared.common_logout_anonymous_description
-import com.pointlessapps.songbook.shared.common_logout_description
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_cancel
+import com.pointlessapps.songbook.shared.ui.common_logout
+import com.pointlessapps.songbook.shared.ui.common_logout_anonymous_description
+import com.pointlessapps.songbook.shared.ui.common_logout_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible

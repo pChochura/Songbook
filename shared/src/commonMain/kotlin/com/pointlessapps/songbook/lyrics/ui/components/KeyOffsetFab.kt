@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_decrement
-import com.pointlessapps.songbook.shared.common_increment
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_decrement
+import com.pointlessapps.songbook.shared.ui.common_increment
 import com.pointlessapps.songbook.ui.BottomBarBackground
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookText

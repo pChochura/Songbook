@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.search_no_items_found
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.search_no_items_found
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle

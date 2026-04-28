@@ -40,11 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_unknown
-import com.pointlessapps.songbook.shared.common_unnamed
-import com.pointlessapps.songbook.shared.setlist_search_songs
-import com.pointlessapps.songbook.shared.setlist_search_songs_placeholder
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_unknown
+import com.pointlessapps.songbook.shared.ui.common_unnamed
+import com.pointlessapps.songbook.shared.ui.setlist_search_songs
+import com.pointlessapps.songbook.shared.ui.setlist_search_songs_placeholder
 import com.pointlessapps.songbook.ui.components.SongbookBottomSheet
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText

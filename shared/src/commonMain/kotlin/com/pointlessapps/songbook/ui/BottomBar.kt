@@ -20,9 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.Route
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.navigation_library
-import com.pointlessapps.songbook.shared.navigation_search
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.navigation_library
+import com.pointlessapps.songbook.shared.ui.navigation_search
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle

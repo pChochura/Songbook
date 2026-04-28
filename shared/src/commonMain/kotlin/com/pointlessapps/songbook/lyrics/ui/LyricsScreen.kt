@@ -52,11 +52,11 @@ import com.pointlessapps.songbook.lyrics.ui.components.dialogs.KeyOffsetDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
 import com.pointlessapps.songbook.lyrics.ui.components.dialogs.WrapModeDialog
 import com.pointlessapps.songbook.preview.ui.PreviewSongLayout
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_close_fullscreen
-import com.pointlessapps.songbook.shared.lyrics_delete_song
-import com.pointlessapps.songbook.shared.lyrics_delete_song_description
-import com.pointlessapps.songbook.shared.lyrics_section_label
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_close_fullscreen
+import com.pointlessapps.songbook.shared.ui.lyrics_delete_song
+import com.pointlessapps.songbook.shared.ui.lyrics_delete_song_description
+import com.pointlessapps.songbook.shared.ui.lyrics_section_label
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookIconButton

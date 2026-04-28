@@ -37,9 +37,9 @@ import com.pointlessapps.songbook.setlist.ui.components.SetlistOptionsBottomShee
 import com.pointlessapps.songbook.setlist.ui.components.SetlistOptionsBottomSheetAction.Rename
 import com.pointlessapps.songbook.setlist.ui.components.SetlistSongItem
 import com.pointlessapps.songbook.setlist.ui.dialogs.RenameSetlistDialog
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.setlist_delete_setlist
-import com.pointlessapps.songbook.shared.setlist_delete_setlist_description
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.setlist_delete_setlist
+import com.pointlessapps.songbook.shared.ui.setlist_delete_setlist_description
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookLoader

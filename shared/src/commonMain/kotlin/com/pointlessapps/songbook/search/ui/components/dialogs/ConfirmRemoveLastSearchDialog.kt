@@ -11,11 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.common_cancel
-import com.pointlessapps.songbook.shared.common_confirm
-import com.pointlessapps.songbook.shared.search_delete_the_last_search
-import com.pointlessapps.songbook.shared.search_delete_the_last_search_description
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_cancel
+import com.pointlessapps.songbook.shared.ui.common_confirm
+import com.pointlessapps.songbook.shared.ui.search_delete_the_last_search
+import com.pointlessapps.songbook.shared.ui.search_delete_the_last_search_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible

@@ -15,8 +15,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.library.DisplayMode
 import com.pointlessapps.songbook.library.ui.components.SongCard
-import com.pointlessapps.songbook.shared.Res
-import com.pointlessapps.songbook.shared.setlist_delete_from_setlist
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.setlist_delete_from_setlist
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
