@@ -26,6 +26,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -49,6 +50,7 @@ internal data class LibraryState(
     val displayMode: DisplayMode = DisplayMode.Grid,
     val syncStatus: SyncStatus = SyncStatus.LOCAL,
     val loginStatus: LoginStatus = LoginStatus.ANONYMOUS,
+    val isLoading: Boolean = false,
 )
 
 internal class LibraryViewModel(
@@ -61,18 +63,27 @@ internal class LibraryViewModel(
     private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
+    @Stable
+    private data class LibraryTransientState(
+        val isLoading: Boolean = false,
+    )
+
+    private val _transientState = MutableStateFlow(LibraryTransientState())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<LibraryState> = combine(
         syncRepository.currentSyncStatusFlow,
         authRepository.currentLoginStatusFlow,
         setlistRepository.getAllSetlistsFlow(limit = SETLISTS_LIMIT),
         prefsRepository.getLibraryDisplayModeFlow(),
-    ) { syncStatus, loginStatus, setlists, displayMode ->
+        _transientState,
+    ) { syncStatus, loginStatus, setlists, displayMode, transient ->
         LibraryState(
             setlists = setlists,
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Grid,
             syncStatus = syncStatus,
             loginStatus = loginStatus,
+            isLoading = transient.isLoading,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -124,6 +135,14 @@ internal class LibraryViewModel(
     fun logoutClicked() {
         viewModelScope.launch {
             authRepository.logout()
+            syncRepository.clearDatabase()
+            eventChannel.send(LibraryEvent.NavigateToIntroduction)
+        }
+    }
+
+    fun removeAccountClicked() {
+        viewModelScope.launch {
+            authRepository.removeAccount()
             syncRepository.clearDatabase()
             eventChannel.send(LibraryEvent.NavigateToIntroduction)
         }

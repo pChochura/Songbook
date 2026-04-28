@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.library.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import com.pointlessapps.songbook.core.utils.persistentListOfNotNull
@@ -14,9 +15,12 @@ import com.pointlessapps.songbook.shared.ui.library_menu_login
 import com.pointlessapps.songbook.shared.ui.library_menu_login_description
 import com.pointlessapps.songbook.shared.ui.library_menu_logout
 import com.pointlessapps.songbook.shared.ui.library_menu_logout_description
+import com.pointlessapps.songbook.shared.ui.library_menu_remove_account
+import com.pointlessapps.songbook.shared.ui.library_menu_remove_account_description
 import com.pointlessapps.songbook.ui.OptionsBottomSheet
 import com.pointlessapps.songbook.ui.OptionsBottomSheetItem
 import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
+import com.pointlessapps.songbook.ui.theme.IconDeletePermanently
 import com.pointlessapps.songbook.ui.theme.IconDisplayMode
 import com.pointlessapps.songbook.ui.theme.IconLogin
 import com.pointlessapps.songbook.ui.theme.IconLogout
@@ -57,10 +61,17 @@ internal fun LibraryOptionsBottomSheet(
                 description = stringResource(Res.string.library_menu_logout_description),
                 onClick = { onAction(LibraryOptionsBottomSheetAction.Logout) },
             ),
+            OptionsBottomSheetItem.new(
+                color = MaterialTheme.colorScheme.error,
+                icon = IconDeletePermanently,
+                label = Res.string.library_menu_remove_account,
+                description = stringResource(Res.string.library_menu_remove_account_description),
+                onClick = { onAction(LibraryOptionsBottomSheetAction.RemoveAccount) },
+            ),
         ),
     )
 }
 
 internal enum class LibraryOptionsBottomSheetAction {
-    DisplayMode, Login, Logout
+    DisplayMode, Login, Logout, RemoveAccount
 }

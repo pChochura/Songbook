@@ -8,7 +8,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.pointlessapps.songbook.Route
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +26,7 @@ import kotlin.coroutines.resume
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-internal class SongbookSnackbarState {
+class SongbookSnackbarState {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     private val mutex = Mutex()
@@ -134,7 +133,7 @@ internal class SongbookSnackbarState {
 }
 
 @Stable
-internal data class SongbookSnackbarData(
+data class SongbookSnackbarData(
     override val visuals: SongbookSnackbarVisuals,
     private val continuation: CancellableContinuation<SnackbarResult>,
 ) : SnackbarData {
@@ -144,7 +143,7 @@ internal data class SongbookSnackbarData(
 }
 
 @Stable
-internal data class SongbookSnackbarVisuals(
+data class SongbookSnackbarVisuals(
     override val message: String,
     override val actionLabel: String?,
     override val withDismissAction: Boolean,
@@ -152,8 +151,7 @@ internal data class SongbookSnackbarVisuals(
     val icon: DrawableResource?,
 ) : SnackbarVisuals
 
-internal sealed interface SongbookSnackbarCallbackAction {
-    data class NavigateTo(val route: Route) : SongbookSnackbarCallbackAction
+sealed interface SongbookSnackbarCallbackAction {
     data class LoadToQueueAndOpen(val songId: String) : SongbookSnackbarCallbackAction
     data class AddSongToSetlist(
         val setlistId: String,

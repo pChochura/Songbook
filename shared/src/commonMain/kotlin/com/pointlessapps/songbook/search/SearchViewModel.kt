@@ -13,9 +13,9 @@ import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.PublicLyricsRepository
 import com.pointlessapps.songbook.core.song.SongRepository
-import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.core.song.model.Section
+import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList

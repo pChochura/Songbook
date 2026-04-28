@@ -35,6 +35,11 @@ kotlin {
         iosSimulatorArm64(),
     )
 
+    @Suppress("OPT_IN_USAGE")
+    wasmJs { browser() }
+
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.mp.runtime)
@@ -50,15 +55,25 @@ kotlin {
             implementation(libs.supabase.auth)
             implementation(libs.supabase.postgres)
             implementation(libs.supabase.realtime)
+            implementation(libs.supabase.functions)
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.prefs)
 
-            implementation(libs.room.runtime)
-            implementation(libs.room.paging)
             implementation(libs.paging.common)
-            implementation(libs.sqlite.bundled)
         }
+
+        val nonWasmMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.room.runtime)
+                implementation(libs.room.paging)
+                implementation(libs.sqlite.bundled)
+            }
+        }
+
+        androidMain.get().dependsOn(nonWasmMain)
+        iosMain.get().dependsOn(nonWasmMain)
 
         androidMain.dependencies {
             implementation(libs.koin.android)

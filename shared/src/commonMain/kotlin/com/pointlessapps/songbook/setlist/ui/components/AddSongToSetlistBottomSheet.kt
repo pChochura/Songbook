@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
-import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
+import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_unknown
 import com.pointlessapps.songbook.shared.ui.common_unnamed

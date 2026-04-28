@@ -8,13 +8,10 @@ import com.pointlessapps.songbook.lyrics.di.lyricsModule
 import com.pointlessapps.songbook.preview.di.previewModule
 import com.pointlessapps.songbook.search.di.searchModule
 import com.pointlessapps.songbook.setlist.di.setlistModule
-import com.pointlessapps.songbook.utils.SongbookSnackbarState
-import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 internal val sharedModule = module {
-    singleOf(::SongbookSnackbarState)
     viewModelOf(::AppViewModel)
 
     includes(

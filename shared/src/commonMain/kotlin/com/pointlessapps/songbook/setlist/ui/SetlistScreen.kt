@@ -25,8 +25,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.pointlessapps.songbook.LocalBottomBarPadding
 import com.pointlessapps.songbook.LocalNavigator
-import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.Song
+import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import com.pointlessapps.songbook.setlist.SetlistEvent
 import com.pointlessapps.songbook.setlist.SetlistState
 import com.pointlessapps.songbook.setlist.SetlistViewModel

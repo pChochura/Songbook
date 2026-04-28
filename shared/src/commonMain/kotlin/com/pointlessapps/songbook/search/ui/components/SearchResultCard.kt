@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
+import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import com.pointlessapps.songbook.search.ui.utils.parseSnippet
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_unknown

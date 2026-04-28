@@ -10,8 +10,8 @@ import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
-import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.model.Song
+import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList

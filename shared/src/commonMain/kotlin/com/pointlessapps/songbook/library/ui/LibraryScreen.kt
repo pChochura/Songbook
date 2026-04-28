@@ -43,6 +43,7 @@ import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomShee
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.DisplayMode
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Login
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Logout
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.RemoveAccount
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
@@ -51,6 +52,8 @@ import com.pointlessapps.songbook.library.ui.components.dialogs.DisplayModeDialo
 import com.pointlessapps.songbook.library.ui.components.dialogs.LogoutDialog
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_app_name
+import com.pointlessapps.songbook.shared.ui.common_remove_account
+import com.pointlessapps.songbook.shared.ui.common_remove_account_description
 import com.pointlessapps.songbook.shared.ui.library_setlists_section_title
 import com.pointlessapps.songbook.shared.ui.library_songs_found
 import com.pointlessapps.songbook.shared.ui.library_songs_section_title
@@ -58,9 +61,11 @@ import com.pointlessapps.songbook.shared.ui.library_sort_by_date
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookChip
+import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -168,6 +173,7 @@ internal fun LibraryScreen(
 
     var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isLogoutDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isRemoveAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     LibraryOptionsBottomSheet(
         show = isBottomSheetVisible,
@@ -180,6 +186,7 @@ internal fun LibraryScreen(
                 DisplayMode -> isDisplayModeDialogVisible = true
                 Login -> viewModel.loginClicked()
                 Logout -> isLogoutDialogVisible = true
+                RemoveAccount -> isRemoveAccountDialogVisible = true
             }
         },
     )
@@ -205,6 +212,20 @@ internal fun LibraryScreen(
             onDismissRequest = { isLogoutDialogVisible = false },
         )
     }
+
+    if (isRemoveAccountDialogVisible) {
+        ConfirmDeleteDialog(
+            title = Res.string.common_remove_account,
+            description = Res.string.common_remove_account_description,
+            onConfirmClicked = {
+                viewModel.removeAccountClicked()
+                isRemoveAccountDialogVisible = false
+            },
+            onDismissRequest = { isRemoveAccountDialogVisible = false },
+        )
+    }
+
+    SongbookLoader(state.isLoading)
 }
 
 @Composable

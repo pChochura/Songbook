@@ -3,6 +3,9 @@ package com.pointlessapps.songbook.introduction
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.auth.AuthRepository
+import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.error_login_failed
+import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.channels.Channel
@@ -23,7 +26,7 @@ internal data class IntroductionState(
 
 internal class IntroductionViewModel(
     private val authRepository: AuthRepository,
-    snackbarState: SongbookSnackbarState,
+    private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
     private val _state = MutableStateFlow(IntroductionState())
@@ -35,8 +38,14 @@ internal class IntroductionViewModel(
     fun onContinueAsGuestClicked() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            authRepository.signInAnonymously()
-            eventChannel.send(IntroductionEvent.NavigateToLibrary)
+            if (authRepository.signInAnonymously()) {
+                eventChannel.send(IntroductionEvent.NavigateToLibrary)
+            } else {
+                snackbarState.showSnackbar(
+                    message = Res.string.error_login_failed,
+                    icon = IconWarning,
+                )
+            }
             _state.update { it.copy(isLoading = false) }
         }.invokeOnCompletion {
             _state.update { it.copy(isLoading = false) }
@@ -46,8 +55,14 @@ internal class IntroductionViewModel(
     fun onSignInWithGoogleClicked() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            authRepository.signInWithGoogle()
-            eventChannel.send(IntroductionEvent.NavigateToLibrary)
+            if (authRepository.signInWithGoogle()) {
+                eventChannel.send(IntroductionEvent.NavigateToLibrary)
+            } else {
+                snackbarState.showSnackbar(
+                    message = Res.string.error_login_failed,
+                    icon = IconWarning,
+                )
+            }
             _state.update { it.copy(isLoading = false) }
         }.invokeOnCompletion {
             _state.update { it.copy(isLoading = false) }

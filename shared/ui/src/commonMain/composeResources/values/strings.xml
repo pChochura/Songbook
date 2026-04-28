@@ -50,6 +50,8 @@
     <string name="common_logout_anonymous_description">Your local data will be lost when logging out anonymously. Make sure to create an account before logging out if you want to save your data.</string>
     <string name="common_take_a_photo">Take a photo</string>
     <string name="common_search_chord_placeholder">Search for a chord...</string>
+    <string name="common_remove_account">Remove the account</string>
+    <string name="common_remove_account_description">Are you sure you want to delete your account permanently? All your data will be lost irreversibly.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
@@ -59,6 +61,7 @@
     <string name="error_song_not_found">The song was not found</string>
     <string name="error_unknown_error">An unknown error occurred</string>
     <string name="error_account_already_linked_error">That account is already linked to another device</string>
+    <string name="error_login_failed">The login failed. Please try again.</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Library</string>
@@ -92,6 +95,8 @@
     <string name="library_menu_login_description">Allows for synchronizing the library with other devices</string>
     <string name="library_menu_logout">Logout</string>
     <string name="library_menu_logout_description">Clear the local database and log out of the app</string>
+    <string name="library_menu_remove_account">Remove account</string>
+    <string name="library_menu_remove_account_description">Remove the account from the app and clear the data</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Add new song</string>
@@ -181,4 +186,12 @@
     <string name="setlist_search_songs_placeholder">Search for songs by title, artist or lyrics...</string>
     <string name="setlist_delete_from_setlist">Delete from setlist</string>
     <string name="setlist_song_removed_from_setlist">The song has been removed from the setlist</string>
+
+    <!-- Remove Account Screen -->
+    <string name="remove_account_title">Account Deletion</string>
+    <string name="remove_account_description">We are sorry to see you go. If you delete your account, all your data will be permanently removed.</string>
+    <string name="remove_account_button">Remove Account</string>
+    <string name="remove_account_confirmation_title">Delete account?</string>
+    <string name="remove_account_confirmation_description">Are you sure you want to delete your account? This action is irreversible.</string>
+    <string name="remove_account_success">Your account has been deleted</string>
 </resources>

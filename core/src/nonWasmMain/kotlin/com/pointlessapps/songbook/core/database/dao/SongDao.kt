@@ -9,8 +9,8 @@ import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
-import com.pointlessapps.songbook.core.song.database.entity.SongSearchResult
 import com.pointlessapps.songbook.core.song.database.mapper.toSearchEntity
+import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import kotlinx.coroutines.flow.Flow
 
 @Dao

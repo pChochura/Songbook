@@ -24,9 +24,10 @@ fun SongbookSnackbar(
     actionLabel: String?,
     actionCallback: (() -> Unit)?,
     onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = MaterialTheme.spacing.medium),
         onClick = onDismissRequest,

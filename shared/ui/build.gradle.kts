@@ -34,6 +34,9 @@ kotlin {
         }
     }
 
+    @Suppress("OPT_IN_USAGE")
+    wasmJs { browser() }
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.mp.runtime)
@@ -45,6 +48,10 @@ kotlin {
 
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.immutable)
+
+            implementation(libs.androidx.lifecycle.viewmodel)
+
+            implementation(libs.koin.core)
         }
     }
 }
