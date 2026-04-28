@@ -196,7 +196,7 @@ internal fun ScanDialog(
             PeekabooCamera(
                 modifier = Modifier.fillMaxSize(),
                 cameraMode = CameraMode.Back,
-                captureIcon = @Composable {
+                captureIcon = @Composable { capture ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -210,7 +210,7 @@ internal fun ScanDialog(
                                 .padding(MaterialTheme.spacing.extraLarge),
                             icon = IconCamera,
                             tooltipLabel = Res.string.common_take_a_photo,
-                            onClick = { isCameraVisible = false },
+                            onClick = capture,
                             iconButtonStyle = defaultSongbookIconButtonStyle().copy(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary,
