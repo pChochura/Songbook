@@ -37,6 +37,7 @@ internal class AuthRepositoryImpl(
             runCatching {
                 auth.importAuthToken(accessToken, refreshToken)
                 auth.retrieveUserForCurrentSession(updateSession = true)
+                auth.startAutoRefreshForCurrentSession()
             }
         }
 

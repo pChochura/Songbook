@@ -51,6 +51,8 @@ internal class RemoveAccountViewModel(
         viewModelScope.launch {
             authRepository.initialize(url)
             _transientState.update { it.copy(isLoading = false) }
+        }.invokeOnCompletion {
+            _transientState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -60,6 +62,8 @@ internal class RemoveAccountViewModel(
             authRepository.removeAccount()
             _transientState.update { it.copy(isLoading = false) }
             snackbarState.showSnackbar(Res.string.remove_account_success)
+        }.invokeOnCompletion {
+            _transientState.update { it.copy(isLoading = false) }
         }
     }
 }

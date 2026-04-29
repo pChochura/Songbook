@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 
 internal class AndroidAppRepository(
     private val context: Context,
+    private val removeAccountUrl: String,
 ) : AppRepository {
     override fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -17,10 +18,19 @@ internal class AndroidAppRepository(
         context.startActivity(intent)
     }
 
-    override fun openUrl(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+    override fun openRemoveAccountWebsite(accessToken: String, refreshToken: String) {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            removeAccountUrl.toUri().buildUpon()
+                .appendQueryParameter(ACCESS_TOKEN, accessToken)
+                .appendQueryParameter(REFRESH_TOKEN, refreshToken)
+                .build(),
+        ).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
         context.startActivity(intent)
+    }
+
+    private companion object {
+        const val ACCESS_TOKEN = "access_token"
+        const val REFRESH_TOKEN = "refresh_token"
     }
 }

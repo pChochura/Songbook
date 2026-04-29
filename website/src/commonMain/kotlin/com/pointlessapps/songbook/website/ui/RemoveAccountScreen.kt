@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_app_name
+import com.pointlessapps.songbook.shared.ui.login_to_remove_account_description
 import com.pointlessapps.songbook.shared.ui.remove_account_button
 import com.pointlessapps.songbook.shared.ui.remove_account_confirmation_description
 import com.pointlessapps.songbook.shared.ui.remove_account_confirmation_title
@@ -61,7 +62,10 @@ internal fun RemoveAccountScreen(
             .verticalScroll(rememberScrollState())
             .padding(MaterialTheme.spacing.extraLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(
+            space = MaterialTheme.spacing.medium,
+            alignment = Alignment.CenterVertically,
+        ),
     ) {
         SongbookIcon(
             modifier = Modifier
@@ -83,7 +87,7 @@ internal fun RemoveAccountScreen(
             ),
         )
 
-        Spacer(Modifier.height(MaterialTheme.spacing.extraLarge * 2))
+        Spacer(Modifier.height(MaterialTheme.spacing.extraLarge))
 
         SongbookText(
             text = stringResource(Res.string.remove_account_title),
@@ -95,7 +99,13 @@ internal fun RemoveAccountScreen(
         )
         SongbookText(
             modifier = Modifier.padding(horizontal = MaterialTheme.spacing.extraLarge),
-            text = stringResource(Res.string.remove_account_description),
+            text = stringResource(
+                if (state.isLoggedIn) {
+                    Res.string.remove_account_description
+                } else {
+                    Res.string.login_to_remove_account_description
+                },
+            ),
             textStyle = defaultSongbookTextStyle().copy(
                 textAlign = TextAlign.Center,
                 textColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -103,22 +113,23 @@ internal fun RemoveAccountScreen(
             ),
         )
 
-        Spacer(Modifier.height(MaterialTheme.spacing.extraLarge * 2))
+        if (state.isLoggedIn) {
+            Spacer(Modifier.height(MaterialTheme.spacing.extraLarge))
 
-        SongbookButton(
-            modifier = Modifier.fillMaxWidth().width(100.dp),
-            label = stringResource(Res.string.remove_account_button),
-            onClick = { showConfirmationDialog = true },
-            buttonStyle = defaultSongbookButtonStyle().copy(
-                enabled = state.isLoggedIn,
-                containerColor = MaterialTheme.colorScheme.error,
-                textStyle = defaultSongbookButtonTextStyle().copy(
-                    textColor = MaterialTheme.colorScheme.onError,
-                    typography = MaterialTheme.typography.titleMedium,
+            SongbookButton(
+                modifier = Modifier.fillMaxWidth().width(100.dp),
+                label = stringResource(Res.string.remove_account_button),
+                onClick = { showConfirmationDialog = true },
+                buttonStyle = defaultSongbookButtonStyle().copy(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    textStyle = defaultSongbookButtonTextStyle().copy(
+                        textColor = MaterialTheme.colorScheme.onError,
+                        typography = MaterialTheme.typography.titleMedium,
+                    ),
+                    icon = IconDelete,
                 ),
-                icon = IconDelete,
-            ),
-        )
+            )
+        }
     }
 
     SongbookLoader(state.isLoading)

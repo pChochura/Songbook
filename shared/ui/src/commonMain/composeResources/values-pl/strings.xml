@@ -50,6 +50,8 @@
     <string name="common_logout_anonymous_description">Twoje lokalne dane zostaną utracone, wylogowując się anonimowo. Upewnij się, czy nie chcesz założyć konta przed wylogowaniem się, aby zachować dane.</string>
     <string name="common_take_a_photo">Zrób zdjęcie</string>
     <string name="common_search_chord_placeholder">Wyszukaj akordu...</string>
+    <string name="common_remove_account">Usuń konto</string>
+    <string name="common_remove_account_description">Zostaniesz wylogowany, Twoje lokalne dane zostaną usunięte i następnie zostaniesz przekierowany na stronę Songbook, gdzie będziesz mógł usunąć konto.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">Wystąpił błąd podczas inicjalizacji aplikacji. Proszę uruchom aplikację ponownie</string>
@@ -181,4 +183,13 @@
     <string name="setlist_search_songs_placeholder">Szukaj piosenek po tytule, wykonawcy lub tekście...</string>
     <string name="setlist_delete_from_setlist">Usuń z setlisty</string>
     <string name="setlist_song_removed_from_setlist">Piosenka została usunięta z setlisty</string>
+
+    <!-- Remove Account Screen -->
+    <string name="remove_account_title">Usuwanie konta</string>
+    <string name="remove_account_description">Przykro nam, że odchodzisz. Jeśli usuniesz konto Twoje dane zostaną permanentnie usunięte.</string>
+    <string name="remove_account_button">Usuń konto</string>
+    <string name="remove_account_confirmation_title">Usunąć konto?</string>
+    <string name="remove_account_confirmation_description">Czy na pewno chcesz usunąć konto? Ta akcja jest nieodwracalna.</string>
+    <string name="remove_account_success">Twoje konto zostało usunięte</string>
+    <string name="login_to_remove_account_description">Musisz być zalogowany, żeby usunąć konto. Uruchom tę stronę z aplikacji Songbook, kierując się podanymi instrukcjami.</string>
 </resources>

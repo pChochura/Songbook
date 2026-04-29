@@ -1,6 +1,6 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -92,15 +92,16 @@ dependencies {
 buildkonfig {
     packageName = "com.pointlessapps.songbook.core"
 
-    val props = Properties().apply {
-        load(project.rootProject.file("local.properties").inputStream())
-    }
-
     defaultConfigs {
         buildConfigField(
             FieldSpec.Type.STRING,
             "GOOGLE_WEB_CLIENT_ID",
-            props.getProperty("GOOGLE_WEB_CLIENT_ID"),
+            getLocalProperty("GOOGLE_WEB_CLIENT_ID"),
+        )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "REMOVE_ACCOUNT_WEBSITE_URL",
+            getLocalProperty("REMOVE_ACCOUNT_WEBSITE_URL"),
         )
     }
 }

@@ -145,7 +145,7 @@ internal class LibraryViewModel(
     fun removeAccountClicked() {
         viewModelScope.launch {
             authRepository.getTokens()?.let { (accessToken, refreshToken) ->
-                appRepository.openUrl("?access_token=$accessToken&refresh_token=$refreshToken")
+                appRepository.openRemoveAccountWebsite(accessToken, refreshToken)
             }
             authRepository.logout()
             syncRepository.clearDatabase()

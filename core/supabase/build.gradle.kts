@@ -1,6 +1,6 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -49,20 +49,8 @@ kotlin {
 buildkonfig {
     packageName = "com.pointlessapps.songbook.core.supabase"
 
-    val props = Properties().apply {
-        load(project.rootProject.file("local.properties").inputStream())
-    }
-
     defaultConfigs {
-        buildConfigField(
-            FieldSpec.Type.STRING,
-            "SUPABASE_URL",
-            props.getProperty("SUPABASE_URL"),
-        )
-        buildConfigField(
-            FieldSpec.Type.STRING,
-            "SUPABASE_KEY",
-            props.getProperty("SUPABASE_KEY"),
-        )
+        buildConfigField(FieldSpec.Type.STRING, "SUPABASE_URL", getLocalProperty("SUPABASE_URL"))
+        buildConfigField(FieldSpec.Type.STRING, "SUPABASE_KEY", getLocalProperty("SUPABASE_KEY"))
     }
 }

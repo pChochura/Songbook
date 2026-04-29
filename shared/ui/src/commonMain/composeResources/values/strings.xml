@@ -51,7 +51,7 @@
     <string name="common_take_a_photo">Take a photo</string>
     <string name="common_search_chord_placeholder">Search for a chord...</string>
     <string name="common_remove_account">Remove the account</string>
-    <string name="common_remove_account_description">Are you sure you want to delete your account permanently? All your data will be lost irreversibly.</string>
+    <string name="common_remove_account_description">You will be logged out, your local data will be cleared and then you will be redirected to the Songbook website where you can remove your account.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
@@ -194,4 +194,5 @@
     <string name="remove_account_confirmation_title">Delete account?</string>
     <string name="remove_account_confirmation_description">Are you sure you want to delete your account? This action is irreversible.</string>
     <string name="remove_account_success">Your account has been deleted</string>
+    <string name="login_to_remove_account_description">You have to be logged in to remove your account. Follow the instructions from the Songbook app and open this website from within the application.</string>
 </resources>
