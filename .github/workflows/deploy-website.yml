@@ -34,14 +34,6 @@ jobs:
       - name: Build Website
         run: ./gradlew :website:wasmJsBrowserDistribution
 
-      - name: Verify build output
-        run: |
-          echo "Checking for build output..."
-          ls -la ./website/build/dist/wasmJs/ || echo "wasmJs directory not found"
-          ls -la ./website/build/dist/wasmJs/productionExecutable/ || echo "productionExecutable directory not found"
-          echo "Full build directory structure:"
-          find ./website/build -type d -name "dist" 2>/dev/null || echo "No dist directories found"
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

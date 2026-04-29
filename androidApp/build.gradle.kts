@@ -29,11 +29,17 @@ android {
         }
     }
     signingConfigs {
-        create("release") {
-            storeFile = file(getLocalProperty("storeFile")!!)
-            storePassword = getLocalProperty("storePassword")!!
-            keyAlias = getLocalProperty("keyAlias")!!
-            keyPassword = getLocalProperty("keyPassword")!!
+        val storeFile = getLocalProperty("storeFile")
+        val storePassword = getLocalProperty("storePassword")
+        val keyAlias = getLocalProperty("keyAlias")
+        val keyPassword = getLocalProperty("keyPassword")
+        if (storeFile != null && storePassword != null && keyAlias != null && keyPassword != null) {
+            create("release") {
+                this.storeFile = file(storeFile)
+                this.storePassword = storePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
         }
     }
     buildTypes {
