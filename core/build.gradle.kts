@@ -16,10 +16,6 @@ room {
 }
 
 kotlin {
-    sourceSets.configureEach {
-        languageSettings.optIn("kotlin.expectactual.ExpectActualClasses")
-    }
-
     android {
         namespace = "com.pointlessapps.songbook.core"
         compileSdk = libs.versions.sdk.compile.get().toInt()

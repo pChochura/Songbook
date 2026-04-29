@@ -12,6 +12,7 @@ import com.pointlessapps.songbook.core.sync.di.syncModule
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
 import io.ktor.client.HttpClient
@@ -22,8 +23,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-internal actual val platformModule = module {
-}
+internal actual val platformModule = module {}
 
 actual val coreModule = module {
     includes(platformModule)
@@ -47,6 +47,7 @@ actual val coreModule = module {
             supabaseUrl = BuildKonfig.SUPABASE_URL,
             supabaseKey = BuildKonfig.SUPABASE_KEY,
         ) {
+            install(Functions)
             install(Realtime)
             install(Postgrest)
             install(Auth)
