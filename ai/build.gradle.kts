@@ -1,5 +1,4 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
-import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -49,14 +48,18 @@ buildkonfig {
 
     defaultConfigs {
         buildConfigField(
-            FieldSpec.Type.STRING,
-            "GEMINI_API_KEY",
-            getLocalProperty("GEMINI_API_KEY"),
+            type = FieldSpec.Type.STRING,
+            name = "GEMINI_API_KEY",
+            value = System.getenv("GEMINI_API_KEY") ?: project.findProperty("GEMINI_API_KEY")
+                ?.toString(),
+            nullable = true,
         )
         buildConfigField(
-            FieldSpec.Type.STRING,
-            "OLLAMA_API_KEY",
-            getLocalProperty("OLLAMA_API_KEY"),
+            type = FieldSpec.Type.STRING,
+            name = "OLLAMA_API_KEY",
+            value = System.getenv("OLLAMA_API_KEY") ?: project.findProperty("OLLAMA_API_KEY")
+                ?.toString(),
+            nullable = true,
         )
     }
 }
