@@ -13,7 +13,7 @@ internal val appModule = module {
     single<AppRepository> {
         AndroidAppRepository(
             context = androidContext(),
-            removeAccountUrl = BuildKonfig.REMOVE_ACCOUNT_WEBSITE_URL,
+            removeAccountUrl = BuildKonfig.REMOVE_ACCOUNT_WEBSITE_URL.orEmpty(),
         )
     }
 }

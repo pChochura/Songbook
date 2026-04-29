@@ -10,10 +10,10 @@ import org.koin.dsl.module
 
 val aiModule = module {
     single<Agent>(named("Gemini")) {
-        GeminiAgent(key = BuildKonfig.GEMINI_API_KEY)
+        GeminiAgent(key = BuildKonfig.GEMINI_API_KEY.orEmpty())
     }
     single<Agent>(named("Ollama")) {
-        OllamaAgent(key = BuildKonfig.OLLAMA_API_KEY)
+        OllamaAgent(key = BuildKonfig.OLLAMA_API_KEY.orEmpty())
     }
     single<Agent>(named("G4f")) {
         G4fAgent()

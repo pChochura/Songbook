@@ -30,8 +30,8 @@ val supabaseModule = module {
 
     single<SupabaseClient> {
         createSupabaseClient(
-            supabaseUrl = BuildKonfig.SUPABASE_URL,
-            supabaseKey = BuildKonfig.SUPABASE_KEY,
+            supabaseUrl = BuildKonfig.SUPABASE_URL.orEmpty(),
+            supabaseKey = BuildKonfig.SUPABASE_KEY.orEmpty(),
         ) {
             install(Functions)
             install(Realtime)

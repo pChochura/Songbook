@@ -47,7 +47,7 @@ internal actual val platformModule = module {
     single<GoogleAuthManager> {
         AndroidGoogleAuthManager(
             context = androidContext(),
-            webClientId = BuildKonfig.GOOGLE_WEB_CLIENT_ID,
+            webClientId = BuildKonfig.GOOGLE_WEB_CLIENT_ID.orEmpty(),
         )
     }
 
