@@ -147,7 +147,7 @@ internal class LibraryViewModel(
             authRepository.getTokens()?.let { (accessToken, refreshToken) ->
                 appRepository.openRemoveAccountWebsite(accessToken, refreshToken)
             }
-            authRepository.logout()
+            authRepository.clearSession()
             syncRepository.clearDatabase()
             eventChannel.send(LibraryEvent.NavigateToIntroduction)
         }

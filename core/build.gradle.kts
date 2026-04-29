@@ -1,4 +1,5 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -96,14 +97,14 @@ buildkonfig {
             type = FieldSpec.Type.STRING,
             name = "GOOGLE_WEB_CLIENT_ID",
             value = System.getenv("GOOGLE_WEB_CLIENT_ID")
-                ?: project.findProperty("GOOGLE_WEB_CLIENT_ID")?.toString(),
+                ?: getLocalProperty("GOOGLE_WEB_CLIENT_ID"),
             nullable = true,
         )
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = "REMOVE_ACCOUNT_WEBSITE_URL",
             value = System.getenv("REMOVE_ACCOUNT_WEBSITE_URL")
-                ?: project.findProperty("REMOVE_ACCOUNT_WEBSITE_URL")?.toString(),
+                ?: getLocalProperty("REMOVE_ACCOUNT_WEBSITE_URL"),
             nullable = true,
         )
     }

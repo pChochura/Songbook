@@ -25,6 +25,7 @@ interface AuthRepository {
     suspend fun linkWithGoogle(): Boolean
     suspend fun signInAnonymously(): Boolean
     suspend fun logout()
+    suspend fun clearSession()
 
     suspend fun getTokens(): Tokens?
 }
@@ -89,6 +90,11 @@ internal class AuthRepositoryImpl(
 
     override suspend fun logout() = withContext(Dispatchers.Default) {
         auth.signOut()
+        _currentLoginStatusFlow.value = getLoginStatus()
+    }
+
+    override suspend fun clearSession() = withContext(Dispatchers.Default) {
+        auth.clearSession()
         _currentLoginStatusFlow.value = getLoginStatus()
     }
 

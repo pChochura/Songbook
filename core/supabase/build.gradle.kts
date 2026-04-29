@@ -1,4 +1,5 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -52,15 +53,13 @@ buildkonfig {
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = "SUPABASE_URL",
-            value = System.getenv("SUPABASE_URL") ?: project.findProperty("SUPABASE_URL")
-                ?.toString(),
+            value = System.getenv("SUPABASE_URL") ?: getLocalProperty("SUPABASE_URL"),
             nullable = true,
         )
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = "SUPABASE_KEY",
-            value = System.getenv("SUPABASE_KEY") ?: project.findProperty("SUPABASE_KEY")
-                ?.toString(),
+            value = System.getenv("SUPABASE_KEY") ?: getLocalProperty("SUPABASE_KEY"),
             nullable = true,
         )
     }
