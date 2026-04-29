@@ -112,8 +112,8 @@
     <string name="import_menu_rescan_description">Import an image from gallery or capture a photo again</string>
     <string name="import_menu_add_to_setlists">Add to setlists</string>
     <string name="import_menu_add_to_setlists_description">Select setlists to add the song to</string>
-    <string name="import_menu_preview">Preview</string>
-    <string name="import_menu_preview_description">Show the preview of the song with chords being correctly displayed</string>
+    <string name="import_menu_preview">Visual editor</string>
+    <string name="import_menu_preview_description">Toggle between a visual editor and a text input</string>
     <string name="import_extraction_in_progress">Extraction in progress</string>
     <string name="import_extraction_in_progress_description">The AI is working hard on the image you provided to extract all the lyrics and chords. It may take a few seconds.</string>
     <string name="import_song_imported">The song has been imported</string>

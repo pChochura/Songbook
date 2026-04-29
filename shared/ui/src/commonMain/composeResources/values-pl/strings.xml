@@ -109,8 +109,8 @@
     <string name="import_menu_rescan_description">Importuj obraz z galerii lub zrób zdjęcie ponownie</string>
     <string name="import_menu_add_to_setlists">Dodaj do setlist</string>
     <string name="import_menu_add_to_setlists_description">Wybierz setlisty, do których chcesz dodać piosenkę</string>
-    <string name="import_menu_preview">Podgląd</string>
-    <string name="import_menu_preview_description">Pokaż podgląd piosenki z poprawnie wyświetlonymi akordami</string>
+    <string name="import_menu_preview">Interaktywny edytor</string>
+    <string name="import_menu_preview_description">Przełącz między interaktywnym a tekstowym edytorem</string>
     <string name="import_extraction_in_progress">Trwa analizowanie</string>
     <string name="import_extraction_in_progress_description">AI ciężko pracuje nad dostarczonym obrazem, aby odczytać tekst i akordy. Może to potrwać kilka sekund.</string>
     <string name="import_song_imported">Piosenka została zaimportowana</string>
