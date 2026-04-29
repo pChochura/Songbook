@@ -43,14 +43,16 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
+        runCatching { signingConfigs.getByName("release") }.getOrNull()?.let { config ->
+            getByName("release") {
+                isMinifyEnabled = true
+                isShrinkResources = true
+                signingConfig = config
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro",
+                )
+            }
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
