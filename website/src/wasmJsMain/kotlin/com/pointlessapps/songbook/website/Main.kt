@@ -18,7 +18,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
-import com.pointlessapps.songbook.core.di.coreModule
+import com.pointlessapps.songbook.core.supabase.di.supabaseModule
 import com.pointlessapps.songbook.di.uiModule
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookSnackbar
@@ -36,7 +36,7 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     startKoin {
-        modules(websiteModule, uiModule, coreModule)
+        modules(websiteModule, uiModule, supabaseModule)
     }
 
     ComposeViewport(document.body!!) {

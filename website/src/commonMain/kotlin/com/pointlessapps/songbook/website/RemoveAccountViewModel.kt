@@ -2,12 +2,11 @@ package com.pointlessapps.songbook.website
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
-import com.pointlessapps.songbook.core.auth.AuthRepository
-import com.pointlessapps.songbook.core.auth.model.Tokens
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.remove_account_success
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
+import com.pointlessapps.songbook.website.auth.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,17 +48,8 @@ internal class RemoveAccountViewModel(
     )
 
     init {
-        val tokens = Regex("access_token=([^&]+)&refresh_token=([^&]+)")
-            .find(url)?.groups
         viewModelScope.launch {
-            authRepository.initialize(
-                tokens?.let {
-                    Tokens(
-                        accessToken = it[1]!!.value,
-                        refreshToken = it[2]!!.value,
-                    )
-                },
-            )
+            authRepository.initialize(url)
             _transientState.update { it.copy(isLoading = false) }
         }
     }

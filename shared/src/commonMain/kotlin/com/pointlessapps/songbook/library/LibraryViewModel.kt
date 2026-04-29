@@ -4,6 +4,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.pointlessapps.songbook.core.app.AppRepository
 import com.pointlessapps.songbook.core.auth.AuthRepository
 import com.pointlessapps.songbook.core.auth.exceptions.AccountAlreadyLinkedException
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
@@ -54,6 +55,7 @@ internal data class LibraryState(
 )
 
 internal class LibraryViewModel(
+    private val appRepository: AppRepository,
     private val queueManager: QueueManager,
     private val syncRepository: SyncRepository,
     private val songRepository: SongRepository,
@@ -142,7 +144,10 @@ internal class LibraryViewModel(
 
     fun removeAccountClicked() {
         viewModelScope.launch {
-            authRepository.removeAccount()
+            authRepository.getTokens()?.let { (accessToken, refreshToken) ->
+                appRepository.openUrl("?access_token=$accessToken&refresh_token=$refreshToken")
+            }
+            authRepository.logout()
             syncRepository.clearDatabase()
             eventChannel.send(LibraryEvent.NavigateToIntroduction)
         }

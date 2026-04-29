@@ -48,15 +48,12 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
 
-            implementation(libs.supabase.auth)
-            implementation(libs.supabase.postgres)
-            implementation(libs.supabase.realtime)
-            implementation(libs.supabase.functions)
-
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.prefs)
 
             implementation(libs.paging.common)
+
+            implementation(projects.core.supabase)
         }
 
         val nonWasmMain by creating {
@@ -100,16 +97,6 @@ buildkonfig {
     }
 
     defaultConfigs {
-        buildConfigField(
-            FieldSpec.Type.STRING,
-            "SUPABASE_URL",
-            props.getProperty("SUPABASE_URL"),
-        )
-        buildConfigField(
-            FieldSpec.Type.STRING,
-            "SUPABASE_KEY",
-            props.getProperty("SUPABASE_KEY"),
-        )
         buildConfigField(
             FieldSpec.Type.STRING,
             "GOOGLE_WEB_CLIENT_ID",

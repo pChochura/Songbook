@@ -1,7 +1,6 @@
 package com.pointlessapps.songbook.core.auth
 
 import com.pointlessapps.songbook.core.auth.exceptions.AccountAlreadyLinkedException
-import com.pointlessapps.songbook.core.auth.exceptions.RemoveAccountFailedException
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import com.pointlessapps.songbook.core.auth.model.Tokens
 import io.github.jan.supabase.SupabaseClient
@@ -10,10 +9,6 @@ import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
-import io.github.jan.supabase.functions.functions
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 interface AuthRepository {
-    suspend fun initialize(tokens: Tokens? = null)
+    suspend fun initialize()
 
     val currentLoginStatusFlow: StateFlow<LoginStatus>
 
@@ -30,7 +25,6 @@ interface AuthRepository {
     suspend fun linkWithGoogle(): Boolean
     suspend fun signInAnonymously(): Boolean
     suspend fun logout()
-    suspend fun removeAccount()
 
     suspend fun getTokens(): Tokens?
 }
@@ -40,25 +34,14 @@ internal class AuthRepositoryImpl(
     private val googleAuthManager: GoogleAuthManager,
 ) : AuthRepository {
 
-    private val functions = client.functions
     private val auth = client.auth
 
     private val _currentLoginStatusFlow = MutableStateFlow(LoginStatus.LOGGED_OUT)
     override val currentLoginStatusFlow: StateFlow<LoginStatus>
         get() = _currentLoginStatusFlow.asStateFlow()
 
-    override suspend fun initialize(tokens: Tokens?) = withContext(Dispatchers.Default) {
+    override suspend fun initialize() = withContext(Dispatchers.Default) {
         auth.awaitInitialization()
-
-        if (tokens != null) {
-            runCatching {
-                auth.importAuthToken(
-                    accessToken = tokens.accessToken,
-                    refreshToken = tokens.refreshToken,
-                )
-                auth.retrieveUserForCurrentSession(updateSession = true)
-            }
-        }
 
         _currentLoginStatusFlow.value = getLoginStatus()
     }
@@ -109,23 +92,6 @@ internal class AuthRepositoryImpl(
         _currentLoginStatusFlow.value = getLoginStatus()
     }
 
-    override suspend fun removeAccount() {
-        withContext(Dispatchers.Default) {
-            val statusCode = functions.invoke(
-                function = REMOVE_ACCOUNT_EDGE_FUNCTION,
-                headers = Headers.build {
-                    append(HttpHeaders.ContentType, "application/json")
-                },
-            ).status
-
-            if (!statusCode.isSuccess()) {
-                throw RemoveAccountFailedException()
-            }
-
-            logout()
-        }
-    }
-
     override suspend fun getTokens() = withContext(Dispatchers.Default) {
         runCatching {
             auth.refreshCurrentSession()
@@ -146,9 +112,5 @@ internal class AuthRepositoryImpl(
             currentUser.isAnonymous == true -> LoginStatus.ANONYMOUS
             else -> LoginStatus.LOGGED_IN
         }
-    }
-
-    private companion object {
-        const val REMOVE_ACCOUNT_EDGE_FUNCTION = "delete-current-user"
     }
 }

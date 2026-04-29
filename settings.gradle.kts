@@ -23,4 +23,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":androidApp", ":shared", ":shared:ui", ":core", ":ai", ":website")
+include(":androidApp", ":shared", ":shared:ui", ":core", ":core:supabase", ":ai", ":website")

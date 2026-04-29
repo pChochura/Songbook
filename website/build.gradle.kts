@@ -28,7 +28,7 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
 
             implementation(projects.shared.ui)
-            implementation(projects.core)
+            implementation(projects.core.supabase)
         }
     }
 }
