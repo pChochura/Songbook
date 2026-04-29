@@ -2,7 +2,7 @@ name: Deploy Website to GitHub Pages
 
 on:
   release:
-    types: [published]
+    types: [ published ]
   workflow_dispatch:
 
 jobs:
@@ -25,8 +25,11 @@ jobs:
 
       - name: Create local.properties
         run: |
+          echo "GOOGLE_WEB_CLIENT_ID=${{ secrets.GOOGLE_WEB_CLIENT_ID }}" >> local.properties
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> local.properties
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> local.properties
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> local.properties
+          echo "OLLAMA_API_KEY=${{ secrets.OLLAMA_API_KEY }}" >> local.properties
 
       - name: Build Website
         run: ./gradlew :website:wasmJsBrowserDistribution
