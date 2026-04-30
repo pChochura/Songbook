@@ -41,18 +41,18 @@ import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import com.pointlessapps.songbook.utils.collectWithLifecycle
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun App(
     initialFilterLetter: String? = null,
     openSearch: Boolean = false,
 ) {
-    val viewModel = koinViewModel<AppViewModel>()
+    val viewModel = koinViewModel<AppViewModel> {
+        parametersOf(openSearch, initialFilterLetter)
+    }
     val snackbarSate = koinInject<SongbookSnackbarState>()
-    val backstack = rememberNavBackStack(
-        configuration = navigationConfig,
-        if (viewModel.isLoggedIn) Route.Library else Route.Introduction,
-    )
+    val backstack = rememberNavBackStack(navigationConfig, elements = viewModel.startingRoutes)
     val navigator = remember { Navigator(backstack) }
     val bottomBarPadding = remember { BottomBarPadding() }
 
@@ -129,7 +129,7 @@ fun App(
                     bottomBarPadding.padding.value = paddingValues.calculateBottomPadding()
                 }
 
-                NavDisplay(backstack)
+                NavDisplay(navigator)
             }
         }
     }

@@ -8,11 +8,23 @@ import com.pointlessapps.songbook.lyrics.di.lyricsModule
 import com.pointlessapps.songbook.preview.di.previewModule
 import com.pointlessapps.songbook.search.di.searchModule
 import com.pointlessapps.songbook.setlist.di.setlistModule
-import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 internal val sharedModule = module {
-    viewModelOf(::AppViewModel)
+    viewModel { (openSearch: Boolean, initialFilterLetter: String?) ->
+        AppViewModel(
+            openSearch = openSearch,
+            initialFilterLetter = initialFilterLetter,
+            chordLibrary = get(),
+            syncRepository = get(),
+            authRepository = get(),
+            queueManager = get(),
+            songRepository = get(),
+            setlistRepository = get(),
+            snackbarState = get(),
+        )
+    }
 
     includes(
         introductionModule,

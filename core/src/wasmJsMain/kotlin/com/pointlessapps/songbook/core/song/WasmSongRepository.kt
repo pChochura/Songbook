@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
 internal class WasmSongRepository : SongRepository {
-    override fun getAllSongs(): Flow<PagingData<Song>> = emptyFlow()
+    override fun getAllSongs(initialFilterLetter: String?): Flow<PagingData<Song>> = emptyFlow()
     override fun getSongByIdFlow(id: String): Flow<Song?> = emptyFlow()
     override fun searchSongs(query: String): Flow<PagingData<SongSearchResult>> = emptyFlow()
     override fun getSongSetlistsById(id: String): Flow<ImmutableList<Setlist>> = emptyFlow()

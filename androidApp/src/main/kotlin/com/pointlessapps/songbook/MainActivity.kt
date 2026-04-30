@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pointlessapps.songbook.core.app.AndroidAppViewModel
-import com.pointlessapps.songbook.widget.EXTRA_FILTER_LETTER
-import com.pointlessapps.songbook.widget.EXTRA_OPEN_SEARCH
+import com.pointlessapps.songbook.widget.SongbookWidget.Companion.EXTRA_FILTER_LETTER
+import com.pointlessapps.songbook.widget.SongbookWidget.Companion.EXTRA_OPEN_SEARCH
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {

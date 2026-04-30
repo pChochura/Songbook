@@ -34,9 +34,15 @@ internal class SongRepositoryImpl(
     private val syncActionDao: SyncActionDao,
 ) : SongRepository {
 
-    override fun getAllSongs() = Pager(
+    override fun getAllSongs(initialFilterLetter: String?) = Pager(
         config = PagingConfig(pageSize = 20),
-        pagingSourceFactory = { songDao.getAllSongs() },
+        pagingSourceFactory = {
+            if (initialFilterLetter != null) {
+                songDao.getAllSongs(initialFilterLetter)
+            } else {
+                songDao.getAllSongs()
+            }
+        },
     ).flow.map { pagingData ->
         pagingData.map(SongEntity::toDomain)
     }.flowOn(Dispatchers.Default)

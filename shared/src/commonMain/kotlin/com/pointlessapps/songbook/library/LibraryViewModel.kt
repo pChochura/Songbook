@@ -31,8 +31,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal sealed interface LibraryEvent {
@@ -48,6 +52,7 @@ internal enum class DisplayMode { List, Grid }
 @Stable
 internal data class LibraryState(
     val setlists: ImmutableList<Setlist> = emptyImmutableList(),
+    val initialFilterLetter: String? = null,
     val displayMode: DisplayMode = DisplayMode.Grid,
     val syncStatus: SyncStatus = SyncStatus.LOCAL,
     val loginStatus: LoginStatus = LoginStatus.ANONYMOUS,
@@ -55,6 +60,7 @@ internal data class LibraryState(
 )
 
 internal class LibraryViewModel(
+    initialFilterLetter: String?,
     private val appRepository: AppRepository,
     private val queueManager: QueueManager,
     private val syncRepository: SyncRepository,
@@ -67,10 +73,13 @@ internal class LibraryViewModel(
 
     @Stable
     private data class LibraryTransientState(
+        val initialFilterLetter: String? = null,
         val isLoading: Boolean = false,
     )
 
-    private val _transientState = MutableStateFlow(LibraryTransientState())
+    private val _transientState = MutableStateFlow(
+        LibraryTransientState(initialFilterLetter = initialFilterLetter),
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<LibraryState> = combine(
@@ -82,6 +91,7 @@ internal class LibraryViewModel(
     ) { syncStatus, loginStatus, setlists, displayMode, transient ->
         LibraryState(
             setlists = setlists,
+            initialFilterLetter = transient.initialFilterLetter,
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Grid,
             syncStatus = syncStatus,
             loginStatus = loginStatus,
@@ -93,10 +103,18 @@ internal class LibraryViewModel(
         initialValue = LibraryState(),
     )
 
-    val songs = songRepository.getAllSongs().cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val songs = _transientState.map { it.initialFilterLetter }
+        .distinctUntilChanged()
+        .flatMapLatest { songRepository.getAllSongs(it) }
+        .cachedIn(viewModelScope)
 
     private val eventChannel = Channel<LibraryEvent>(BUFFERED)
     val events = eventChannel.receiveAsFlow()
+
+    fun onClearInitialFilterLetterClicked() {
+        _transientState.update { it.copy(initialFilterLetter = null) }
+    }
 
     fun onImportSongClicked() {
         eventChannel.trySend(LibraryEvent.NavigateToImportSong)

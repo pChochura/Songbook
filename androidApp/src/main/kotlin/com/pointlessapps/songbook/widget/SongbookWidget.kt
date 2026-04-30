@@ -3,18 +3,26 @@ package com.pointlessapps.songbook.widget
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.appWidgetBackground
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.color.DynamicThemeColorProviders
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -23,177 +31,184 @@ import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.layout.wrapContentHeight
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
 import com.pointlessapps.songbook.MainActivity
 import com.pointlessapps.songbook.R
-
-const val EXTRA_FILTER_LETTER = "extra_filter_letter"
-const val EXTRA_OPEN_SEARCH = "extra_open_search"
-
-private val ALPHABET_ROW_1 = ('A'..'I').map { it.toString() }
-private val ALPHABET_ROW_2 = ('J'..'R').map { it.toString() }
-private val ALPHABET_ROW_3 = ('S'..'Z').map { it.toString() }
+import kotlin.math.ceil
 
 class SongbookWidget : GlanceAppWidget() {
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent {
-            GlanceTheme {
-                // Outer Column: exactly 10 children — stays within Glance's RemoteViews limit.
-                // The Spacer between Divider and SearchBar was removed; SearchBar uses paddingTop instead.
-                Column(
-                    modifier = GlanceModifier
-                        .fillMaxSize()
-                        .background(Color(0xFF111218))
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                ) {
-                    Header()                                                       // 1
-                    Spacer(modifier = GlanceModifier.height(8.dp))                // 2
-                    LetterRow(                                                     // 3
-                        context = context,
-                        letters = ALPHABET_ROW_1,
-                        modifier = GlanceModifier.defaultWeight().fillMaxWidth(),
+    companion object {
+        const val EXTRA_FILTER_LETTER = "extra_filter_letter"
+        const val EXTRA_OPEN_SEARCH = "extra_open_search"
+    }
+
+    override val sizeMode = SizeMode.Exact
+
+    private val alphabet = ('A'..'Z').map(Char::toString)
+    private val itemSpacing = 5.dp
+    private val textPaddingFactor = 0.6f
+
+    override suspend fun provideGlance(context: Context, id: GlanceId) = provideContent {
+        GlanceTheme(DynamicThemeColorProviders) {
+            Column(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .background(
+                        color = GlanceTheme.colors.widgetBackground
+                            .getColor(context).copy(alpha = 0.5f),
                     )
-                    Spacer(modifier = GlanceModifier.height(4.dp))                // 4
-                    LetterRow(                                                     // 5
-                        context = context,
-                        letters = ALPHABET_ROW_2,
-                        modifier = GlanceModifier.defaultWeight().fillMaxWidth(),
-                    )
-                    Spacer(modifier = GlanceModifier.height(4.dp))                // 6
-                    LetterRowLastLine(                                             // 7
-                        context = context,
-                        modifier = GlanceModifier.defaultWeight().fillMaxWidth(),
-                    )
-                    Spacer(modifier = GlanceModifier.height(8.dp))                // 8
-                    Divider()                                                      // 9
-                    SearchBar(context = context)                                   // 10 — uses paddingTop instead of a separate Spacer
+                    .padding(itemSpacing)
+                    .appWidgetBackground()
+                    .widgetCornerRadius(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                val (width, height, fontSize) = calculateGridDimensions()
+
+                repeat(width) { row ->
+                    Row(
+                        modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        repeat(height) { col ->
+                            val letter = alphabet[row * height + col]
+                            LetterCell(
+                                letter = letter,
+                                fontSize = fontSize,
+                                modifier = GlanceModifier.fillMaxHeight().defaultWeight(),
+                            )
+                        }
+                    }
                 }
+
+                SearchBar()
             }
         }
     }
-}
 
-@Composable
-private fun Header() {
-    Column(modifier = GlanceModifier.fillMaxWidth()) {
-        Text(
-            text = "Songbook",
-            style = TextStyle(
-                color = ColorProvider(R.color.widget_title),
-                fontWeight = FontWeight.Bold,
-            ),
-        )
-        Text(
-            text = "Browse by letter",
-            style = TextStyle(color = ColorProvider(R.color.widget_subtitle)),
-        )
-    }
-}
-
-// Each Row has exactly 9 children (cells only, no Spacers between them — Glance caps
-// containers at 10 children; 9 cells + 8 Spacers = 17, which silently truncates to 5).
-// Visual gaps between cells come from the 2dp inset baked into bg_widget_cell.xml.
-@Composable
-private fun LetterRow(context: Context, letters: List<String>, modifier: GlanceModifier) {
-    Row(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    @Composable
+    private fun LetterCell(
+        letter: String,
+        fontSize: TextUnit,
+        modifier: GlanceModifier = GlanceModifier,
     ) {
-        letters.forEach { letter ->
-            LetterCell(
-                context = context,
-                letter = letter,
-                modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
+        val context = LocalContext.current
+        Box(
+            modifier = modifier.padding(itemSpacing),
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .background(
+                        color = GlanceTheme.colors.background
+                            .getColor(context).copy(alpha = 0.7f),
+                    )
+                    .widgetCornerRadius()
+                    .clickable(actionStartActivity(getIntent(context, letter))),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = letter,
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onBackground,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = fontSize,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun SearchBar() {
+        val context = LocalContext.current
+        val intent = Intent(context, MainActivity::class.java).apply {
+            putExtra(EXTRA_OPEN_SEARCH, true)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        Row(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(
+                    color = GlanceTheme.colors.background
+                        .getColor(context).copy(alpha = 0.7f),
+                )
+                .clickable(actionStartActivity(intent))
+                .widgetCornerRadius()
+                .padding(itemSpacing * 2),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(
+                modifier = GlanceModifier.size(18.dp),
+                provider = ImageProvider(R.drawable.ic_widget_search),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant),
+            )
+            Spacer(modifier = GlanceModifier.width(itemSpacing))
+            Text(
+                text = context.getString(R.string.search_songs),
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                ),
             )
         }
     }
-}
 
-// Last row: 8 letters + 1 invisible filler = 9 children, aligning column widths with the rows above.
-@Composable
-private fun LetterRowLastLine(context: Context, modifier: GlanceModifier) {
-    Row(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ALPHABET_ROW_3.forEach { letter ->
-            LetterCell(
-                context = context,
-                letter = letter,
-                modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
-            )
+    @Composable
+    private fun calculateGridDimensions(): Triple<Int, Int, TextUnit> {
+        val size = LocalSize.current
+        val totalItems = alphabet.size
+
+        var bestSide = 0.dp
+        var bestCols = 1
+
+        for (cols in 1..totalItems) {
+            val rows = ceil(totalItems.toDouble() / cols).toInt()
+            val cellWidth = size.width / cols
+            val cellHeight = size.height / rows
+
+            val side = if (cellWidth < cellHeight) cellWidth else cellHeight
+
+            if (side > bestSide) {
+                bestSide = side
+                bestCols = cols
+            }
         }
-        // 1 filler to match the 9-column width of the rows above
-        Box(modifier = GlanceModifier.defaultWeight().fillMaxHeight()) {}
-    }
-}
 
-@Composable
-private fun LetterCell(context: Context, letter: String, modifier: GlanceModifier) {
-    val intent = Intent(context, MainActivity::class.java).apply {
-        putExtra(EXTRA_FILTER_LETTER, letter)
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-    }
-    Box(
-        modifier = modifier
-            .background(ImageProvider(R.drawable.bg_widget_cell))
-            .clickable(actionStartActivity(intent)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = letter,
-            style = TextStyle(
-                color = ColorProvider(R.color.widget_letter),
-                fontWeight = FontWeight.Bold,
-            ),
-        )
-    }
-}
+        val fontSize = (bestSide.value * textPaddingFactor).sp
 
-@Composable
-private fun Divider() {
-    Box(
-        modifier = GlanceModifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(ColorProvider(R.color.widget_divider)),
-    ) {}
-}
+        return Triple(totalItems / bestCols, bestCols, fontSize)
+    }
 
-@Composable
-private fun SearchBar(context: Context) {
-    val intent = Intent(context, MainActivity::class.java).apply {
-        putExtra(EXTRA_OPEN_SEARCH, true)
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+    private fun GlanceModifier.widgetCornerRadius(): GlanceModifier {
+        val cornerRadiusModifier =
+            if (android.os.Build.VERSION.SDK_INT >= 31) {
+                GlanceModifier.cornerRadius(android.R.dimen.system_app_widget_background_radius)
+            } else {
+                GlanceModifier
+            }
+
+        return this.then(cornerRadiusModifier)
     }
-    Row(
-        modifier = GlanceModifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(top = 8.dp)
-            .background(ImageProvider(R.drawable.bg_widget_search))
-            .clickable(actionStartActivity(intent))
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Image(
-            provider = ImageProvider(R.drawable.ic_widget_search),
-            contentDescription = null,
-            modifier = GlanceModifier.size(18.dp),
-        )
-        Spacer(modifier = GlanceModifier.width(8.dp))
-        Text(
-            text = "Search songs\u2026",
-            style = TextStyle(color = ColorProvider(R.color.widget_subtitle)),
-        )
-    }
+
+    private fun getIntent(context: Context, letter: String) =
+        Intent(context, MainActivity::class.java).apply {
+            putExtra(EXTRA_FILTER_LETTER, letter)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
 }

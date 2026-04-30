@@ -31,17 +31,22 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.getString
 
 internal class AppViewModel(
+    openSearch: Boolean,
+    initialFilterLetter: String?,
     chordLibrary: ChordLibrary,
     syncRepository: SyncRepository,
+    authRepository: AuthRepository,
     private val queueManager: QueueManager,
     private val songRepository: SongRepository,
-    private val authRepository: AuthRepository,
     private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
-    val isLoggedIn: Boolean
-        get() = authRepository.isLoggedIn()
+    val startingRoutes: Array<Route> = when {
+        !authRepository.isLoggedIn() -> arrayOf(Route.Introduction)
+        openSearch -> arrayOf(Route.Library(initialFilterLetter), Route.Search)
+        else -> arrayOf(Route.Library(initialFilterLetter))
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val state = combine(

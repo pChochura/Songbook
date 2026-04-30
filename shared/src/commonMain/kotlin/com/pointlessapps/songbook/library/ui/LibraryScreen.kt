@@ -1,5 +1,6 @@
 package com.pointlessapps.songbook.library.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -58,14 +59,17 @@ import com.pointlessapps.songbook.shared.ui.library_setlists_section_title
 import com.pointlessapps.songbook.shared.ui.library_songs_found
 import com.pointlessapps.songbook.shared.ui.library_songs_section_title
 import com.pointlessapps.songbook.shared.ui.library_sort_by_date
+import com.pointlessapps.songbook.shared.ui.library_starting_with
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookChip
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
+import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -138,7 +142,9 @@ internal fun LibraryScreen(
             item(key = "all_songs_header", span = { GridItemSpan(maxLineSpan) }) {
                 AllSongsHeader(
                     numberOfSongs = songs.itemCount,
+                    initialFilterLetter = state.initialFilterLetter,
                     modifier = Modifier.animateItem(),
+                    onClearInitialFilterLetterClicked = viewModel::onClearInitialFilterLetterClicked,
                 )
             }
 
@@ -292,6 +298,8 @@ private fun LazyGridItemScope.SetlistsRow(
 @Composable
 private fun AllSongsHeader(
     numberOfSongs: Int,
+    initialFilterLetter: String?,
+    onClearInitialFilterLetterClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -313,16 +321,32 @@ private fun AllSongsHeader(
             onClick = {},
         )
 
-        SongbookText(
+        AnimatedContent(
             modifier = Modifier
                 .weight(1f)
                 .wrapContentWidth(Alignment.End),
-            text = stringResource(Res.string.library_sort_by_date),
-            textStyle = defaultSongbookTextStyle().copy(
-                textAlign = TextAlign.End,
-                textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                typography = MaterialTheme.typography.labelMedium,
-            ),
-        )
+            targetState = initialFilterLetter,
+        ) { letter ->
+            if (letter == null) {
+                SongbookText(
+                    text = stringResource(Res.string.library_sort_by_date),
+                    textStyle = defaultSongbookTextStyle().copy(
+                        textAlign = TextAlign.End,
+                        textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        typography = MaterialTheme.typography.labelMedium,
+                    ),
+                )
+            } else {
+                SongbookChip(
+                    label = stringResource(Res.string.library_starting_with, letter),
+                    isSelected = true,
+                    onClick = onClearInitialFilterLetterClicked,
+                    chipStyle = defaultSongbookChipStyle().copy(
+                        icon = IconClose,
+                        iconAlignment = Alignment.End,
+                    ),
+                )
+            }
+        }
     }
 }

@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface SongDao {
+    @Query("SELECT * FROM songs WHERE title LIKE :initialFilterLetter || '%' ORDER BY title ASC")
+    fun getAllSongs(initialFilterLetter: String): PagingSource<Int, SongEntity>
+
     @Query("SELECT * FROM songs ORDER BY title ASC")
     fun getAllSongs(): PagingSource<Int, SongEntity>
 

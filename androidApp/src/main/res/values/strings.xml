@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Songbook</string>
     <string name="widget_description">Songbook quick-filter widget</string>
+    <string name="search_songs">Search songs...</string>
 </resources>

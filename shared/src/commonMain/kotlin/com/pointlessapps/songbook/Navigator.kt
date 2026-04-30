@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
@@ -35,7 +36,7 @@ internal sealed interface Route : NavKey {
 
     @Keep
     @Serializable
-    data object Library : Route {
+    data class Library(val initialFilterLetter: String? = null) : Route {
         override val hasBottomBar = true
     }
 
@@ -91,9 +92,10 @@ private const val DEFAULT_TRANSITION_DURATION_MILLISECOND = 500
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-internal fun NavDisplay(backstack: NavBackStack<NavKey>) {
+internal fun NavDisplay(navigator: Navigator) {
     NavDisplay(
-        backStack = backstack,
+        backStack = navigator.backStack,
+        onBack = navigator::navigateBack,
         entryProvider = koinEntryProvider(),
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
@@ -120,7 +122,8 @@ internal fun NavDisplay(backstack: NavBackStack<NavKey>) {
     )
 }
 
-internal class Navigator(private val backStack: NavBackStack<NavKey>) {
+@Stable
+internal class Navigator(val backStack: NavBackStack<NavKey>) {
 
     val currentRoute: Route?
         get() = backStack.lastOrNull() as? Route
@@ -136,12 +139,12 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
         }
     }
 
-    fun navigateTo(route: Route) {
-        backStack.add(route)
-    }
-
     fun navigateBack() {
-        backStack.removeLastOrNull()
+        val removedElement = backStack.removeLastOrNull()
+        println("LOG!, removed something: $removedElement")
+        if (backStack.isEmpty() && removedElement !is Route.Library) {
+            backStack.add(Route.Library())
+        }
     }
 
     fun navigateToIntroduction() {
@@ -151,7 +154,7 @@ internal class Navigator(private val backStack: NavBackStack<NavKey>) {
 
     fun navigateToLibrary() {
         backStack.clear()
-        backStack.add(Route.Library)
+        backStack.add(Route.Library())
     }
 
     fun navigateToLyrics() {

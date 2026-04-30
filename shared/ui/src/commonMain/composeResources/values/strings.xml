@@ -79,7 +79,8 @@
     <string name="library_setlists_section_title">Setlists</string>
     <string name="library_setlist_songs">Songs: %1$d</string>
     <string name="library_songs_found">%1$d Found</string>
-    <string name="library_sort_by_date">Sort by: Date Added</string>
+    <string name="library_starting_with">Starting with: %1$d</string>
+    <string name="library_sort_by_date">Sort by: Title</string>
     <string name="library_add_song_title">Add new song</string>
     <string name="library_add_song_subtitle">Import text or an image</string>
     <string name="library_add_to_favourites">Add to favourites</string>
