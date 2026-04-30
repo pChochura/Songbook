@@ -14,10 +14,12 @@ import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
+import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionParametersOf
+import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
-import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -56,7 +58,21 @@ class SongbookWidget : GlanceAppWidget() {
     private val itemSpacing = 5.dp
     private val textPaddingFactor = 0.6f
 
+    private val filterLetterKey = ActionParameters.Key<String>(EXTRA_FILTER_LETTER)
+    private val openSearchKey = ActionParameters.Key<Boolean>(EXTRA_OPEN_SEARCH)
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) = provideContent {
+        WidgetContent()
+    }
+
     override suspend fun provideGlance(context: Context, id: GlanceId) = provideContent {
+        WidgetContent()
+    }
+
+    @Composable
+    private fun WidgetContent() {
+        val context = LocalContext.current
+
         GlanceTheme(DynamicThemeColorProviders) {
             Column(
                 modifier = GlanceModifier
@@ -114,7 +130,11 @@ class SongbookWidget : GlanceAppWidget() {
                             .getColor(context).copy(alpha = 0.7f),
                     )
                     .widgetCornerRadius()
-                    .clickable(actionStartActivity(getIntent(context, letter))),
+                    .clickable(
+                        actionStartActivity<MainActivity>(
+                            actionParametersOf(filterLetterKey to letter),
+                        ),
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -133,10 +153,6 @@ class SongbookWidget : GlanceAppWidget() {
     @Composable
     private fun SearchBar() {
         val context = LocalContext.current
-        val intent = Intent(context, MainActivity::class.java).apply {
-            putExtra(EXTRA_OPEN_SEARCH, true)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
         Row(
             modifier = GlanceModifier
                 .fillMaxWidth()
@@ -145,7 +161,9 @@ class SongbookWidget : GlanceAppWidget() {
                     color = GlanceTheme.colors.background
                         .getColor(context).copy(alpha = 0.7f),
                 )
-                .clickable(actionStartActivity(intent))
+                .clickable(
+                    actionStartActivity<MainActivity>(actionParametersOf(openSearchKey to true)),
+                )
                 .widgetCornerRadius()
                 .padding(itemSpacing * 2),
             verticalAlignment = Alignment.CenterVertically,

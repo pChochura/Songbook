@@ -129,22 +129,11 @@ internal class Navigator(val backStack: NavBackStack<NavKey>) {
         get() = backStack.lastOrNull() as? Route
 
     fun bottomNavigationTo(route: Route) {
-        when (route) {
-            is Route.Library -> {
-                backStack.subList(1, backStack.size).removeAll { it is Route.Library }
-                backStack.add(route)
-            }
-
-            else -> backStack.add(route)
-        }
+        backStack.add(route)
     }
 
     fun navigateBack() {
-        val removedElement = backStack.removeLastOrNull()
-        println("LOG!, removed something: $removedElement")
-        if (backStack.isEmpty() && removedElement !is Route.Library) {
-            backStack.add(Route.Library())
-        }
+        backStack.removeLastOrNull()
     }
 
     fun navigateToIntroduction() {

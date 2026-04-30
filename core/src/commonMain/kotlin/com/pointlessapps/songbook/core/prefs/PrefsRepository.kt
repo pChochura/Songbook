@@ -25,4 +25,7 @@ interface PrefsRepository {
 
     suspend fun getShowPublicLyrics(): Boolean?
     suspend fun setShowPublicLyrics(show: Boolean)
+
+    suspend fun getIsWidgetPreviewRendered(): Boolean
+    suspend fun setIsWidgetPreviewRendered()
 }

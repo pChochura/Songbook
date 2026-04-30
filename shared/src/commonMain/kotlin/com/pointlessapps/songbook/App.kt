@@ -56,6 +56,14 @@ fun App(
     val navigator = remember { Navigator(backstack) }
     val bottomBarPadding = remember { BottomBarPadding() }
 
+    LaunchedEffect(initialFilterLetter, openSearch) {
+        if (openSearch) {
+            navigator.bottomNavigationTo(Route.Search)
+        } else if (initialFilterLetter != null) {
+            navigator.bottomNavigationTo(Route.Library(initialFilterLetter))
+        }
+    }
+
     viewModel.state.collectWithLifecycle()
 
     snackbarSate.callbackActionsFlow.collectWithLifecycle {
