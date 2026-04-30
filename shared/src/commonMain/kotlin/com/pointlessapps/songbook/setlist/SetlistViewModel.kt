@@ -36,8 +36,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -68,7 +68,7 @@ internal sealed interface SetlistState {
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 internal class SetlistViewModel(
-    private val id: String,
+    id: String,
     syncRepository: SyncRepository,
     private val queueManager: QueueManager,
     private val setlistRepository: SetlistRepository,
@@ -85,10 +85,13 @@ internal class SetlistViewModel(
     private val _transientState = MutableStateFlow(SetlistTransientState())
 
     val state: StateFlow<SetlistState> = combine(
-        syncRepository.currentSyncStatusFlow.onEach { if (it.idle) updateLocalSongs() },
+        setlistRepository.getSetlistsSongsById(id)
+            .onEach { updateLocalSongs(it) }
+            .map {}.distinctUntilChanged(),
+        syncRepository.currentSyncStatusFlow,
         setlistRepository.getSetlistByIdFlow(id),
         _transientState,
-    ) { syncStatus, setlist, transient ->
+    ) { _, syncStatus, setlist, transient ->
         if (transient.isLoading) {
             return@combine SetlistState.Loading
         }
@@ -176,7 +179,6 @@ internal class SetlistViewModel(
         viewModelScope.launch {
             val state = state.value.loaded
             setlistRepository.addSongToSetlist(state.setlist.id, id, state.songs.size)
-            updateLocalSongs()
         }
     }
 
@@ -205,10 +207,10 @@ internal class SetlistViewModel(
         }
     }
 
-    private fun updateLocalSongs() {
+    private fun updateLocalSongs(songs: ImmutableList<Song>) {
         viewModelScope.launch {
             _transientState.update {
-                it.copy(localSongs = setlistRepository.getSetlistsSongsById(id).first())
+                it.copy(localSongs = songs)
             }
         }
     }
