@@ -20,7 +20,7 @@ compose-multiplatform-material3 = "1.9.0"
 # AndroidX
 androidx-activity = "1.13.0"
 androidx-material = "1.13.0"
-androidx-glance = "1.2.0-rc01"
+androidx-glance = "1.1.1"
 androidx-lifecycle = "2.10.0"
 androidx-navigation3 = "1.1.0"
 androidx-room = "2.8.4"

@@ -24,7 +24,6 @@ internal class PrefsRepositoryImpl(
     private val lyricsWrapModeKey = stringPreferencesKey("lyrics_wrap_mode")
     private val showKeyOffsetFabKey = booleanPreferencesKey("show_key_offset_fab")
     private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
-    private val isWidgetPreviewRenderedKey = booleanPreferencesKey("is_widget_preview_rendered")
 
     override fun getLastSearchesFlow() = dataStore.data.map { preferences ->
         preferences[lastSearchesKey].orEmpty().toImmutableSet()
@@ -133,22 +132,6 @@ internal class PrefsRepositoryImpl(
             dataStore.updateData {
                 it.toMutablePreferences().apply {
                     set(showPublicLyricsKey, show)
-                }
-            }
-        }
-    }
-
-    override suspend fun getIsWidgetPreviewRendered() = withContext(Dispatchers.IO) {
-        dataStore.data.map { preferences ->
-            preferences[isWidgetPreviewRenderedKey] ?: false
-        }.first()
-    }
-
-    override suspend fun setIsWidgetPreviewRendered() {
-        withContext(Dispatchers.IO) {
-            dataStore.updateData {
-                it.toMutablePreferences().apply {
-                    set(isWidgetPreviewRenderedKey, true)
                 }
             }
         }

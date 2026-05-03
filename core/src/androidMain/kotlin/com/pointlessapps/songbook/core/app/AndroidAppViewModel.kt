@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.auth.AuthRepository
-import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,12 +14,10 @@ import kotlinx.coroutines.launch
 
 data class AndroidAppState(
     val isInitializing: Boolean = true,
-    val previewAlreadyRendered: Boolean = true,
 )
 
 class AndroidAppViewModel(
     private val authRepository: AuthRepository,
-    private val prefsRepository: PrefsRepository,
 ) : ViewModel(
     viewModelScope = CoroutineScope(
         SupervisorJob() +
@@ -37,17 +34,7 @@ class AndroidAppViewModel(
     init {
         viewModelScope.launch {
             runCatching { authRepository.initialize() }
-            state = state.copy(
-                isInitializing = false,
-                previewAlreadyRendered = prefsRepository.getIsWidgetPreviewRendered(),
-            )
-        }
-    }
-
-    fun setPreviewRendered() {
-        state = state.copy(previewAlreadyRendered = true)
-        viewModelScope.launch {
-            prefsRepository.setIsWidgetPreviewRendered()
+            state = state.copy(isInitializing = false)
         }
     }
 }

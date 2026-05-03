@@ -5,17 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.setWidgetPreviews
 import com.pointlessapps.songbook.core.app.AndroidAppViewModel
 import com.pointlessapps.songbook.widget.SongbookWidget.Companion.EXTRA_FILTER_LETTER
 import com.pointlessapps.songbook.widget.SongbookWidget.Companion.EXTRA_OPEN_SEARCH
-import com.pointlessapps.songbook.widget.SongbookWidgetReceiver
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -35,13 +31,6 @@ class MainActivity : ComponentActivity() {
         handleIntent(intent)
 
         setContent {
-            LaunchedEffect(appViewModel.state.previewAlreadyRendered) {
-                if (!appViewModel.state.previewAlreadyRendered) {
-                    GlanceAppWidgetManager(applicationContext).setWidgetPreviews<SongbookWidgetReceiver>()
-                    appViewModel.setPreviewRendered()
-                }
-            }
-
             if (!appViewModel.state.isInitializing) {
                 App(
                     initialFilterLetter = filterLetter,

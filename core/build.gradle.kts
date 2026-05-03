@@ -108,4 +108,14 @@ buildkonfig {
             nullable = true,
         )
     }
+
+    defaultConfigs("debug") {
+        buildConfigField(
+            type = FieldSpec.Type.STRING,
+            name = "GOOGLE_WEB_CLIENT_ID",
+            value = System.getenv("DEBUG_GOOGLE_WEB_CLIENT_ID")
+                ?: getLocalProperty("DEBUG_GOOGLE_WEB_CLIENT_ID"),
+            nullable = true,
+        )
+    }
 }

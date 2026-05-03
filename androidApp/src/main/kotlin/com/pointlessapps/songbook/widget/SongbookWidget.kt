@@ -1,7 +1,6 @@
 package com.pointlessapps.songbook.widget
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -60,10 +59,6 @@ class SongbookWidget : GlanceAppWidget() {
 
     private val filterLetterKey = ActionParameters.Key<String>(EXTRA_FILTER_LETTER)
     private val openSearchKey = ActionParameters.Key<Boolean>(EXTRA_OPEN_SEARCH)
-
-    override suspend fun providePreview(context: Context, widgetCategory: Int) = provideContent {
-        WidgetContent()
-    }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) = provideContent {
         WidgetContent()
@@ -153,37 +148,42 @@ class SongbookWidget : GlanceAppWidget() {
     @Composable
     private fun SearchBar() {
         val context = LocalContext.current
-        Row(
+        Box(
             modifier = GlanceModifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .background(
-                    color = GlanceTheme.colors.background
-                        .getColor(context).copy(alpha = 0.7f),
-                )
-                .clickable(
-                    actionStartActivity<MainActivity>(actionParametersOf(openSearchKey to true)),
-                )
-                .widgetCornerRadius()
-                .padding(itemSpacing * 2),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(itemSpacing)
+                .wrapContentHeight(),
         ) {
-            Image(
-                modifier = GlanceModifier.size(18.dp),
-                provider = ImageProvider(R.drawable.ic_widget_search),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant),
-            )
-            Spacer(modifier = GlanceModifier.width(itemSpacing))
-            Text(
-                text = context.getString(R.string.search_songs),
-                style = TextStyle(
-                    color = GlanceTheme.colors.onSurfaceVariant,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                ),
-            )
+            Row(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .background(
+                        color = GlanceTheme.colors.background
+                            .getColor(context).copy(alpha = 0.7f),
+                    )
+                    .clickable(
+                        actionStartActivity<MainActivity>(actionParametersOf(openSearchKey to true)),
+                    )
+                    .widgetCornerRadius()
+                    .padding(itemSpacing * 2),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    modifier = GlanceModifier.size(18.dp),
+                    provider = ImageProvider(R.drawable.ic_widget_search),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant),
+                )
+                Spacer(modifier = GlanceModifier.width(itemSpacing))
+                Text(
+                    text = context.getString(R.string.search_songs),
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onSurfaceVariant,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
         }
     }
 
@@ -223,10 +223,4 @@ class SongbookWidget : GlanceAppWidget() {
 
         return this.then(cornerRadiusModifier)
     }
-
-    private fun getIntent(context: Context, letter: String) =
-        Intent(context, MainActivity::class.java).apply {
-            putExtra(EXTRA_FILTER_LETTER, letter)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
 }

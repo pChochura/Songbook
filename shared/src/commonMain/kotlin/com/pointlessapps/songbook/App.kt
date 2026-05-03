@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -48,21 +49,15 @@ fun App(
     initialFilterLetter: String? = null,
     openSearch: Boolean = false,
 ) {
-    val viewModel = koinViewModel<AppViewModel> {
+    val viewModel = koinViewModel<AppViewModel>(key = "{$initialFilterLetter$openSearch}") {
         parametersOf(openSearch, initialFilterLetter)
     }
     val snackbarSate = koinInject<SongbookSnackbarState>()
-    val backstack = rememberNavBackStack(navigationConfig, elements = viewModel.startingRoutes)
-    val navigator = remember { Navigator(backstack) }
-    val bottomBarPadding = remember { BottomBarPadding() }
-
-    LaunchedEffect(initialFilterLetter, openSearch) {
-        if (openSearch) {
-            navigator.bottomNavigationTo(Route.Search)
-        } else if (initialFilterLetter != null) {
-            navigator.bottomNavigationTo(Route.Library(initialFilterLetter))
-        }
+    val backstack = key(viewModel.startingRoutes) {
+        rememberNavBackStack(navigationConfig, elements = viewModel.startingRoutes)
     }
+    val navigator = remember(backstack) { Navigator(backstack) }
+    val bottomBarPadding = remember { BottomBarPadding() }
 
     viewModel.state.collectWithLifecycle()
 
