@@ -185,8 +185,8 @@ internal class SetlistViewModel(
     fun onRemoveSongFromSetlistClicked(id: String) {
         viewModelScope.launch {
             val state = state.value.loaded
+            val songIndex = state.songs.indexOfFirst { it.id == id }
             setlistRepository.removeSongFromSetlist(state.setlist.id, id)
-            val songIndex = _transientState.value.localSongs.indexOfFirst { it.id == id }
             _transientState.update {
                 it.copy(
                     localSongs = it.localSongs
