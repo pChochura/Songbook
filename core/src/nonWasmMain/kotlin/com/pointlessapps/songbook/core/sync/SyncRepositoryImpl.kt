@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration.Companion.seconds
@@ -75,6 +76,8 @@ internal class SyncRepositoryImpl(
                 setlists = setlists,
                 setlistSongs = setlistSongs,
             )
+        }.onStart {
+            _syncStatus.value = SyncStatus.SYNCING
         }.debounce(SYNC_DEBOUNCE).conflate().map {
             syncMutex.withLock { performSafeSync(it) }
         }.onCompletion {

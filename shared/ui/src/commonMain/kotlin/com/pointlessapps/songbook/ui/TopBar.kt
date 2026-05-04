@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,8 +32,8 @@ import org.jetbrains.compose.resources.StringResource
 
 @Composable
 fun TopBar(
-    leftButton: TopBarButton?,
-    rightButton: TopBarButton?,
+    leftButton: (@Composable () -> Unit)?,
+    rightButton: (@Composable () -> Unit)?,
     title: String,
 ) {
     Row(
@@ -49,26 +48,9 @@ fun TopBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        leftButton?.let {
-            SongbookIconButton(
-                modifier = it.modifier
-                    .size(TOP_BAR_ICON_SIZE)
-                    .padding(MaterialTheme.spacing.extraSmall),
-                icon = it.icon,
-                tooltipLabel = it.tooltip,
-                onClick = it.onClick,
-                iconButtonStyle = defaultSongbookIconButtonStyle().copy(
-                    enabled = it.enabled,
-                    containerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    outlineColor = Color.Transparent,
-                    disabledOutlineColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                    tooltipPosition = Position.BELOW,
-                ),
-            )
-        } ?: run { Box(Modifier.size(TOP_BAR_ICON_SIZE)) }
+        leftButton?.invoke() ?: run {
+            Box(Modifier.size(TOP_BAR_ICON_SIZE))
+        }
 
         Box(
             modifier = Modifier
@@ -86,54 +68,54 @@ fun TopBar(
             )
         }
 
-        rightButton?.let {
-            SongbookIconButton(
-                modifier = it.modifier
-                    .size(TOP_BAR_ICON_SIZE)
-                    .padding(MaterialTheme.spacing.extraSmall),
-                icon = it.icon,
-                tooltipLabel = it.tooltip,
-                onClick = it.onClick,
-                iconButtonStyle = defaultSongbookIconButtonStyle().copy(
-                    enabled = it.enabled,
-                    containerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    outlineColor = Color.Transparent,
-                    disabledOutlineColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                    tooltipPosition = Position.BELOW,
-                ),
-            )
-        } ?: run { Box(Modifier.size(TOP_BAR_ICON_SIZE)) }
+        rightButton?.invoke() ?: run {
+            Box(Modifier.size(TOP_BAR_ICON_SIZE))
+        }
     }
 }
 
-@Stable
-data class TopBarButton(
-    val enabled: Boolean,
-    val icon: DrawableResource,
-    val tooltip: StringResource,
-    val onClick: () -> Unit,
-    val modifier: Modifier,
+@Composable
+fun TopBarButton(
+    enabled: Boolean,
+    icon: DrawableResource,
+    tooltip: StringResource,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    companion object {
-        fun back(onClick: () -> Unit) = TopBarButton(
-            enabled = true,
-            icon = IconArrowLeft,
-            tooltip = Res.string.common_back,
-            onClick = onClick,
-            modifier = Modifier,
-        )
-
-        fun menu(onClick: () -> Unit) = TopBarButton(
-            enabled = true,
-            icon = IconMoveHandle,
-            tooltip = Res.string.common_menu,
-            onClick = onClick,
-            modifier = Modifier,
-        )
-    }
+    SongbookIconButton(
+        modifier = modifier
+            .size(TOP_BAR_ICON_SIZE)
+            .padding(MaterialTheme.spacing.extraSmall),
+        icon = icon,
+        tooltipLabel = tooltip,
+        onClick = onClick,
+        iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+            enabled = enabled,
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            outlineColor = Color.Transparent,
+            disabledOutlineColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            disabledContentColor = MaterialTheme.colorScheme.onSurface,
+            tooltipPosition = Position.BELOW,
+        ),
+    )
 }
 
-private val TOP_BAR_ICON_SIZE = 36.dp
+@Composable
+fun MenuTopBarButton(onClick: () -> Unit) = TopBarButton(
+    enabled = true,
+    icon = IconMoveHandle,
+    tooltip = Res.string.common_menu,
+    onClick = onClick,
+)
+
+@Composable
+fun BackTopBarButton(onClick: () -> Unit) = TopBarButton(
+    enabled = true,
+    icon = IconArrowLeft,
+    tooltip = Res.string.common_back,
+    onClick = onClick,
+)
+
+val TOP_BAR_ICON_SIZE = 36.dp

@@ -77,8 +77,9 @@ import com.pointlessapps.songbook.shared.ui.import_lyrics_tip
 import com.pointlessapps.songbook.shared.ui.import_menu_rescan_description
 import com.pointlessapps.songbook.shared.ui.import_song_title_label
 import com.pointlessapps.songbook.shared.ui.import_song_title_placeholder
+import com.pointlessapps.songbook.ui.BackTopBarButton
+import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
-import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookLoader
@@ -122,12 +123,8 @@ internal fun ImportSongScreen(
     SongbookScaffoldLayout(
         topBar = @Composable {
             TopBar(
-                leftButton = TopBarButton.back(
-                    onClick = viewModel::onCancelClicked,
-                ),
-                rightButton = TopBarButton.menu(
-                    onClick = { isBottomSheetVisible = true },
-                ),
+                leftButton = @Composable { BackTopBarButton(viewModel::onCancelClicked) },
+                rightButton = @Composable { MenuTopBarButton { isBottomSheetVisible = true } },
                 title = stringResource(
                     if (state.songId == null) {
                         Res.string.import_header_title

@@ -60,8 +60,8 @@ import com.pointlessapps.songbook.shared.ui.library_songs_found
 import com.pointlessapps.songbook.shared.ui.library_songs_section_title
 import com.pointlessapps.songbook.shared.ui.library_sort_by_date
 import com.pointlessapps.songbook.shared.ui.library_starting_with
+import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
-import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookChip
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
@@ -71,9 +71,9 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.SyncingTopBarButton
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
-import com.pointlessapps.songbook.utils.syncingTopBarButton
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 
@@ -98,10 +98,8 @@ internal fun LibraryScreen(
     SongbookScaffoldLayout(
         topBar = @Composable {
             TopBar(
-                leftButton = syncingTopBarButton(state.syncStatus),
-                rightButton = TopBarButton.menu(
-                    onClick = { isBottomSheetVisible = true },
-                ),
+                leftButton = @Composable { SyncingTopBarButton(state.syncStatus) },
+                rightButton = @Composable { MenuTopBarButton { isBottomSheetVisible = true } },
                 title = stringResource(Res.string.common_app_name),
             )
         },

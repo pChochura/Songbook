@@ -30,6 +30,7 @@ fun SongbookIconButton(
     iconButtonStyle: SongbookIconButtonStyle = defaultSongbookIconButtonStyle(),
 ) {
     SongbookTooltip(
+        state = iconButtonStyle.tooltipState,
         position = iconButtonStyle.tooltipPosition,
         contentDescription = tooltipLabel,
     ) {
@@ -82,6 +83,7 @@ fun defaultSongbookIconButtonStyle() = SongbookIconButtonStyle(
     shape = CircleShape,
     enabled = true,
     tooltipPosition = Position.ABOVE,
+    tooltipState = rememberSongbookTooltipState(isPersistent = false),
 )
 
 @Stable
@@ -95,6 +97,7 @@ data class SongbookIconButtonStyle(
     val shape: Shape,
     val enabled: Boolean,
     val tooltipPosition: Position,
+    val tooltipState: SongbookTooltipState,
 )
 
 private val ICON_BUTTON_BORDER_WIDTH = 1.dp

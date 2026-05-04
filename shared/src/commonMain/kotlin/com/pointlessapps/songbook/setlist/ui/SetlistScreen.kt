@@ -40,15 +40,15 @@ import com.pointlessapps.songbook.setlist.ui.dialogs.RenameSetlistDialog
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.setlist_delete_setlist
 import com.pointlessapps.songbook.shared.ui.setlist_delete_setlist_description
+import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
-import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.SyncingTopBarButton
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
-import com.pointlessapps.songbook.utils.syncingTopBarButton
 import kotlinx.collections.immutable.toImmutableSet
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -222,10 +222,8 @@ private fun SetlistTopBar(
     onMenuClicked: () -> Unit,
 ) {
     TopBar(
-        leftButton = syncingTopBarButton(state.syncStatus),
-        rightButton = TopBarButton.menu(
-            onClick = onMenuClicked,
-        ),
+        leftButton = @Composable { SyncingTopBarButton(state.syncStatus) },
+        rightButton = @Composable { MenuTopBarButton(onMenuClicked) },
         title = state.setlist.name,
     )
 }

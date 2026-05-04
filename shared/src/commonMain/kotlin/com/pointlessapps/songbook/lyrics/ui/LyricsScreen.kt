@@ -57,8 +57,9 @@ import com.pointlessapps.songbook.shared.ui.common_close_fullscreen
 import com.pointlessapps.songbook.shared.ui.lyrics_delete_song
 import com.pointlessapps.songbook.shared.ui.lyrics_delete_song_description
 import com.pointlessapps.songbook.shared.ui.lyrics_section_label
+import com.pointlessapps.songbook.ui.BackTopBarButton
+import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
-import com.pointlessapps.songbook.ui.TopBarButton
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
@@ -150,12 +151,10 @@ private fun LyricsScreenContent(
             AnimatedContent(isTopBarVisible) {
                 if (it) {
                     TopBar(
-                        leftButton = TopBarButton.back(
-                            onClick = onNavigateBack,
-                        ),
-                        rightButton = TopBarButton.menu(
-                            onClick = { isBottomSheetVisible = true },
-                        ),
+                        leftButton = @Composable { BackTopBarButton(onNavigateBack) },
+                        rightButton = @Composable {
+                            MenuTopBarButton { isBottomSheetVisible = true }
+                        },
                         title = stringResource(Res.string.lyrics_section_label),
                     )
                 } else {
