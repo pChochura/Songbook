@@ -179,6 +179,7 @@ private fun LyricsScreenContent(
     ) { paddingValues ->
         Box(Modifier.fillMaxSize()) {
             PreviewSongLayout(
+                songId = state.songId,
                 title = state.title,
                 artist = state.artist,
                 sections = state.sections,

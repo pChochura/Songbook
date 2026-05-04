@@ -70,6 +70,7 @@ internal fun PreviewSongLayout(
     textScale: Int,
     keyOffset: Int,
     onTextScaleChanged: (Int) -> Unit,
+    songId: String? = null,
     displayMode: DisplayMode = DisplayMode.Inline,
     wrapMode: WrapMode = WrapMode.Wrap,
     previousSongTitle: String? = null,
@@ -152,6 +153,7 @@ internal fun PreviewSongLayout(
         ) {
             item(key = "header") {
                 SongHeader(
+                    songId = songId,
                     title = title,
                     artist = artist,
                     modifier = Modifier.padding(horizontal = MaterialTheme.spacing.huge),

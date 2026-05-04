@@ -1,6 +1,7 @@
 package com.pointlessapps.songbook.library.ui.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import com.pointlessapps.songbook.LocalSharedTransitionScope
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.library.DisplayMode
 import com.pointlessapps.songbook.shared.ui.Res
@@ -53,27 +55,39 @@ internal fun SongCard(
                 horizontalAlignment = Alignment.Start,
             ) {
                 val songIdentityComposable = movableContentWithReceiverOf<Modifier> {
-                    Column(modifier = this) {
-                        SongbookText(
-                            text = song.title.takeIf { it.isNotEmpty() }
-                                ?: stringResource(Res.string.common_unnamed),
-                            textStyle = defaultSongbookTextStyle().copy(
-                                textColor = MaterialTheme.colorScheme.onSurface,
-                                typography = MaterialTheme.typography.titleMedium,
-                                maxLines = 1,
-                                textOverflow = TextOverflow.Ellipsis,
-                            ),
-                        )
-                        SongbookText(
-                            text = song.artist.takeIf { it.isNotEmpty() }
-                                ?: stringResource(Res.string.common_unknown),
-                            textStyle = defaultSongbookTextStyle().copy(
-                                textColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                typography = MaterialTheme.typography.bodySmall,
-                                maxLines = 1,
-                                textOverflow = TextOverflow.Ellipsis,
-                            ),
-                        )
+                    LocalSharedTransitionScope { animatedContentScope ->
+                        Column(modifier = this@movableContentWithReceiverOf) {
+                            SongbookText(
+                                modifier = Modifier.sharedBounds(
+                                    sharedContentState = rememberSharedContentState("title-${song.id}"),
+                                    animatedVisibilityScope = animatedContentScope,
+                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
+                                ),
+                                text = song.title.takeIf { it.isNotEmpty() }
+                                    ?: stringResource(Res.string.common_unnamed),
+                                textStyle = defaultSongbookTextStyle().copy(
+                                    textColor = MaterialTheme.colorScheme.onSurface,
+                                    typography = MaterialTheme.typography.titleMedium,
+                                    maxLines = 1,
+                                    textOverflow = TextOverflow.Ellipsis,
+                                ),
+                            )
+                            SongbookText(
+                                modifier = Modifier.sharedBounds(
+                                    sharedContentState = rememberSharedContentState("artist-${song.id}"),
+                                    animatedVisibilityScope = animatedContentScope,
+                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
+                                ),
+                                text = song.artist.takeIf { it.isNotEmpty() }
+                                    ?: stringResource(Res.string.common_unknown),
+                                textStyle = defaultSongbookTextStyle().copy(
+                                    textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    typography = MaterialTheme.typography.bodySmall,
+                                    maxLines = 1,
+                                    textOverflow = TextOverflow.Ellipsis,
+                                ),
+                            )
+                        }
                     }
                 }
 

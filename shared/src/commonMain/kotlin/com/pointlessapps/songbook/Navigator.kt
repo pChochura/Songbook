@@ -1,10 +1,14 @@
 package com.pointlessapps.songbook
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -12,6 +16,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.pointlessapps.songbook.core.song.model.Section
@@ -93,33 +98,38 @@ private const val DEFAULT_TRANSITION_DURATION_MILLISECOND = 500
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 internal fun NavDisplay(navigator: Navigator) {
-    NavDisplay(
-        backStack = navigator.backStack,
-        onBack = navigator::navigateBack,
-        entryProvider = koinEntryProvider(),
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
-        transitionSpec = {
-            ContentTransform(
-                fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
-                fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+    SharedTransitionLayout {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            NavDisplay(
+                backStack = navigator.backStack,
+                onBack = navigator::navigateBack,
+                entryProvider = koinEntryProvider(),
+                entryDecorators = listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator(),
+                ),
+                transitionSpec = {
+                    ContentTransform(
+                        fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+                        fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+                    )
+                },
+                popTransitionSpec = {
+                    ContentTransform(
+                        fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+                        fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+                    )
+                },
+                predictivePopTransitionSpec = {
+                    ContentTransform(
+                        fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+                        fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+                    )
+                },
+                sharedTransitionScope = this,
             )
-        },
-        popTransitionSpec = {
-            ContentTransform(
-                fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
-                fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
-            )
-        },
-        predictivePopTransitionSpec = {
-            ContentTransform(
-                fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
-                fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
-            )
-        },
-    )
+        }
+    }
 }
 
 @Stable
@@ -170,3 +180,13 @@ internal class Navigator(val backStack: NavBackStack<NavKey>) {
 
 internal val LocalNavigator: ProvidableCompositionLocal<Navigator> =
     staticCompositionLocalOf { error("LocalNavigator not initialized") }
+
+internal val LocalSharedTransitionScope: ProvidableCompositionLocal<SharedTransitionScope> =
+    staticCompositionLocalOf { error("LocalSharedTransitionScope not initialized") }
+
+@Composable
+internal fun LocalSharedTransitionScope(
+    content: @Composable SharedTransitionScope.(AnimatedContentScope) -> Unit,
+) = with(LocalSharedTransitionScope.current) {
+    content(LocalNavAnimatedContentScope.current)
+}
