@@ -199,7 +199,7 @@ internal fun SearchScreen(
                         SearchResultCard(
                             modifier = Modifier.animateItem(),
                             result = result,
-                            onClick = { viewModel.onLyricsClicked(result) },
+                            onClick = { viewModel.onLyricsClicked(result.songId) },
                         )
                     }
                 }

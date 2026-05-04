@@ -128,11 +128,11 @@ internal class SetlistViewModel(
     private val eventChannel = Channel<SetlistEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    fun onLyricsClicked(song: Song) {
+    fun onLyricsClicked(songId: String) {
         viewModelScope.launch {
             queueManager.setQueue(
-                songs = state.value.loaded.songs,
-                currentSong = song,
+                songsIds = state.value.loaded.songs.map { it.id },
+                currentSongId = songId,
             )
             eventChannel.send(SetlistEvent.NavigateToLyrics)
         }

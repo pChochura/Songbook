@@ -24,6 +24,9 @@ internal interface SongDao {
     @Query("SELECT * FROM songs WHERE id = :id")
     fun getSongByIdFlow(id: String): Flow<SongEntity?>
 
+    @Query("SELECT * FROM songs WHERE id IN (:ids)")
+    fun getSongsByIdFlow(ids: List<String>): Flow<List<SongEntity>>
+
     @Upsert
     suspend fun insertSongs(songs: List<SongEntity>)
 

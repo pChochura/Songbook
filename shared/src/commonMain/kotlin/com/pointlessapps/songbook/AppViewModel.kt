@@ -6,11 +6,9 @@ import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.song.ChordLibrary
-import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.error_initilizing_error
-import com.pointlessapps.songbook.shared.ui.error_unknown_error
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
@@ -21,7 +19,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
@@ -37,7 +34,6 @@ internal class AppViewModel(
     syncRepository: SyncRepository,
     authRepository: AuthRepository,
     private val queueManager: QueueManager,
-    private val songRepository: SongRepository,
     private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
@@ -82,13 +78,7 @@ internal class AppViewModel(
 
     fun openSong(songId: String) {
         viewModelScope.launch {
-            val song = songRepository.getSongByIdFlow(songId).firstOrNull()
-                ?: return@launch snackbarState.showSnackbar(
-                    message = getString(Res.string.error_unknown_error),
-                    icon = IconWarning,
-                )
-
-            queueManager.setQueue(listOf(song), song)
+            queueManager.setSong(songId)
         }
     }
 

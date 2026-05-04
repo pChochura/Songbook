@@ -90,7 +90,7 @@ private fun SetlistScreenContent(
     state: SetlistState.Loaded,
     songSearchQueryTextFieldState: TextFieldState,
     songSearchResults: LazyPagingItems<SongSearchResult>,
-    onLyricsClicked: (Song) -> Unit,
+    onLyricsClicked: (String) -> Unit,
     onNameChanged: (String) -> Unit,
     onDeleteSetlistConfirmClicked: () -> Unit,
     onAddSongToSetlistClicked: (String) -> Unit,

@@ -51,6 +51,10 @@ internal class SongRepositoryImpl(
         .map { it?.toDomain() }
         .flowOn(Dispatchers.IO)
 
+    override fun getSongsByIdFlow(ids: List<String>) = songDao.getSongsByIdFlow(ids)
+        .map { it.map(SongEntity::toDomain).toImmutableList() }
+        .flowOn(Dispatchers.IO)
+
     override fun searchSongs(query: String): Flow<PagingData<SongSearchResult>> {
         if (query.isBlank()) return flowOf(PagingData.empty())
 

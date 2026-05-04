@@ -19,9 +19,6 @@ import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
-import com.pointlessapps.songbook.shared.ui.Res
-import com.pointlessapps.songbook.shared.ui.error_song_not_found
-import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.collections.immutable.ImmutableList
@@ -37,7 +34,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -46,7 +42,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 import kotlin.time.Duration.Companion.milliseconds
 
 internal sealed interface SearchEvent {
@@ -82,7 +77,7 @@ internal class SearchViewModel(
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
     private val publicLyricsRepository: PublicLyricsRepository,
-    private val snackbarState: SongbookSnackbarState,
+    snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
 
     private val eventChannel = Channel<SearchEvent>()
@@ -162,19 +157,9 @@ internal class SearchViewModel(
         }
     }
 
-    fun onLyricsClicked(songSearchResult: SongSearchResult) {
+    fun onLyricsClicked(songId: String) {
         viewModelScope.launch {
-            val song = songRepository.getSongByIdFlow(songSearchResult.songId).first()
-            if (song == null) {
-                snackbarState.showSnackbar(
-                    message = getString(Res.string.error_song_not_found),
-                    icon = IconWarning,
-                )
-
-                return@launch
-            }
-
-            queueManager.setQueue(listOf(song), song)
+            queueManager.setSong(songId)
             eventChannel.send(SearchEvent.NavigateToLyrics)
         }
     }

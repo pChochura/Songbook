@@ -20,7 +20,6 @@ internal val sharedModule = module {
             syncRepository = get(),
             authRepository = get(),
             queueManager = get(),
-            songRepository = get(),
             setlistRepository = get(),
             snackbarState = get(),
         )

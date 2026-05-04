@@ -107,56 +107,54 @@ internal class LyricsViewModel(
     private val _transientState = MutableStateFlow(LyricsTransientState())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val state: StateFlow<LyricsState> = combine(
-        queueManager.queueFlow,
-        queueManager.currentSongFlow,
-    ) { queue, songId -> queue to songId }.flatMapLatest { (queue, song) ->
-        if (song == null) {
-            snackbarState.showSnackbar(
-                message = getString(Res.string.error_song_not_found),
-                icon = IconWarning,
-            )
-            eventChannel.trySend(LyricsEvent.NavigateBack)
+    val state: StateFlow<LyricsState> = queueManager.currentSongFlow
+        .flatMapLatest { song ->
+            if (song == null) {
+                snackbarState.showSnackbar(
+                    message = getString(Res.string.error_song_not_found),
+                    icon = IconWarning,
+                )
+                eventChannel.trySend(LyricsEvent.NavigateBack)
 
-            return@flatMapLatest flowOf(LyricsState.Loading)
-        }
-
-        combine(
-            syncRepository.currentSyncStatusFlow,
-            setlistRepository.getAllSetlistsFlow(),
-            songRepository.getSongSetlistsById(song.id),
-            prefsRepository.getLyricsTextScaleFlow(),
-            prefsRepository.getLyricsDisplayModeFlow(),
-            prefsRepository.getLyricsWrapModeFlow(),
-            prefsRepository.getShowKeyOffsetFabFlow(),
-            _transientState,
-        ) { syncStatus, allSetlists, selectedSetlists, textScale, displayMode, wrapMode, showKeyOffsetFab, transient ->
-            if (transient.isLoading) {
-                return@combine LyricsState.Loading
+                return@flatMapLatest flowOf(LyricsState.Loading)
             }
 
-            LyricsState.Loaded(
-                songId = song.id,
-                title = song.title,
-                artist = song.artist,
-                sections = LyricsParser.parseLyrics(song.lyrics),
-                textScale = textScale,
-                displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
-                wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
-                keyOffset = transient.keyOffset,
-                previousSongTitle = queueManager.peekPreviousSong()?.title,
-                nextSongTitle = queueManager.peekNextSong()?.title,
-                showKeyOffsetFab = showKeyOffsetFab,
-                allSetlists = allSetlists,
-                selectedSetlists = selectedSetlists,
-                syncStatus = syncStatus,
-            )
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = LyricsState.Loading,
-    )
+            combine(
+                syncRepository.currentSyncStatusFlow,
+                setlistRepository.getAllSetlistsFlow(),
+                songRepository.getSongSetlistsById(song.id),
+                prefsRepository.getLyricsTextScaleFlow(),
+                prefsRepository.getLyricsDisplayModeFlow(),
+                prefsRepository.getLyricsWrapModeFlow(),
+                prefsRepository.getShowKeyOffsetFabFlow(),
+                _transientState,
+            ) { syncStatus, allSetlists, selectedSetlists, textScale, displayMode, wrapMode, showKeyOffsetFab, transient ->
+                if (transient.isLoading) {
+                    return@combine LyricsState.Loading
+                }
+
+                LyricsState.Loaded(
+                    songId = song.id,
+                    title = song.title,
+                    artist = song.artist,
+                    sections = LyricsParser.parseLyrics(song.lyrics),
+                    textScale = textScale,
+                    displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Inline,
+                    wrapMode = wrapMode?.let(WrapMode::valueOf) ?: WrapMode.NoWrap,
+                    keyOffset = transient.keyOffset,
+                    previousSongTitle = queueManager.peekPreviousSong()?.title,
+                    nextSongTitle = queueManager.peekNextSong()?.title,
+                    showKeyOffsetFab = showKeyOffsetFab,
+                    allSetlists = allSetlists,
+                    selectedSetlists = selectedSetlists,
+                    syncStatus = syncStatus,
+                )
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = LyricsState.Loading,
+        )
 
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()

@@ -13,7 +13,6 @@ import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
-import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
@@ -120,9 +119,9 @@ internal class LibraryViewModel(
         eventChannel.trySend(LibraryEvent.NavigateToImportSong)
     }
 
-    fun onLyricsClicked(song: Song) {
+    fun onLyricsClicked(songId: String) {
         viewModelScope.launch {
-            queueManager.setQueue(listOf(song), song)
+            queueManager.setSong(songId)
             eventChannel.send(LibraryEvent.NavigateToLyrics)
         }
     }

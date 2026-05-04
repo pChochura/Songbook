@@ -158,7 +158,7 @@ internal fun LibraryScreen(
                         modifier = Modifier.animateItem(),
                         song = result,
                         displayMode = state.displayMode,
-                        onClick = { viewModel.onLyricsClicked(result) },
+                        onClick = { viewModel.onLyricsClicked(result.id) },
                     )
                 }
             }
