@@ -156,6 +156,7 @@ internal fun LibraryScreen(
                         modifier = Modifier.animateItem(),
                         song = result,
                         displayMode = state.displayMode,
+                        enableSharedElementTransitions = true,
                         onClick = { viewModel.onLyricsClicked(result.id) },
                     )
                 }

@@ -2,6 +2,8 @@ package com.pointlessapps.songbook.library.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.SharedContentConfig
+import androidx.compose.animation.SharedTransitionScope.SharedContentState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.movableContentWithReceiverOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,8 +42,62 @@ internal fun SongCard(
     song: Song,
     displayMode: DisplayMode,
     onClick: () -> Unit,
+    enableSharedElementTransitions: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    val sharedContentConfig = object : SharedContentConfig {
+        override val SharedContentState.isEnabled: Boolean
+            get() = enableSharedElementTransitions
+    }
+
+    val songIdentityComposable = remember(song.id) {
+        movableContentWithReceiverOf<Modifier> {
+            LocalSharedTransitionScope { animatedContentScope ->
+                Column(modifier = this@movableContentWithReceiverOf) {
+                    val titleModifier = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(
+                            key = "title-${song.id}",
+                            config = sharedContentConfig,
+                        ),
+                        animatedVisibilityScope = animatedContentScope,
+                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
+                    )
+                    SongbookText(
+                        modifier = titleModifier,
+                        text = song.title.takeIf { it.isNotEmpty() }
+                            ?: stringResource(Res.string.common_unnamed),
+                        textStyle = defaultSongbookTextStyle().copy(
+                            textColor = MaterialTheme.colorScheme.onSurface,
+                            typography = MaterialTheme.typography.titleMedium,
+                            maxLines = 1,
+                            textOverflow = TextOverflow.Ellipsis,
+                        ),
+                    )
+
+                    val artistModifier = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(
+                            key = "artist-${song.id}",
+                            config = sharedContentConfig,
+                        ),
+                        animatedVisibilityScope = animatedContentScope,
+                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
+                    )
+                    SongbookText(
+                        modifier = artistModifier,
+                        text = song.artist.takeIf { it.isNotEmpty() }
+                            ?: stringResource(Res.string.common_unknown),
+                        textStyle = defaultSongbookTextStyle().copy(
+                            textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            typography = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            textOverflow = TextOverflow.Ellipsis,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
     SongbookCard(
         modifier = modifier,
         onClick = onClick,
@@ -54,43 +111,6 @@ internal fun SongCard(
                 ),
                 horizontalAlignment = Alignment.Start,
             ) {
-                val songIdentityComposable = movableContentWithReceiverOf<Modifier> {
-                    LocalSharedTransitionScope { animatedContentScope ->
-                        Column(modifier = this@movableContentWithReceiverOf) {
-                            SongbookText(
-                                modifier = Modifier.sharedBounds(
-                                    sharedContentState = rememberSharedContentState("title-${song.id}"),
-                                    animatedVisibilityScope = animatedContentScope,
-                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
-                                ),
-                                text = song.title.takeIf { it.isNotEmpty() }
-                                    ?: stringResource(Res.string.common_unnamed),
-                                textStyle = defaultSongbookTextStyle().copy(
-                                    textColor = MaterialTheme.colorScheme.onSurface,
-                                    typography = MaterialTheme.typography.titleMedium,
-                                    maxLines = 1,
-                                    textOverflow = TextOverflow.Ellipsis,
-                                ),
-                            )
-                            SongbookText(
-                                modifier = Modifier.sharedBounds(
-                                    sharedContentState = rememberSharedContentState("artist-${song.id}"),
-                                    animatedVisibilityScope = animatedContentScope,
-                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
-                                ),
-                                text = song.artist.takeIf { it.isNotEmpty() }
-                                    ?: stringResource(Res.string.common_unknown),
-                                textStyle = defaultSongbookTextStyle().copy(
-                                    textColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    typography = MaterialTheme.typography.bodySmall,
-                                    maxLines = 1,
-                                    textOverflow = TextOverflow.Ellipsis,
-                                ),
-                            )
-                        }
-                    }
-                }
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
