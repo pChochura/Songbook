@@ -109,6 +109,9 @@
     <string name="import_lyrics_label">Song lyrics</string>
     <string name="import_lyrics_placeholder">Lyrics of the song...</string>
     <string name="import_lyrics_tip">Tip: Use [Chord] for inline chords or naming the sections.</string>
+    <string name="import_visual_editor_tip">Tip: Tap and hold between letters to insert a chord.</string>
+    <string name="import_visual_editor_empty_state">There's nothing to be displayed. Switch back to the text editor.</string>
+    <string name="import_switch">Switch back</string>
     <string name="import_menu_rescan">Rescan the photo</string>
     <string name="import_menu_rescan_description">Import an image from gallery or capture a photo again</string>
     <string name="import_menu_add_to_setlists">Add to setlists</string>

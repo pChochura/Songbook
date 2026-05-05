@@ -35,7 +35,7 @@ fun SongbookTextField(
         state = state,
         scrollState = scrollState,
         keyboardOptions = textFieldStyle.keyboardOptions,
-        onKeyboardAction = { onImeAction?.invoke() },
+        onKeyboardAction = { onImeAction?.invoke() ?: it() },
         inputTransformation = textFieldStyle.inputTransformation,
         outputTransformation = textFieldStyle.outputTransformation,
         textStyle = textFieldStyle.typography.copy(

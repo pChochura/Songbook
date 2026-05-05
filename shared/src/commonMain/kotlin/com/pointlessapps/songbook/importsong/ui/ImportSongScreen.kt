@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -24,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +39,8 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
@@ -77,6 +81,9 @@ import com.pointlessapps.songbook.shared.ui.import_lyrics_tip
 import com.pointlessapps.songbook.shared.ui.import_menu_rescan_description
 import com.pointlessapps.songbook.shared.ui.import_song_title_label
 import com.pointlessapps.songbook.shared.ui.import_song_title_placeholder
+import com.pointlessapps.songbook.shared.ui.import_switch
+import com.pointlessapps.songbook.shared.ui.import_visual_editor_empty_state
+import com.pointlessapps.songbook.shared.ui.import_visual_editor_tip
 import com.pointlessapps.songbook.ui.BackTopBarButton
 import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
@@ -93,6 +100,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconHelp
+import com.pointlessapps.songbook.ui.theme.IconQueue
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.collectWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
@@ -184,6 +192,7 @@ internal fun ImportSongScreen(
                         sections = state.sections,
                         onChordMoved = viewModel::onChordMoved,
                         onChordInserted = viewModel::onChordInserted,
+                        onSwitchInputModeClicked = viewModel::onPreviewClicked,
                     )
                 }
             }
@@ -376,6 +385,7 @@ private fun SongLyricsVisualEditor(
     sections: ImmutableList<Section>,
     onChordMoved: (Int, Chord, Int) -> Unit,
     onChordInserted: (Int, Int, String) -> Unit,
+    onSwitchInputModeClicked: () -> Unit,
 ) {
     @Stable
     data class ChordInputPopupData(
@@ -386,34 +396,96 @@ private fun SongLyricsVisualEditor(
     )
 
     var chordInputPopupData by rememberSaveable { mutableStateOf<ChordInputPopupData?>(null) }
+    val shouldShowEmptyState by remember { derivedStateOf { sections.isEmpty() } }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            LyricsSections(
-                modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
-                sections = sections,
-                textScale = textScale,
-                keyOffset = 0,
-                displayMode = DisplayMode.Inline,
-                wrapMode = WrapMode.NoWrap,
-                editable = true,
-                onChordClicked = { sectionId, chord, rect ->
-                    chordInputPopupData = ChordInputPopupData(
-                        selectedChord = chord.value,
-                        sectionId = sectionId,
-                        cursorRect = rect,
-                        cursorPosition = chord.position,
-                    )
-                },
-                onChordMoved = onChordMoved,
-                onCursorPlaced = { sectionId, position, rect ->
-                    chordInputPopupData = ChordInputPopupData(
-                        selectedChord = null,
-                        sectionId = sectionId,
-                        cursorRect = rect,
-                        cursorPosition = position,
-                    )
-                },
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+    ) {
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            item {
+                LyricsSections(
+                    modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
+                    sections = sections,
+                    textScale = textScale,
+                    keyOffset = 0,
+                    displayMode = DisplayMode.Inline,
+                    wrapMode = WrapMode.NoWrap,
+                    editable = true,
+                    onChordClicked = { sectionId, chord, rect ->
+                        chordInputPopupData = ChordInputPopupData(
+                            selectedChord = chord.value,
+                            sectionId = sectionId,
+                            cursorRect = rect,
+                            cursorPosition = chord.position,
+                        )
+                    },
+                    onChordMoved = onChordMoved,
+                    onCursorPlaced = { sectionId, position, rect ->
+                        chordInputPopupData = ChordInputPopupData(
+                            selectedChord = null,
+                            sectionId = sectionId,
+                            cursorRect = rect,
+                            cursorPosition = position,
+                        )
+                    },
+                )
+            }
+
+            if (shouldShowEmptyState) {
+                item {
+                    Column(
+                        modifier = Modifier.fillParentMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = MaterialTheme.spacing.medium,
+                            alignment = Alignment.CenterVertically,
+                        ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        SongbookText(
+                            modifier = Modifier.widthIn(max = 300.dp),
+                            text = stringResource(Res.string.import_visual_editor_empty_state),
+                            textStyle = defaultSongbookTextStyle().copy(
+                                typography = MaterialTheme.typography.bodyLarge,
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                            ),
+                        )
+
+                        SongbookButton(
+                            label = stringResource(Res.string.import_switch),
+                            onClick = onSwitchInputModeClicked,
+                            buttonStyle = defaultSongbookButtonStyle().copy(
+                                icon = IconQueue,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MaterialTheme.spacing.large),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+        ) {
+            SongbookIcon(
+                icon = IconHelp,
+                contentDescription = stringResource(Res.string.common_tooltip),
+                iconStyle = defaultSongbookIconStyle().copy(
+                    tint = MaterialTheme.colorScheme.onSurface,
+                ),
+            )
+
+            SongbookText(
+                text = stringResource(Res.string.import_visual_editor_tip),
+                modifier = Modifier.weight(1f),
+                textStyle = defaultSongbookTextStyle().copy(
+                    typography = MaterialTheme.typography.bodySmall,
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                ),
             )
         }
     }

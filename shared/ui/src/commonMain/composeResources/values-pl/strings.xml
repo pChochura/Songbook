@@ -95,6 +95,8 @@
     <string name="library_menu_login_description">Pozwala na synchronizację biblioteki z innymi urządzeniami</string>
     <string name="library_menu_logout">Wyloguj się</string>
     <string name="library_menu_logout_description">Wyczyść lokalną bazę danych i wyloguj się z aplikacji</string>
+    <string name="library_menu_remove_account">Usuń konto</string>
+    <string name="library_menu_remove_account_description">Usuń konto z aplikacji i wyczyść dane</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Dodaj nową piosenkę</string>
@@ -106,6 +108,9 @@
     <string name="import_lyrics_label">Tekst piosenki</string>
     <string name="import_lyrics_placeholder">Tekst piosenki...</string>
     <string name="import_lyrics_tip">Wskazówka: Użyj [Akord] dla akordów wewnątrz tekstu lub nazywania sekcji.</string>
+    <string name="import_visual_editor_tip">Wskazówka: Wciśnij i przytrzymaj między literami, żeby dodać akord.</string>
+    <string name="import_visual_editor_empty_state">Nie ma nic do wyświetlenia. Przełącz się do edycji tekstu.</string>
+    <string name="import_switch">Przełącz się</string>
     <string name="import_menu_rescan">Zeskanuj ponownie zdjęcie</string>
     <string name="import_menu_rescan_description">Importuj obraz z galerii lub zrób zdjęcie ponownie</string>
     <string name="import_menu_add_to_setlists">Dodaj do setlist</string>
