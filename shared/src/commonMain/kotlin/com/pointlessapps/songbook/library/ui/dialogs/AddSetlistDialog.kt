@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.library.ui.components.dialogs
+package com.pointlessapps.songbook.library.ui.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -97,7 +97,11 @@ internal fun AddSetlistDialog(
                     imeAction = ImeAction.Done,
                 ),
             ),
-            onImeAction = { onConfirmClicked(nameTextFieldState.text.toString()) },
+            onImeAction = {
+                if (isConfirmEnabled) {
+                    onConfirmClicked(nameTextFieldState.text.toString())
+                }
+            },
         )
 
         Column(

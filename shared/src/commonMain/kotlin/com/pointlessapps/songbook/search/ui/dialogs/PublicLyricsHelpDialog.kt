@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.importsong.ui.components.dialogs
+package com.pointlessapps.songbook.search.ui.dialogs
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,12 +10,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import com.pointlessapps.songbook.shared.ui.Res
-import com.pointlessapps.songbook.shared.ui.common_camera_permission
-import com.pointlessapps.songbook.shared.ui.common_camera_permission_description
-import com.pointlessapps.songbook.shared.ui.common_cancel
-import com.pointlessapps.songbook.shared.ui.common_open_settings
+import com.pointlessapps.songbook.shared.ui.search_i_understand
+import com.pointlessapps.songbook.shared.ui.search_turn_it_off
+import com.pointlessapps.songbook.shared.ui.search_what_is_public_lyrics
+import com.pointlessapps.songbook.shared.ui.search_what_is_public_lyrics_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -29,20 +35,35 @@ import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun CameraPermissionDeniedDialog(
-    onOpenSettingsClicked: () -> Unit,
+internal fun PublicLyricsHelpDialog(
     onDismissRequest: () -> Unit,
+    onDenyClicked: () -> Unit,
 ) {
     SongbookDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.common_camera_permission),
+            label = stringResource(Res.string.search_what_is_public_lyrics),
             icon = IconWarning,
-            dismissible = SongbookDialogDismissible.None,
+            dismissible = SongbookDialogDismissible.Both,
         ),
     ) {
         SongbookText(
-            text = stringResource(Res.string.common_camera_permission_description),
+            text = buildAnnotatedString {
+                append(stringResource(Res.string.search_what_is_public_lyrics_description))
+                withLink(
+                    LinkAnnotation.Url(
+                        url = URL,
+                        styles = TextLinkStyles(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline,
+                            ),
+                        ),
+                    ),
+                ) {
+                    append(URL)
+                }
+            },
             textStyle = defaultSongbookTextStyle().copy(
                 typography = MaterialTheme.typography.bodyMedium,
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -56,13 +77,13 @@ internal fun CameraPermissionDeniedDialog(
         ) {
             SongbookButton(
                 modifier = Modifier.fillMaxWidth(),
-                label = stringResource(Res.string.common_open_settings),
-                onClick = onOpenSettingsClicked,
+                label = stringResource(Res.string.search_i_understand),
+                onClick = onDismissRequest,
                 buttonStyle = defaultSongbookButtonStyle().copy(
-                    containerColor = MaterialTheme.colorScheme.error,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     textStyle = defaultSongbookTextStyle().copy(
                         textAlign = TextAlign.Center,
-                        textColor = MaterialTheme.colorScheme.onError,
+                        textColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                 ),
             )
@@ -74,8 +95,8 @@ internal fun CameraPermissionDeniedDialog(
                         color = MaterialTheme.colorScheme.outlineVariant,
                         shape = CircleShape,
                     ),
-                label = stringResource(Res.string.common_cancel),
-                onClick = { onDismissRequest() },
+                label = stringResource(Res.string.search_turn_it_off),
+                onClick = onDenyClicked,
                 buttonStyle = defaultSongbookButtonStyle().copy(
                     containerColor = Color.Transparent,
                     textStyle = defaultSongbookTextStyle().copy(
@@ -87,3 +108,5 @@ internal fun CameraPermissionDeniedDialog(
         }
     }
 }
+
+private const val URL = "https://lrclib.net"

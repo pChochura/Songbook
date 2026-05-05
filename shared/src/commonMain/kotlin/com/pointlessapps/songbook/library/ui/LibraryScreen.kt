@@ -48,9 +48,9 @@ import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomShee
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
-import com.pointlessapps.songbook.library.ui.components.dialogs.AddSetlistDialog
-import com.pointlessapps.songbook.library.ui.components.dialogs.DisplayModeDialog
-import com.pointlessapps.songbook.library.ui.components.dialogs.LogoutDialog
+import com.pointlessapps.songbook.library.ui.dialogs.AddSetlistDialog
+import com.pointlessapps.songbook.library.ui.dialogs.DisplayModeDialog
+import com.pointlessapps.songbook.library.ui.dialogs.LogoutDialog
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_app_name
 import com.pointlessapps.songbook.shared.ui.common_remove_account

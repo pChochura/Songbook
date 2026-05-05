@@ -46,11 +46,11 @@ import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetA
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.ShowQueue
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.TextScale
 import com.pointlessapps.songbook.lyrics.ui.components.LyricsOptionsBottomSheetAction.WrapMode
-import com.pointlessapps.songbook.lyrics.ui.components.dialogs.ConfirmBroadcastToTeamDialog
-import com.pointlessapps.songbook.lyrics.ui.components.dialogs.DisplayModeDialog
-import com.pointlessapps.songbook.lyrics.ui.components.dialogs.KeyOffsetDialog
-import com.pointlessapps.songbook.lyrics.ui.components.dialogs.TextScaleDialog
-import com.pointlessapps.songbook.lyrics.ui.components.dialogs.WrapModeDialog
+import com.pointlessapps.songbook.lyrics.ui.dialogs.ConfirmBroadcastToTeamDialog
+import com.pointlessapps.songbook.lyrics.ui.dialogs.DisplayModeDialog
+import com.pointlessapps.songbook.lyrics.ui.dialogs.KeyOffsetDialog
+import com.pointlessapps.songbook.lyrics.ui.dialogs.TextScaleDialog
+import com.pointlessapps.songbook.lyrics.ui.dialogs.WrapModeDialog
 import com.pointlessapps.songbook.preview.ui.PreviewSongLayout
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_close_fullscreen

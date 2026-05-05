@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.lyrics.ui.components.dialogs
+package com.pointlessapps.songbook.importsong.ui.dialogs
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -12,10 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.pointlessapps.songbook.shared.ui.Res
-import com.pointlessapps.songbook.shared.ui.common_broadcast_to_team
-import com.pointlessapps.songbook.shared.ui.common_broadcast_to_team_description
 import com.pointlessapps.songbook.shared.ui.common_cancel
 import com.pointlessapps.songbook.shared.ui.common_confirm
+import com.pointlessapps.songbook.shared.ui.common_discard_changes
+import com.pointlessapps.songbook.shared.ui.common_discard_changes_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -24,25 +24,25 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
-import com.pointlessapps.songbook.ui.theme.IconVoice
+import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun ConfirmBroadcastToTeamDialog(
+internal fun ConfirmDiscardChangesDialog(
     onConfirmClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     SongbookDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.common_broadcast_to_team),
-            icon = IconVoice,
+            label = stringResource(Res.string.common_discard_changes),
+            icon = IconWarning,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {
         SongbookText(
-            text = stringResource(Res.string.common_broadcast_to_team_description),
+            text = stringResource(Res.string.common_discard_changes_description),
             textStyle = defaultSongbookTextStyle().copy(
                 typography = MaterialTheme.typography.bodyMedium,
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -59,10 +59,10 @@ internal fun ConfirmBroadcastToTeamDialog(
                 label = stringResource(Res.string.common_confirm),
                 onClick = { onConfirmClicked() },
                 buttonStyle = defaultSongbookButtonStyle().copy(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.error,
                     textStyle = defaultSongbookTextStyle().copy(
                         textAlign = TextAlign.Center,
-                        textColor = MaterialTheme.colorScheme.onPrimary,
+                        textColor = MaterialTheme.colorScheme.onError,
                     ),
                 ),
             )

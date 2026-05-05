@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.importsong.ui.components.dialogs
+package com.pointlessapps.songbook.importsong.ui.dialogs
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CircularProgressIndicator

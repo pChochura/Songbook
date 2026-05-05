@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.lyrics.ui.components.dialogs
+package com.pointlessapps.songbook.lyrics.ui.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

@@ -54,9 +54,9 @@ import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBott
 import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheetAction.AddToSetlists
 import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheetAction.Preview
 import com.pointlessapps.songbook.importsong.ui.components.ImportSongOptionsBottomSheetAction.Rescan
-import com.pointlessapps.songbook.importsong.ui.components.dialogs.ConfirmDiscardChangesDialog
-import com.pointlessapps.songbook.importsong.ui.components.dialogs.ExtractingInProgressDialog
-import com.pointlessapps.songbook.importsong.ui.components.dialogs.ScanDialog
+import com.pointlessapps.songbook.importsong.ui.dialogs.ConfirmDiscardChangesDialog
+import com.pointlessapps.songbook.importsong.ui.dialogs.ExtractingInProgressDialog
+import com.pointlessapps.songbook.importsong.ui.dialogs.ScanDialog
 import com.pointlessapps.songbook.importsong.ui.utils.ChordHighlightTransformation
 import com.pointlessapps.songbook.lyrics.DisplayMode
 import com.pointlessapps.songbook.lyrics.WrapMode

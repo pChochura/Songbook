@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.preview.ui.components.dialogs
+package com.pointlessapps.songbook.preview.ui.dialogs
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas

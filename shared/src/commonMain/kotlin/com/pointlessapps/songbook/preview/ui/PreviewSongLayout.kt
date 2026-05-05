@@ -52,7 +52,7 @@ import com.pointlessapps.songbook.lyrics.ui.components.SongHeader
 import com.pointlessapps.songbook.lyrics.ui.components.TextScaleOverlay
 import com.pointlessapps.songbook.preview.ui.components.PinchToZoomBox
 import com.pointlessapps.songbook.preview.ui.components.collectIsPinchedToZoomAsState
-import com.pointlessapps.songbook.preview.ui.components.dialogs.ChordDetailsDialog
+import com.pointlessapps.songbook.preview.ui.dialogs.ChordDetailsDialog
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.lyrics_no_next_song
 import com.pointlessapps.songbook.shared.ui.lyrics_no_previous_song

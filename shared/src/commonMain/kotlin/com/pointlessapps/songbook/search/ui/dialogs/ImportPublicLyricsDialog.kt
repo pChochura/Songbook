@@ -1,4 +1,4 @@
-package com.pointlessapps.songbook.importsong.ui.components.dialogs
+package com.pointlessapps.songbook.search.ui.dialogs
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -11,11 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_cancel
-import com.pointlessapps.songbook.shared.ui.common_confirm
-import com.pointlessapps.songbook.shared.ui.common_discard_changes
-import com.pointlessapps.songbook.shared.ui.common_discard_changes_description
+import com.pointlessapps.songbook.shared.ui.common_import_song
+import com.pointlessapps.songbook.shared.ui.search_import_public_lyrics
+import com.pointlessapps.songbook.shared.ui.search_import_public_lyrics_description
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookDialog
 import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
@@ -24,25 +25,26 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
-import com.pointlessapps.songbook.ui.theme.IconWarning
+import com.pointlessapps.songbook.ui.theme.IconSave
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun ConfirmDiscardChangesDialog(
+internal fun ImportPublicLyricsDialog(
+    publicLyrics: PublicLyrics,
     onConfirmClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     SongbookDialog(
         onDismissRequest = onDismissRequest,
         dialogStyle = defaultSongbookDialogStyle().copy(
-            label = stringResource(Res.string.common_discard_changes),
-            icon = IconWarning,
+            label = stringResource(Res.string.search_import_public_lyrics),
+            icon = IconSave,
             dismissible = SongbookDialogDismissible.OnBackPress,
         ),
     ) {
         SongbookText(
-            text = stringResource(Res.string.common_discard_changes_description),
+            text = stringResource(Res.string.search_import_public_lyrics_description),
             textStyle = defaultSongbookTextStyle().copy(
                 typography = MaterialTheme.typography.bodyMedium,
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -56,13 +58,13 @@ internal fun ConfirmDiscardChangesDialog(
         ) {
             SongbookButton(
                 modifier = Modifier.fillMaxWidth(),
-                label = stringResource(Res.string.common_confirm),
-                onClick = { onConfirmClicked() },
+                label = stringResource(Res.string.common_import_song),
+                onClick = onConfirmClicked,
                 buttonStyle = defaultSongbookButtonStyle().copy(
-                    containerColor = MaterialTheme.colorScheme.error,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     textStyle = defaultSongbookTextStyle().copy(
                         textAlign = TextAlign.Center,
-                        textColor = MaterialTheme.colorScheme.onError,
+                        textColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                 ),
             )
@@ -75,7 +77,7 @@ internal fun ConfirmDiscardChangesDialog(
                         shape = CircleShape,
                     ),
                 label = stringResource(Res.string.common_cancel),
-                onClick = { onDismissRequest() },
+                onClick = onDismissRequest,
                 buttonStyle = defaultSongbookButtonStyle().copy(
                     containerColor = Color.Transparent,
                     textStyle = defaultSongbookTextStyle().copy(

@@ -59,9 +59,9 @@ import com.pointlessapps.songbook.search.SearchViewModel
 import com.pointlessapps.songbook.search.ui.components.EmptyListCard
 import com.pointlessapps.songbook.search.ui.components.PublicLyricsCard
 import com.pointlessapps.songbook.search.ui.components.SearchResultCard
-import com.pointlessapps.songbook.search.ui.components.dialogs.ConfirmRemoveLastSearchDialog
-import com.pointlessapps.songbook.search.ui.components.dialogs.ImportPublicLyricsDialog
-import com.pointlessapps.songbook.search.ui.components.dialogs.PublicLyricsHelpDialog
+import com.pointlessapps.songbook.search.ui.dialogs.ConfirmRemoveLastSearchDialog
+import com.pointlessapps.songbook.search.ui.dialogs.ImportPublicLyricsDialog
+import com.pointlessapps.songbook.search.ui.dialogs.PublicLyricsHelpDialog
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_back
 import com.pointlessapps.songbook.shared.ui.common_clear

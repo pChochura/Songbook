@@ -87,7 +87,11 @@ internal fun RenameSetlistDialog(
                     imeAction = ImeAction.Done,
                 ),
             ),
-            onImeAction = { onConfirmClicked(nameTextFieldState.text.toString()) },
+            onImeAction = {
+                if (isConfirmEnabled) {
+                    onConfirmClicked(nameTextFieldState.text.toString())
+                }
+            },
         )
 
         Column(
