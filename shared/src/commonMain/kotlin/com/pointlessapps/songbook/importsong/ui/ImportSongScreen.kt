@@ -278,6 +278,7 @@ internal fun ImportSongScreen(
                 Res.string.import_menu_rescan_description
             },
             showEnterManuallyButton = isScanDialogVisible,
+            hasInternetConnection = state.hasInternetConnection,
             onImageCaptured = {
                 viewModel.onImageCaptured(it)
                 isRescanDialogVisible = false

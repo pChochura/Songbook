@@ -124,6 +124,7 @@ fun defaultSongbookButtonStyle() = SongbookButtonStyle(
 @Composable
 fun defaultSongbookButtonTextStyle() = defaultSongbookTextStyle().copy(
     textColor = MaterialTheme.colorScheme.onPrimary,
+    disabledTextColor = MaterialTheme.colorScheme.onPrimary.copy(0.3f),
     typography = MaterialTheme.typography.labelLarge,
 )
 

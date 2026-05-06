@@ -8,6 +8,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.Agent
 import com.pointlessapps.songbook.core.app.AppRepository
+import com.pointlessapps.songbook.core.network.NetworkRepository
+import com.pointlessapps.songbook.core.network.model.NetworkStatus
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
@@ -71,6 +73,7 @@ internal data class ImportSongState(
     val sections: ImmutableList<Section> = emptyImmutableList(),
     val canImport: Boolean = false,
     val isExtractingInProgress: Boolean = false,
+    val hasInternetConnection: Boolean = true,
     val isLoading: Boolean = false,
 ) {
     val setlistsSelection: ImmutableMap<Setlist, Boolean> =
@@ -82,8 +85,9 @@ internal class ImportSongViewModel(
     title: String?,
     artist: String?,
     lyrics: String?,
+    setlistRepository: SetlistRepository,
+    networkRepository: NetworkRepository,
     private val agent: Agent,
-    private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val appRepository: AppRepository,
     private val prefsRepository: PrefsRepository,
@@ -117,8 +121,9 @@ internal class ImportSongViewModel(
         snapshotFlow { lyricsTextFieldState.text }.distinctUntilChanged().map {
             LyricsParser.parseLyrics(it.toString())
         }.distinctUntilChanged(),
+        networkRepository.networkStatus,
         _transientState,
-    ) { allSetlists, titleText, (lyricsText, lyricsCursor), sections, transient ->
+    ) { allSetlists, titleText, (lyricsText, lyricsCursor), sections, networkStatus, transient ->
         ImportSongState(
             songId = id,
             allSetlists = allSetlists,
@@ -129,6 +134,7 @@ internal class ImportSongViewModel(
             sections = sections,
             canImport = titleText.isNotBlank() && lyricsText.isNotBlank(),
             isExtractingInProgress = transient.isExtractingInProgress,
+            hasInternetConnection = networkStatus == NetworkStatus.ONLINE,
             isLoading = transient.isLoading,
         )
     }.stateIn(

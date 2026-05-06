@@ -52,6 +52,7 @@
     <string name="common_search_chord_placeholder">Search for a chord...</string>
     <string name="common_remove_account">Remove the account</string>
     <string name="common_remove_account_description">You will be logged out, your local data will be cleared and then you will be redirected to the Songbook website where you can remove your account.</string>
+    <string name="common_no_internet">No internet connection</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>

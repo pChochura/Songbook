@@ -52,6 +52,7 @@
     <string name="common_search_chord_placeholder">Wyszukaj akordu...</string>
     <string name="common_remove_account">Usuń konto</string>
     <string name="common_remove_account_description">Zostaniesz wylogowany, Twoje lokalne dane zostaną usunięte i następnie zostaniesz przekierowany na stronę Songbook, gdzie będziesz mógł usunąć konto.</string>
+    <string name="common_no_internet">Brak połączenia z internetem</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">Wystąpił błąd podczas inicjalizacji aplikacji. Proszę uruchom aplikację ponownie</string>

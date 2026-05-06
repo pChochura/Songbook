@@ -1,12 +1,12 @@
 package com.pointlessapps.songbook.importsong.ui.dialogs
 
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,6 +34,7 @@ import com.pointlessapps.songbook.shared.ui.common_back
 import com.pointlessapps.songbook.shared.ui.common_cancel
 import com.pointlessapps.songbook.shared.ui.common_enter_manually
 import com.pointlessapps.songbook.shared.ui.common_from_gallery
+import com.pointlessapps.songbook.shared.ui.common_no_internet
 import com.pointlessapps.songbook.shared.ui.common_scan_photo
 import com.pointlessapps.songbook.shared.ui.common_take_a_photo
 import com.pointlessapps.songbook.shared.ui.common_take_photo
@@ -45,15 +46,16 @@ import com.pointlessapps.songbook.ui.components.SongbookDialogDismissible
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookText
+import com.pointlessapps.songbook.ui.components.SongbookTooltip
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonTextStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookDialogStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.components.rememberSongbookTooltipState
 import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconArrowLeft
 import com.pointlessapps.songbook.ui.theme.IconCamera
-import com.pointlessapps.songbook.ui.theme.IconGallery
 import com.pointlessapps.songbook.ui.theme.IconScan
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.rememberPermissionRequester
@@ -70,6 +72,7 @@ import org.jetbrains.compose.resources.stringResource
 internal fun ScanDialog(
     description: StringResource,
     showEnterManuallyButton: Boolean,
+    hasInternetConnection: Boolean,
     onImageCaptured: (ByteArray?) -> Unit,
     onOpenSettingsClicked: () -> Unit,
     onEnterManuallyClicked: () -> Unit,
@@ -116,37 +119,90 @@ internal fun ScanDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
             ) {
-                SongbookButton(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    label = stringResource(Res.string.common_from_gallery),
-                    onClick = { imagePickerLauncher.launch() },
-                    buttonStyle = defaultSongbookButtonStyle().copy(
-                        orientation = SongbookButtonOrientation.Vertical,
-                        shape = MaterialTheme.shapes.medium,
-                        icon = IconGallery,
-                        textStyle = defaultSongbookButtonTextStyle().copy(
-                            textAlign = TextAlign.Center,
-                        ),
-                    ),
-                )
-                SongbookButton(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    label = stringResource(Res.string.common_take_photo),
-                    onClick = {
-                        coroutineScope.launch {
-                            permissionRequester.requestCameraPermission()
-                            isCameraVisible = true
-                        }
-                    },
-                    buttonStyle = defaultSongbookButtonStyle().copy(
-                        orientation = SongbookButtonOrientation.Vertical,
-                        shape = MaterialTheme.shapes.medium,
-                        icon = IconCamera,
-                        textStyle = defaultSongbookButtonTextStyle().copy(
-                            textAlign = TextAlign.Center,
-                        ),
-                    ),
-                )
+                Box(
+                    modifier = Modifier.weight(1f),
+                    propagateMinConstraints = true,
+                ) {
+                    val tooltipState = rememberSongbookTooltipState(isPersistent = false)
+                    SongbookTooltip(
+                        state = tooltipState,
+                        position = Position.ABOVE,
+                        contentDescription = Res.string.common_no_internet,
+                        allowUserInput = false,
+                    ) {
+                        SongbookButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            label = stringResource(Res.string.common_from_gallery),
+                            onClick = {
+                                if (!hasInternetConnection) {
+                                    coroutineScope.launch {
+                                        tooltipState.show(MutatePriority.UserInput)
+                                    }
+                                } else {
+                                    imagePickerLauncher.launch()
+                                }
+                            },
+                            buttonStyle = defaultSongbookButtonStyle().copy(
+                                containerColor = MaterialTheme.colorScheme.primary.copy(
+                                    alpha = if (hasInternetConnection) 1f else 0.3f,
+                                ),
+                                orientation = SongbookButtonOrientation.Vertical,
+                                shape = MaterialTheme.shapes.medium,
+                                icon = IconCamera,
+                                textStyle = defaultSongbookButtonTextStyle().copy(
+                                    textColor = if (hasInternetConnection) {
+                                        MaterialTheme.colorScheme.onPrimary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                    },
+                                    textAlign = TextAlign.Center,
+                                ),
+                            ),
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier.weight(1f),
+                    propagateMinConstraints = true,
+                ) {
+                    val tooltipState = rememberSongbookTooltipState(isPersistent = false)
+                    SongbookTooltip(
+                        state = tooltipState,
+                        position = Position.ABOVE,
+                        contentDescription = Res.string.common_no_internet,
+                        allowUserInput = false,
+                    ) {
+                        SongbookButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            label = stringResource(Res.string.common_take_photo),
+                            onClick = {
+                                coroutineScope.launch {
+                                    if (!hasInternetConnection) {
+                                        tooltipState.show(MutatePriority.UserInput)
+                                    } else if (permissionRequester.requestCameraPermission()) {
+                                        isCameraVisible = true
+                                    }
+                                }
+                            },
+                            buttonStyle = defaultSongbookButtonStyle().copy(
+                                containerColor = MaterialTheme.colorScheme.primary.copy(
+                                    alpha = if (hasInternetConnection) 1f else 0.3f,
+                                ),
+                                orientation = SongbookButtonOrientation.Vertical,
+                                shape = MaterialTheme.shapes.medium,
+                                icon = IconCamera,
+                                textStyle = defaultSongbookButtonTextStyle().copy(
+                                    textColor = if (hasInternetConnection) {
+                                        MaterialTheme.colorScheme.onPrimary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                    },
+                                    textAlign = TextAlign.Center,
+                                ),
+                            ),
+                        )
+                    }
+                }
             }
 
             Column(

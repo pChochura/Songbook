@@ -44,11 +44,13 @@ import kotlin.time.Duration.Companion.milliseconds
 fun SongbookTooltip(
     position: Position,
     contentDescription: StringResource,
+    modifier: Modifier = Modifier,
     allowUserInput: Boolean = true,
     state: SongbookTooltipState = rememberSongbookTooltipState(isPersistent = false),
     content: @Composable () -> Unit,
 ) {
     BasicTooltipBox(
+        modifier = modifier,
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
             positioning = when (position) {
                 Position.ABOVE -> TooltipAnchorPosition.Above
