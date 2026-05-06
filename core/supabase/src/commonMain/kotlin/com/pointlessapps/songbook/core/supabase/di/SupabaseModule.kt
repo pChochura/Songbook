@@ -22,6 +22,7 @@ val supabaseModule = module {
                         ignoreUnknownKeys = true
                         prettyPrint = true
                         isLenient = true
+                        explicitNulls = false
                     },
                 )
             }

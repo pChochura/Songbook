@@ -16,6 +16,10 @@ room {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     android {
         namespace = "com.pointlessapps.songbook.core"
         compileSdk = libs.versions.sdk.compile.get().toInt()

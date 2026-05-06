@@ -23,7 +23,7 @@ import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
         SetlistSongEntity::class,
         SyncActionEntity::class,
     ],
-    version = 2,
+    version = 3,
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -34,7 +34,7 @@ internal abstract class AppDatabase : RoomDatabase() {
     abstract fun syncDao(): SyncDao
 }
 
-@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING", "KotlinNoActualForExpect")
 internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase
 }

@@ -19,29 +19,41 @@ internal interface SongDao {
     @Query("SELECT * FROM songs WHERE title LIKE :initialFilterLetter || '%' ORDER BY title ASC")
     fun getAllSongs(initialFilterLetter: String): PagingSource<Int, SongEntity>
 
-    @Query("SELECT * FROM songs ORDER BY :column ASC")
-    fun getAllSongsAscending(column: String): PagingSource<Int, SongEntity>
+    @Query("SELECT * FROM songs ORDER BY title ASC")
+    fun getAllSongsByTitleAsc(): PagingSource<Int, SongEntity>
 
-    @Query("SELECT * FROM songs ORDER BY :column DESC")
-    fun getAllSongsDescending(column: String): PagingSource<Int, SongEntity>
+    @Query("SELECT * FROM songs ORDER BY title DESC")
+    fun getAllSongsByTitleDesc(): PagingSource<Int, SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY artist ASC")
+    fun getAllSongsByArtistAsc(): PagingSource<Int, SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY artist DESC")
+    fun getAllSongsByArtistDesc(): PagingSource<Int, SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY date_added ASC")
+    fun getAllSongsByDateAddedAsc(): PagingSource<Int, SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY date_added DESC")
+    fun getAllSongsByDateAddedDesc(): PagingSource<Int, SongEntity>
 
     fun getAllSongs(sortBy: Song.SortBy, ascending: Boolean) = when (sortBy) {
         Song.SortBy.Title -> if (ascending) {
-            getAllSongsAscending("title")
+            getAllSongsByTitleAsc()
         } else {
-            getAllSongsDescending("title")
+            getAllSongsByTitleDesc()
         }
 
         Song.SortBy.Artist -> if (ascending) {
-            getAllSongsAscending("artist")
+            getAllSongsByArtistAsc()
         } else {
-            getAllSongsDescending("artist")
+            getAllSongsByArtistDesc()
         }
 
         Song.SortBy.DateAdded -> if (ascending) {
-            getAllSongsAscending("date_added")
+            getAllSongsByDateAddedAsc()
         } else {
-            getAllSongsDescending("date_added")
+            getAllSongsByDateAddedDesc()
         }
     }
 

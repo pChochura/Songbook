@@ -1,32 +1,25 @@
 package com.pointlessapps.songbook.core.database
 
 import androidx.room.TypeConverter
-import com.pointlessapps.songbook.core.song.model.Section
 import com.pointlessapps.songbook.core.sync.database.entity.SyncAction
 import kotlinx.serialization.json.Json
+import kotlin.time.Instant
 
 internal class Converters {
     private val json = Json {
         serializersModule = SyncAction.SerializersModule
+        explicitNulls = false
     }
 
     @TypeConverter
-    fun fromSyncAction(value: SyncAction): String {
-        return json.encodeToString(value)
-    }
+    fun fromSyncAction(value: SyncAction): String = json.encodeToString(value)
 
     @TypeConverter
-    fun toSyncAction(value: String): SyncAction {
-        return json.decodeFromString(value)
-    }
+    fun toSyncAction(value: String): SyncAction = json.decodeFromString(value)
 
     @TypeConverter
-    fun fromSectionList(value: List<Section>): String {
-        return Json.encodeToString(value)
-    }
+    fun fromInstant(value: Instant): Long = value.toEpochMilliseconds()
 
     @TypeConverter
-    fun toSectionList(value: String): List<Section> {
-        return Json.decodeFromString(value)
-    }
+    fun toInstant(value: Long): Instant = Instant.fromEpochMilliseconds(value)
 }

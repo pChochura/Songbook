@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.time.Clock
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -95,6 +96,7 @@ internal class SongRepositoryImpl(
                 id = newSong.id ?: Uuid.random().toString(),
                 title = newSong.title,
                 artist = newSong.artist,
+                dateAdded = if (newSong.id == null) Clock.System.now() else null,
                 lyrics = newSong.lyrics,
             )
 

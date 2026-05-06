@@ -5,7 +5,9 @@ import androidx.compose.runtime.Stable
 import com.pointlessapps.songbook.core.utils.Keep
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 
 @Keep
@@ -16,6 +18,8 @@ data class Song(
     val id: String,
     val title: String,
     val artist: String,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val dateAdded: Instant? = null,
     val lyrics: String,
 ) {
     enum class SortBy { Title, Artist, DateAdded }
