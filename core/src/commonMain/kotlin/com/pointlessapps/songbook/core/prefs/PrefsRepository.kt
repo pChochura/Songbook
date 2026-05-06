@@ -25,4 +25,7 @@ interface PrefsRepository {
 
     suspend fun getShowPublicLyrics(): Boolean?
     suspend fun setShowPublicLyrics(show: Boolean)
+
+    fun getLibrarySortByFlow(): Flow<Pair<String, Boolean>?>
+    suspend fun setLibrarySortBy(field: String, ascending: Boolean)
 }

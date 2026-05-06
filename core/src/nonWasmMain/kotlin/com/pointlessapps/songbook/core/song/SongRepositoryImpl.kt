@@ -34,13 +34,17 @@ internal class SongRepositoryImpl(
     private val syncActionDao: SyncActionDao,
 ) : SongRepository {
 
-    override fun getAllSongs(initialFilterLetter: String?) = Pager(
+    override fun getAllSongs(
+        initialFilterLetter: String?,
+        sortBy: Song.SortBy,
+        sortInAscendingOrder: Boolean,
+    ) = Pager(
         config = PagingConfig(pageSize = 20),
         pagingSourceFactory = {
             if (initialFilterLetter != null) {
                 songDao.getAllSongs(initialFilterLetter)
             } else {
-                songDao.getAllSongs()
+                songDao.getAllSongs(sortBy, sortInAscendingOrder)
             }
         },
     ).flow.map { pagingData ->

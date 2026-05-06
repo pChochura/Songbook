@@ -26,8 +26,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -38,6 +38,7 @@ import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.library.DisplayMode.Grid
 import com.pointlessapps.songbook.library.LibraryEvent
 import com.pointlessapps.songbook.library.LibraryViewModel
+import com.pointlessapps.songbook.library.SortBy
 import com.pointlessapps.songbook.library.ui.components.AddSetlistCard
 import com.pointlessapps.songbook.library.ui.components.AddSongCard
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheet
@@ -51,6 +52,7 @@ import com.pointlessapps.songbook.library.ui.components.SongCard
 import com.pointlessapps.songbook.library.ui.dialogs.AddSetlistDialog
 import com.pointlessapps.songbook.library.ui.dialogs.DisplayModeDialog
 import com.pointlessapps.songbook.library.ui.dialogs.LogoutDialog
+import com.pointlessapps.songbook.library.ui.dialogs.SortByDialog
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_app_name
 import com.pointlessapps.songbook.shared.ui.common_remove_account
@@ -58,7 +60,10 @@ import com.pointlessapps.songbook.shared.ui.common_remove_account_description
 import com.pointlessapps.songbook.shared.ui.library_setlists_section_title
 import com.pointlessapps.songbook.shared.ui.library_songs_found
 import com.pointlessapps.songbook.shared.ui.library_songs_section_title
-import com.pointlessapps.songbook.shared.ui.library_sort_by_date
+import com.pointlessapps.songbook.shared.ui.library_sort_by
+import com.pointlessapps.songbook.shared.ui.library_sort_by_artist
+import com.pointlessapps.songbook.shared.ui.library_sort_by_date_added
+import com.pointlessapps.songbook.shared.ui.library_sort_by_title
 import com.pointlessapps.songbook.shared.ui.library_starting_with
 import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
@@ -69,7 +74,9 @@ import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
 import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.ui.theme.IconAscending
 import com.pointlessapps.songbook.ui.theme.IconClose
+import com.pointlessapps.songbook.ui.theme.IconDescending
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.SyncingTopBarButton
 import com.pointlessapps.songbook.utils.add
@@ -139,9 +146,11 @@ internal fun LibraryScreen(
 
             item(key = "all_songs_header", span = { GridItemSpan(maxLineSpan) }) {
                 AllSongsHeader(
+                    modifier = Modifier.animateItem(),
+                    sortBy = state.sortBy,
+                    onSortBySelected = viewModel::onSortBySelected,
                     numberOfSongs = songs.itemCount,
                     initialFilterLetter = state.initialFilterLetter,
-                    modifier = Modifier.animateItem(),
                     onClearInitialFilterLetterClicked = viewModel::onClearInitialFilterLetterClicked,
                 )
             }
@@ -297,10 +306,14 @@ private fun LazyGridItemScope.SetlistsRow(
 @Composable
 private fun AllSongsHeader(
     numberOfSongs: Int,
+    sortBy: SortBy,
+    onSortBySelected: (SortBy) -> Unit,
     initialFilterLetter: String?,
     onClearInitialFilterLetterClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var isSortByDialogVisible by rememberSaveable { mutableStateOf(false) }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
@@ -327,12 +340,26 @@ private fun AllSongsHeader(
             targetState = initialFilterLetter,
         ) { letter ->
             if (letter == null) {
-                SongbookText(
-                    text = stringResource(Res.string.library_sort_by_date),
-                    textStyle = defaultSongbookTextStyle().copy(
-                        textAlign = TextAlign.End,
-                        textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        typography = MaterialTheme.typography.labelMedium,
+                SongbookChip(
+                    label = stringResource(
+                        resource = Res.string.library_sort_by,
+                        stringResource(
+                            when (sortBy.field) {
+                                SortBy.Field.Title -> Res.string.library_sort_by_title
+                                SortBy.Field.Artist -> Res.string.library_sort_by_artist
+                                SortBy.Field.DateAdded -> Res.string.library_sort_by_date_added
+                            },
+                        ),
+                    ),
+                    isSelected = true,
+                    onClick = { isSortByDialogVisible = true },
+                    chipStyle = defaultSongbookChipStyle().copy(
+                        icon = if (sortBy.ascending) IconAscending else IconDescending,
+                        iconAlignment = Alignment.End,
+                        selectedContainerColor = Color.Transparent,
+                        selectedOutlineColor = Color.Transparent,
+                        selectedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        iconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     ),
                 )
             } else {
@@ -347,5 +374,16 @@ private fun AllSongsHeader(
                 )
             }
         }
+    }
+
+    if (isSortByDialogVisible) {
+        SortByDialog(
+            sortBy = sortBy,
+            onSortBySelected = {
+                isSortByDialogVisible = false
+                onSortBySelected(it)
+            },
+            onDismissRequest = { isSortByDialogVisible = false },
+        )
     }
 }

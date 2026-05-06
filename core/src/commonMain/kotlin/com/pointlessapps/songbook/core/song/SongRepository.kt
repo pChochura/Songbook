@@ -9,7 +9,12 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 
 interface SongRepository {
-    fun getAllSongs(initialFilterLetter: String? = null): Flow<PagingData<Song>>
+    fun getAllSongs(
+        initialFilterLetter: String? = null,
+        sortBy: Song.SortBy,
+        sortInAscendingOrder: Boolean,
+    ): Flow<PagingData<Song>>
+
     fun getSongByIdFlow(id: String): Flow<Song?>
     fun getSongsByIdFlow(ids: List<String>): Flow<ImmutableList<Song>>
     fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>

@@ -62,6 +62,7 @@
     <string name="error_song_not_found">Nie znaleziono piosenki</string>
     <string name="error_unknown_error">Wystąpił nieznany błąd</string>
     <string name="error_account_already_linked_error">To konto jest już powiązane z innym urządzeniem</string>
+    <string name="error_login_failed">Logowanie nie powiodło się. Spróbuj ponownie.</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Biblioteka</string>
@@ -80,7 +81,15 @@
     <string name="library_setlist_songs">Piosenki: %1$d</string>
     <string name="library_songs_found">Znaleziono: %1$d</string>
     <string name="library_starting_with">Zaczynając od: %1$d</string>
-    <string name="library_sort_by_date">Sortuj według: Tytuł</string>
+    <string name="library_sort_by">Sortuj po %1$s</string>
+    <string name="library_sort_by_title">tytule</string>
+    <string name="library_sort_by_artist">artyście</string>
+    <string name="library_sort_by_date_added">dacie dodania</string>
+    <string name="library_change_sorting_order">Zmień kolejność sortowania</string>
+    <string name="library_change_sorting_order_by_title">Po tytule</string>
+    <string name="library_change_sorting_order_by_artist">Po artyście</string>
+    <string name="library_change_sorting_order_by_date_added">Po dacie dodania</string>
+    <string name="library_change_sorting_order_is_ascending">Sortuj listę w porządku rosnącym</string>
     <string name="library_add_song_title">Dodaj nową piosenkę</string>
     <string name="library_add_song_subtitle">Importuj tekst lub obraz</string>
     <string name="library_add_to_favourites">Dodaj do ulubionych</string>

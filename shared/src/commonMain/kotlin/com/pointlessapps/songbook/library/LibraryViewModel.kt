@@ -16,6 +16,7 @@ import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
+import com.pointlessapps.songbook.library.ui.mapper.toDomain
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.error_account_already_linked_error
 import com.pointlessapps.songbook.ui.theme.IconWarning
@@ -37,6 +38,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 internal sealed interface LibraryEvent {
     data object NavigateToIntroduction : LibraryEvent
@@ -48,10 +50,21 @@ internal sealed interface LibraryEvent {
 @Keep
 internal enum class DisplayMode { List, Grid }
 
+@Serializable
+@Stable
+data class SortBy(
+    val ascending: Boolean,
+    val field: Field,
+) {
+    @Keep
+    enum class Field { Title, Artist, DateAdded }
+}
+
 @Stable
 internal data class LibraryState(
     val setlists: ImmutableList<Setlist> = emptyImmutableList(),
     val initialFilterLetter: String? = null,
+    val sortBy: SortBy = SortBy(true, SortBy.Field.Title),
     val displayMode: DisplayMode = DisplayMode.Grid,
     val syncStatus: SyncStatus = SyncStatus.LOCAL,
     val loginStatus: LoginStatus = LoginStatus.ANONYMOUS,
@@ -86,11 +99,16 @@ internal class LibraryViewModel(
         authRepository.currentLoginStatusFlow,
         setlistRepository.getAllSetlistsFlow(limit = SETLISTS_LIMIT),
         prefsRepository.getLibraryDisplayModeFlow(),
+        prefsRepository.getLibrarySortByFlow(),
         _transientState,
-    ) { syncStatus, loginStatus, setlists, displayMode, transient ->
+    ) { syncStatus, loginStatus, setlists, displayMode, sortBy, transient ->
         LibraryState(
             setlists = setlists,
             initialFilterLetter = transient.initialFilterLetter,
+            sortBy = SortBy(
+                ascending = sortBy?.second ?: true,
+                field = sortBy?.first?.let(SortBy.Field::valueOf) ?: SortBy.Field.Title,
+            ),
             displayMode = displayMode?.let(DisplayMode::valueOf) ?: DisplayMode.Grid,
             syncStatus = syncStatus,
             loginStatus = loginStatus,
@@ -103,13 +121,27 @@ internal class LibraryViewModel(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val songs = _transientState.map { it.initialFilterLetter }
-        .distinctUntilChanged()
-        .flatMapLatest { songRepository.getAllSongs(it) }
-        .cachedIn(viewModelScope)
+    val songs = combine(
+        _transientState.map { it.initialFilterLetter }.distinctUntilChanged(),
+        prefsRepository.getLibrarySortByFlow(),
+    ) { initialFilterLetter, sortBy ->
+        initialFilterLetter to sortBy
+    }.flatMapLatest { (initialFilterLetter, sortBy) ->
+        songRepository.getAllSongs(
+            initialFilterLetter = initialFilterLetter,
+            sortBy = (sortBy?.first?.let(SortBy.Field::valueOf) ?: SortBy.Field.Title).toDomain(),
+            sortInAscendingOrder = sortBy?.second ?: true,
+        )
+    }.cachedIn(viewModelScope)
 
     private val eventChannel = Channel<LibraryEvent>(BUFFERED)
     val events = eventChannel.receiveAsFlow()
+
+    fun onSortBySelected(sortBy: SortBy) {
+        viewModelScope.launch {
+            prefsRepository.setLibrarySortBy(sortBy.field.name, sortBy.ascending)
+        }
+    }
 
     fun onClearInitialFilterLetterClicked() {
         _transientState.update { it.copy(initialFilterLetter = null) }

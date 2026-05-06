@@ -17,7 +17,9 @@ data class Song(
     val title: String,
     val artist: String,
     val lyrics: String,
-)
+) {
+    enum class SortBy { Title, Artist, DateAdded }
+}
 
 @Keep
 @Serializable

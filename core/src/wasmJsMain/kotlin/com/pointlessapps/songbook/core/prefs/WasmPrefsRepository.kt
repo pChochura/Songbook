@@ -20,4 +20,6 @@ internal class WasmPrefsRepository : PrefsRepository {
     override suspend fun setShowKeyOffsetFab(show: Boolean) {}
     override suspend fun getShowPublicLyrics(): Boolean? = null
     override suspend fun setShowPublicLyrics(show: Boolean) {}
+    override fun getLibrarySortByFlow(): Flow<Pair<String, Boolean>?> = emptyFlow()
+    override suspend fun setLibrarySortBy(field: String, ascending: Boolean) {}
 }

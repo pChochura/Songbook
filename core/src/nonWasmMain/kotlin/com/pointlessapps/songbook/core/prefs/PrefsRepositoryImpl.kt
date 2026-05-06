@@ -24,6 +24,8 @@ internal class PrefsRepositoryImpl(
     private val lyricsWrapModeKey = stringPreferencesKey("lyrics_wrap_mode")
     private val showKeyOffsetFabKey = booleanPreferencesKey("show_key_offset_fab")
     private val showPublicLyricsKey = booleanPreferencesKey("show_public_lyrics")
+    private val librarySortByFieldKey = stringPreferencesKey("library_sort_by_field")
+    private val librarySortByAscendingKey = booleanPreferencesKey("library_sort_by_ascending")
 
     override fun getLastSearchesFlow() = dataStore.data.map { preferences ->
         preferences[lastSearchesKey].orEmpty().toImmutableSet()
@@ -132,6 +134,23 @@ internal class PrefsRepositoryImpl(
             dataStore.updateData {
                 it.toMutablePreferences().apply {
                     set(showPublicLyricsKey, show)
+                }
+            }
+        }
+    }
+
+    override fun getLibrarySortByFlow() = dataStore.data.map { preferences ->
+        preferences[librarySortByFieldKey]?.let {
+            it to (preferences[librarySortByAscendingKey] ?: true)
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun setLibrarySortBy(field: String, ascending: Boolean) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.toMutablePreferences().apply {
+                    set(librarySortByFieldKey, field)
+                    set(librarySortByAscendingKey, ascending)
                 }
             }
         }

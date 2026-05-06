@@ -10,6 +10,7 @@ import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
 import com.pointlessapps.songbook.core.song.database.mapper.toSearchEntity
+import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import kotlinx.coroutines.flow.Flow
 
@@ -18,8 +19,31 @@ internal interface SongDao {
     @Query("SELECT * FROM songs WHERE title LIKE :initialFilterLetter || '%' ORDER BY title ASC")
     fun getAllSongs(initialFilterLetter: String): PagingSource<Int, SongEntity>
 
-    @Query("SELECT * FROM songs ORDER BY title ASC")
-    fun getAllSongs(): PagingSource<Int, SongEntity>
+    @Query("SELECT * FROM songs ORDER BY :column ASC")
+    fun getAllSongsAscending(column: String): PagingSource<Int, SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY :column DESC")
+    fun getAllSongsDescending(column: String): PagingSource<Int, SongEntity>
+
+    fun getAllSongs(sortBy: Song.SortBy, ascending: Boolean) = when (sortBy) {
+        Song.SortBy.Title -> if (ascending) {
+            getAllSongsAscending("title")
+        } else {
+            getAllSongsDescending("title")
+        }
+
+        Song.SortBy.Artist -> if (ascending) {
+            getAllSongsAscending("artist")
+        } else {
+            getAllSongsDescending("artist")
+        }
+
+        Song.SortBy.DateAdded -> if (ascending) {
+            getAllSongsAscending("date_added")
+        } else {
+            getAllSongsDescending("date_added")
+        }
+    }
 
     @Query("SELECT * FROM songs WHERE id = :id")
     fun getSongByIdFlow(id: String): Flow<SongEntity?>
