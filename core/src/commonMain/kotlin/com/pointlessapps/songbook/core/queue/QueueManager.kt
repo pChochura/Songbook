@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 interface QueueManager {
@@ -24,6 +24,7 @@ interface QueueManager {
 
     suspend fun setSong(songId: String)
     suspend fun setQueue(songsIds: List<String>, currentSongId: String)
+    suspend fun clearQueue()
 
     fun goToNextSong()
     fun goToPreviousSong()
@@ -52,7 +53,7 @@ internal class QueueManagerImpl(
         _queueFlow,
         _currentSongIndexFlow,
     ) { queue, index -> queue.getOrNull(index) }.flatMapLatest {
-        it?.let(songRepository::getSongByIdFlow) ?: emptyFlow()
+        it?.let(songRepository::getSongByIdFlow) ?: flowOf(null)
     }.stateIn(
         scope = scope,
         started = SharingStarted.Eagerly,
@@ -63,6 +64,11 @@ internal class QueueManagerImpl(
     override suspend fun setQueue(songsIds: List<String>, currentSongId: String) {
         _queueFlow.value = songsIds.toImmutableList()
         _currentSongIndexFlow.value = songsIds.indexOf(currentSongId)
+    }
+
+    override suspend fun clearQueue() {
+        _queueFlow.value = emptyImmutableList()
+        _currentSongIndexFlow.value = -1
     }
 
     override fun goToNextSong() {

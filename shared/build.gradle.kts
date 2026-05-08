@@ -71,7 +71,7 @@ kotlin {
         }
 
         androidMain.dependencies {
-            implementation(libs.compose.mp.ui.tooling)
+            implementation(libs.androidx.compose.ui.tooling)
         }
     }
 }

@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.pointlessapps.songbook.LocalBottomBarPadding
+import com.pointlessapps.songbook.BottomBarPadding.Companion.bottomBarHeight
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.core.song.model.PublicLyrics
 import com.pointlessapps.songbook.search.SearchEvent
@@ -263,7 +263,7 @@ internal fun SearchScreen(
                 }
             }
 
-            item { Spacer(Modifier.padding(LocalBottomBarPadding.current.padding.value)) }
+            item { Spacer(Modifier.bottomBarHeight()) }
         }
     }
 

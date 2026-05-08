@@ -36,16 +36,17 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun BottomBar(
+internal fun NavigationBottomBar(
     currentRoute: () -> Route?,
     onNavigateTo: (Route) -> Unit,
-    onActiveClicked: (Route) -> Unit,
-    onLongClicked: (Route) -> Unit,
+    modifier: Modifier = Modifier,
+    onActiveClicked: (Route) -> Unit = {},
+    onLongClicked: (Route) -> Unit = {},
 ) {
     val currentRoute = currentRoute()
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(
             space = MaterialTheme.spacing.large,
             alignment = Alignment.CenterHorizontally,

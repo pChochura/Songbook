@@ -18,6 +18,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -45,7 +46,7 @@ internal class AppViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val state = combine(
+    val initializationState = combine(
         flow {
             withContext(Dispatchers.IO) {
                 chordLibrary.initialize(
@@ -58,6 +59,7 @@ internal class AppViewModel(
         },
         authRepository.currentLoginStatusFlow,
     ) { _, loginStatus -> loginStatus }
+        .distinctUntilChanged()
         .flatMapLatest { loginStatus ->
             return@flatMapLatest if (loginStatus.isLoggedIn) {
                 syncRepository.performSyncAsFlow()
@@ -75,6 +77,18 @@ internal class AppViewModel(
             started = SharingStarted.Eagerly,
             initialValue = LoginStatus.LOGGED_OUT,
         )
+
+    val currentlyPlayedSongState = queueManager.currentSongFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null,
+    )
+
+    fun clearCurrentlyPlayedSong() {
+        viewModelScope.launch {
+            queueManager.clearQueue()
+        }
+    }
 
     fun openSong(songId: String) {
         viewModelScope.launch {

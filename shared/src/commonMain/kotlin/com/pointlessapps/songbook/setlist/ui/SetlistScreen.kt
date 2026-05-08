@@ -3,7 +3,6 @@ package com.pointlessapps.songbook.setlist.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,7 +22,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.pointlessapps.songbook.LocalBottomBarPadding
+import com.pointlessapps.songbook.BottomBarPadding.Companion.bottomBarHeight
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.song.model.SongSearchResult
@@ -151,7 +150,7 @@ private fun SetlistScreenContent(
                 )
             }
 
-            item { Spacer(Modifier.padding(LocalBottomBarPadding.current.padding.value)) }
+            item { Spacer(Modifier.bottomBarHeight()) }
         }
     }
 

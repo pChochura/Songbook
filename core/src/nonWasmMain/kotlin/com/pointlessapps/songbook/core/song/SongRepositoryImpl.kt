@@ -50,7 +50,7 @@ internal class SongRepositoryImpl(
         },
     ).flow.map { pagingData ->
         pagingData.map(SongEntity::toDomain)
-    }.flowOn(Dispatchers.Default)
+    }.flowOn(Dispatchers.IO)
 
     override fun getSongByIdFlow(id: String) = songDao.getSongByIdFlow(id)
         .map { it?.toDomain() }

@@ -26,6 +26,7 @@ import kotlin.coroutines.resume
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+@Stable
 class SongbookSnackbarState {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 

@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -38,6 +38,41 @@ fun SongbookCard(
     cardStyle: SongbookCardStyle = defaultSongbookCardStyle(),
     content: @Composable BoxScope.() -> Unit,
 ) {
+    if (cardStyle is SongbookCardStyle.Dashed) {
+        SongbookDashedCard(
+            modifier = modifier,
+            onClick = onClick,
+            onLongClick = onLongClick,
+            cardStyle = cardStyle,
+            content = content,
+        )
+    } else {
+        Box(
+            modifier = modifier
+                .clip(cardStyle.shape)
+                .background(
+                    color = cardStyle.containerColor,
+                    shape = cardStyle.shape,
+                )
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                    role = Role.Button,
+                ),
+            contentAlignment = Alignment.Center,
+            content = { content() },
+        )
+    }
+}
+
+@Composable
+private fun SongbookDashedCard(
+    modifier: Modifier,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)?,
+    cardStyle: SongbookCardStyle.Dashed,
+    content: @Composable BoxScope.() -> Unit,
+) {
     val offset = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         offset.animateTo(
@@ -55,35 +90,27 @@ fun SongbookCard(
                 color = cardStyle.containerColor,
                 shape = cardStyle.shape,
             )
-            .then(
-                if (cardStyle is SongbookCardStyle.Dashed) {
-                    Modifier.drawWithCache {
-                        val style = Stroke(
-                            width = DEFAULT_BORDER_WIDTH.toPx(),
-                            cap = StrokeCap.Round,
-                            join = StrokeJoin.Round,
-                            pathEffect = PathEffect.dashPathEffect(
-                                intervals = floatArrayOf(10f, 10f),
-                                phase = offset.value,
-                            ),
-                        )
-                        val cornerRadius = CornerRadius(
-                            x = cardStyle.cornerRadius.toPx(),
-                            y = cardStyle.cornerRadius.toPx(),
-                        )
+            .drawWithContent {
+                drawContent()
 
-                        onDrawBehind {
-                            drawRoundRect(
-                                color = cardStyle.outlineColor,
-                                style = style,
-                                cornerRadius = cornerRadius,
-                            )
-                        }
-                    }
-                } else {
-                    Modifier
-                },
-            )
+                val style = Stroke(
+                    width = DEFAULT_BORDER_WIDTH.toPx(),
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round,
+                    pathEffect = PathEffect.dashPathEffect(
+                        intervals = floatArrayOf(10f, 10f),
+                        phase = offset.value,
+                    ),
+                )
+                drawRoundRect(
+                    color = cardStyle.outlineColor,
+                    style = style,
+                    cornerRadius = CornerRadius(
+                        x = cardStyle.cornerRadius.toPx(),
+                        y = cardStyle.cornerRadius.toPx(),
+                    ),
+                )
+            }
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick,

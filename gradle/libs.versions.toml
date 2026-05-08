@@ -1,6 +1,6 @@
 [versions]
 # Build
-agp = "9.2.0"
+agp = "9.2.1"
 sdk-compile = "37"
 sdk-min = "26"
 sdk-target = "37"
@@ -25,11 +25,12 @@ androidx-lifecycle = "2.10.0"
 androidx-navigation3 = "1.1.0"
 androidx-room = "2.8.4"
 androidx-sqlite = "2.6.2"
-androidx-paging = "3.4.2"
+androidx-paging = "3.5.0"
 androidx-datastore = "1.2.1"
 androidx-annotation = "1.10.0"
 androidx-work = "2.11.2"
 androidx-splashscreen = "1.2.0"
+androidx-compose-ui-tooling = "1.11.1"
 
 # Koin
 koin = "4.2.1"
@@ -68,6 +69,7 @@ androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref
 androidx-credentials-core = { module = "androidx.credentials:credentials", version.ref = "androidx-credentials" }
 androidx-credentials-play-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidx-credentials" }
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-splashscreen" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "androidx-compose-ui-tooling" }
 
 # Compose
 compose-mp-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
@@ -75,7 +77,6 @@ compose-mp-foundation = { module = "org.jetbrains.compose.foundation:foundation"
 compose-mp-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-multiplatform-material3" }
 compose-mp-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
 compose-mp-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
-compose-mp-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-multiplatform" }
 compose-mp-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
 
 # Koin

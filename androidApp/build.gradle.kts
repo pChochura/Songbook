@@ -91,5 +91,5 @@ dependencies {
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
 
-    debugImplementation(libs.compose.mp.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 }
