@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -82,7 +83,7 @@ internal fun SortByDialog(
                     Entry(
                         title = Res.string.library_change_sorting_order_by_title,
                         isSelected = currentlySelectedSortByField == Title,
-                        hasAlternativeBackground = false,
+                        hasAlternativeBackground = true,
                         onClick = { currentlySelectedSortByField = Title },
                     )
                 }
@@ -90,7 +91,7 @@ internal fun SortByDialog(
                     Entry(
                         title = Res.string.library_change_sorting_order_by_artist,
                         isSelected = currentlySelectedSortByField == Artist,
-                        hasAlternativeBackground = true,
+                        hasAlternativeBackground = false,
                         onClick = { currentlySelectedSortByField = Artist },
                     )
                 }
@@ -98,21 +99,24 @@ internal fun SortByDialog(
                     Entry(
                         title = Res.string.library_change_sorting_order_by_date_added,
                         isSelected = currentlySelectedSortByField == DateAdded,
-                        hasAlternativeBackground = false,
+                        hasAlternativeBackground = true,
                         onClick = { currentlySelectedSortByField = DateAdded },
                     )
                 }
             }
-
-            SongbookCheckbox(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = MaterialTheme.spacing.medium),
-                label = stringResource(Res.string.library_change_sorting_order_is_ascending),
-                checked = currentlyIsAscending,
-                onCheckChanged = { currentlyIsAscending = !currentlyIsAscending },
-            )
         }
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.outlineVariant,
+        )
+
+        SongbookCheckbox(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.library_change_sorting_order_is_ascending),
+            checked = currentlyIsAscending,
+            onCheckChanged = { currentlyIsAscending = !currentlyIsAscending },
+        )
 
         SongbookButton(
             modifier = Modifier.fillMaxWidth(),

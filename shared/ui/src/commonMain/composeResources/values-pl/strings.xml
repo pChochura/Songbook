@@ -89,7 +89,7 @@
     <string name="library_change_sorting_order_by_title">Po tytule</string>
     <string name="library_change_sorting_order_by_artist">Po artyście</string>
     <string name="library_change_sorting_order_by_date_added">Po dacie dodania</string>
-    <string name="library_change_sorting_order_is_ascending">Sortuj listę w porządku rosnącym</string>
+    <string name="library_change_sorting_order_is_ascending">Sortuj listę w porządku rosnącym (od A do Z lub od najwcześniejszej do najpóźniejszej)</string>
     <string name="library_add_song_title">Dodaj nową piosenkę</string>
     <string name="library_add_song_subtitle">Importuj tekst lub obraz</string>
     <string name="library_add_to_favourites">Dodaj do ulubionych</string>
