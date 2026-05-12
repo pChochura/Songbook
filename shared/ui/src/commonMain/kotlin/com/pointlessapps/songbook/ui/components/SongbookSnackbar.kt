@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pointlessapps.songbook.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
@@ -32,7 +33,7 @@ fun SongbookSnackbar(
             .padding(horizontal = MaterialTheme.spacing.medium),
         onClick = onDismissRequest,
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = MaterialTheme.colorScheme.inverseSurface,
     ) {
         Row(
             modifier = Modifier.padding(
@@ -50,7 +51,7 @@ fun SongbookSnackbar(
                     icon = icon,
                     modifier = Modifier.size(ICON_SIZE),
                     iconStyle = defaultSongbookIconStyle().copy(
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = MaterialTheme.colorScheme.inverseOnSurface,
                     ),
                 )
             }
@@ -59,7 +60,7 @@ fun SongbookSnackbar(
                 modifier = Modifier.weight(1f),
                 text = message,
                 textStyle = defaultSongbookTextStyle().copy(
-                    textColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textColor = MaterialTheme.colorScheme.inverseOnSurface,
                     typography = MaterialTheme.typography.bodyMedium,
                 ),
             )
@@ -72,8 +73,10 @@ fun SongbookSnackbar(
                         .padding(MaterialTheme.spacing.small),
                     text = actionLabel.uppercase(),
                     textStyle = defaultSongbookTextStyle().copy(
-                        textColor = MaterialTheme.colorScheme.primary,
-                        typography = MaterialTheme.typography.labelLarge,
+                        textColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        typography = MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
                     ),
                 )
             }

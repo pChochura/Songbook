@@ -1,6 +1,11 @@
 package com.pointlessapps.songbook.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -130,7 +135,14 @@ internal fun BottomBarButton(
     onClicked: () -> Unit,
     onLongClicked: () -> Unit,
 ) {
-    AnimatedContent(bottomBarButton is BottomBarButton.Active) { isActive ->
+    AnimatedContent(
+        targetState = bottomBarButton is BottomBarButton.Active,
+        transitionSpec = {
+            fadeIn() + scaleIn(initialScale = 0.92f) togetherWith
+                    fadeOut() using SizeTransform(clip = false)
+        },
+        contentAlignment = Alignment.Center,
+    ) { isActive ->
         Row(
             modifier = Modifier
                 .clip(CircleShape)
