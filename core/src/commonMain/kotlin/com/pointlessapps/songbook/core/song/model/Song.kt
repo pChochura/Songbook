@@ -6,6 +6,7 @@ import com.pointlessapps.songbook.core.utils.Keep
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
@@ -19,6 +20,7 @@ data class Song(
     val title: String,
     val artist: String,
     @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @SerialName("created_at")
     val dateAdded: Instant? = null,
     val lyrics: String,
 ) {
