@@ -114,8 +114,8 @@ internal fun LyricsScreen(
 @Composable
 private fun LyricsScreenContent(
     state: LyricsState.Loaded,
-    onPreviousSongRequested: () -> Unit,
-    onNextSongRequested: () -> Unit,
+    onPreviousSongRequested: () -> Boolean,
+    onNextSongRequested: () -> Boolean,
     onNavigateBack: () -> Unit,
     onEditSongClicked: () -> Unit,
     onTextScaleChanged: (Int) -> Unit,

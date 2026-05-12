@@ -26,8 +26,8 @@ interface QueueManager {
     suspend fun setQueue(songsIds: List<String>, currentSongId: String)
     suspend fun clearQueue()
 
-    fun goToNextSong()
-    fun goToPreviousSong()
+    fun goToNextSong(): Boolean
+    fun goToPreviousSong(): Boolean
 
     suspend fun peekPreviousSong(): Song?
     suspend fun peekNextSong(): Song?
@@ -71,16 +71,24 @@ internal class QueueManagerImpl(
         _currentSongIndexFlow.value = -1
     }
 
-    override fun goToNextSong() {
+    override fun goToNextSong(): Boolean {
         if (_currentSongIndexFlow.value < _queueFlow.value.size - 1) {
             _currentSongIndexFlow.value++
+
+            return true
         }
+
+        return false
     }
 
-    override fun goToPreviousSong() {
+    override fun goToPreviousSong(): Boolean {
         if (_currentSongIndexFlow.value > 0) {
             _currentSongIndexFlow.value--
+
+            return true
         }
+
+        return false
     }
 
     override suspend fun peekPreviousSong(): Song? =

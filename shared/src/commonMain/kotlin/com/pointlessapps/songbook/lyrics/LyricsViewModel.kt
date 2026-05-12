@@ -159,12 +159,12 @@ internal class LyricsViewModel(
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    fun onPreviousSongRequested() {
-        queueManager.goToPreviousSong()
+    fun onPreviousSongRequested(): Boolean {
+        return queueManager.goToPreviousSong()
     }
 
-    fun onNextSongRequested() {
-        queueManager.goToNextSong()
+    fun onNextSongRequested(): Boolean {
+        return queueManager.goToNextSong()
     }
 
     fun onEditSongClicked() {

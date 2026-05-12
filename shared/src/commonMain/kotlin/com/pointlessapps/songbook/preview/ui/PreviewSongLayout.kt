@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -59,6 +60,7 @@ import com.pointlessapps.songbook.shared.ui.lyrics_no_previous_song
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.add
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -75,10 +77,11 @@ internal fun PreviewSongLayout(
     wrapMode: WrapMode = WrapMode.Wrap,
     previousSongTitle: String? = null,
     nextSongTitle: String? = null,
-    onPreviousSongRequested: () -> Unit = {},
-    onNextSongRequested: () -> Unit = {},
+    onPreviousSongRequested: () -> Boolean = { false },
+    onNextSongRequested: () -> Boolean = { false },
     paddingValues: PaddingValues = PaddingValues(),
 ) {
+    val coroutineScope = rememberCoroutineScope()
     var currentTextScale by remember(textScale) { mutableStateOf(textScale) }
     var chordDetailsDialogData by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -92,8 +95,15 @@ internal fun PreviewSongLayout(
         onOverscrolled = { finished, side ->
             if (finished) {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
-                if (side == Direction.FromStart) onPreviousSongRequested()
-                else onNextSongRequested()
+                val songChanged = if (side == Direction.FromStart) {
+                    onPreviousSongRequested()
+                } else {
+                    onNextSongRequested()
+                }
+
+                if (songChanged) {
+                    coroutineScope.launch { horizontalScrollState.scrollTo(0) }
+                }
             } else {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
             }
