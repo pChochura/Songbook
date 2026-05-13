@@ -281,7 +281,7 @@ private fun CurrentlyPlayingBottomBar(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             SongbookText(
-                text = song.title.takeIf { it.isNotEmpty() }
+                text = song.title.takeIf(String::isNotEmpty)
                     ?: stringResource(Res.string.common_unnamed),
                 textStyle = defaultSongbookTextStyle().copy(
                     typography = MaterialTheme.typography.titleMedium,
@@ -291,7 +291,7 @@ private fun CurrentlyPlayingBottomBar(
                 ),
             )
             SongbookText(
-                text = song.artist.takeIf { it.isNotEmpty() }
+                text = song.artist.takeIf(String::isNotEmpty)
                     ?: stringResource(Res.string.common_unknown),
                 textStyle = defaultSongbookTextStyle().copy(
                     typography = MaterialTheme.typography.bodySmall,

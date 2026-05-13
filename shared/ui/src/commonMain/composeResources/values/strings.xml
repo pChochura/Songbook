@@ -57,6 +57,8 @@
     <string name="common_currently_played">Currently played</string>
     <string name="common_clear_queue_title">Clear the queue</string>
     <string name="common_clear_queue_description">Remove all the songs from the queue and hide the currently played song bottom bar.</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_done">Done</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>

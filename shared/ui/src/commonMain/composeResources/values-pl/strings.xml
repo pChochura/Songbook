@@ -57,6 +57,8 @@
     <string name="common_currently_played">Obecnie grane</string>
     <string name="common_clear_queue_title">Wyczyść kolejkę</string>
     <string name="common_clear_queue_description">Usuń wszystkie piosenki z kolejki i ukryj belkę z aktualnie graną piosenką.</string>
+    <string name="common_edit">Edytuj</string>
+    <string name="common_done">Zapisz</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">Wystąpił błąd podczas inicjalizacji aplikacji. Proszę uruchom aplikację ponownie</string>

@@ -28,6 +28,7 @@ interface QueueManager {
     fun setQueue(songsIds: List<String>, currentSongId: String)
     fun clearQueue()
     fun removeFromQueue(songId: String)
+    fun removeFromQueue(songsIds: List<String>)
     fun updateOrder(songsIds: List<String>)
 
     fun goToNextSong(): Boolean
@@ -106,11 +107,19 @@ internal class QueueManagerImpl(
     }
 
     override fun removeFromQueue(songId: String) {
+        _queueFlow.value = _queueFlow.value.filterNot { it == songId }.toImmutableList()
+
         if (_currentSongIdFlow.value == songId && !goToNextSong()) {
             _currentSongIdFlow.value = null
         }
+    }
 
-        _queueFlow.value = _queueFlow.value.filterNot { it == songId }.toImmutableList()
+    override fun removeFromQueue(songsIds: List<String>) {
+        _queueFlow.value = _queueFlow.value.filterNot { it in songsIds }.toImmutableList()
+
+        if (songsIds.contains(_currentSongIdFlow.value) && !goToNextSong()) {
+            _currentSongIdFlow.value = null
+        }
     }
 
     override fun updateOrder(songsIds: List<String>) {

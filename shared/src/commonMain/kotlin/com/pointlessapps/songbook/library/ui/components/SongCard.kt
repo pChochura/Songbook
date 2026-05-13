@@ -64,7 +64,7 @@ internal fun SongCard(
                     )
                     SongbookText(
                         modifier = titleModifier,
-                        text = song.title.takeIf { it.isNotEmpty() }
+                        text = song.title.takeIf(String::isNotEmpty)
                             ?: stringResource(Res.string.common_unnamed),
                         textStyle = defaultSongbookTextStyle().copy(
                             textColor = MaterialTheme.colorScheme.onSurface,
@@ -84,7 +84,7 @@ internal fun SongCard(
                     )
                     SongbookText(
                         modifier = artistModifier,
-                        text = song.artist.takeIf { it.isNotEmpty() }
+                        text = song.artist.takeIf(String::isNotEmpty)
                             ?: stringResource(Res.string.common_unknown),
                         textStyle = defaultSongbookTextStyle().copy(
                             textColor = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -105,6 +105,61 @@ fun SongbookCheckbox(
 }
 
 @Composable
+fun SongbookCheckbox(
+    checked: Boolean,
+    onCheckChanged: () -> Unit,
+    modifier: Modifier = Modifier,
+    checkboxStyle: SongbookCheckboxStyle = defaultSongbookCheckboxStyle(),
+) {
+    val backgroundColor by animateColorAsState(
+        targetValue = if (checked) {
+            checkboxStyle.selectedContainerColor
+        } else {
+            checkboxStyle.containerColor
+        },
+    )
+    val borderColor by animateColorAsState(
+        targetValue = if (checked) {
+            checkboxStyle.selectedOutlineColor
+        } else {
+            checkboxStyle.outlineColor
+        },
+    )
+    val iconAlpha by animateFloatAsState(if (checked) 1f else 0f)
+
+    Box(
+        modifier = modifier
+            .clip(checkboxStyle.shape)
+            .clickable(
+                role = Role.Checkbox,
+                onClick = onCheckChanged,
+            )
+            .padding(MaterialTheme.spacing.extraSmall)
+            .background(
+                color = backgroundColor,
+                shape = checkboxStyle.shape,
+            )
+            .border(
+                width = DEFAULT_BORDER_WIDTH,
+                color = borderColor,
+                shape = checkboxStyle.shape,
+            )
+            .padding(MaterialTheme.spacing.extraSmall),
+        contentAlignment = Alignment.Center,
+    ) {
+        SongbookIcon(
+            modifier = Modifier
+                .size(CHECKBOX_ICON_SIZE)
+                .graphicsLayer { alpha = iconAlpha },
+            icon = checkboxStyle.icon,
+            iconStyle = defaultSongbookIconStyle().copy(
+                tint = checkboxStyle.iconColor,
+            ),
+        )
+    }
+}
+
+@Composable
 fun defaultSongbookCheckboxStyle() = SongbookCheckboxStyle(
     shape = CircleShape,
     containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
