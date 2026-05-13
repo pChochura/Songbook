@@ -159,7 +159,7 @@ internal class SearchViewModel(
 
     fun onLyricsClicked(songId: String) {
         viewModelScope.launch {
-            queueManager.setSong(songId)
+            queueManager.clearQueueAndSetSong(songId)
             eventChannel.send(SearchEvent.NavigateToLyrics)
         }
     }

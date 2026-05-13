@@ -51,8 +51,12 @@
     <string name="common_take_a_photo">Take a photo</string>
     <string name="common_search_chord_placeholder">Search for a chord...</string>
     <string name="common_remove_account">Remove the account</string>
-    <string name="common_remove_account_description">You will be logged out, your local data will be cleared and then you will be redirected to the Songbook website where you can remove your account.</string>
+    <string name="common_remove_account_description">You will be logged out, your local data will be cleared, and then you will be redirected to the Songbook website where you can remove your account.</string>
     <string name="common_no_internet">No internet connection</string>
+    <string name="common_drag_to_reorder">Drag to reorder</string>
+    <string name="common_currently_played">Currently played</string>
+    <string name="common_clear_queue_title">Clear the queue</string>
+    <string name="common_clear_queue_description">Remove all the songs from the queue and hide the currently played song bottom bar.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
@@ -166,6 +170,7 @@
     <string name="lyrics_show_key_offset_fab">Display the permanent transpose widget on the bottom of the screen</string>
     <string name="lyrics_no_previous_song">It's the first song</string>
     <string name="lyrics_no_next_song">It's the last song</string>
+    <string name="library_queue_bottomsheet_title">Queue</string>
 
     <!-- Search Screen -->
     <string name="search_placeholder">Search titles, artists and lyrics...</string>

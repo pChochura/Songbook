@@ -53,11 +53,16 @@ internal class SongRepositoryImpl(
     }.flowOn(Dispatchers.IO)
 
     override fun getSongByIdFlow(id: String) = songDao.getSongByIdFlow(id)
-        .map { it?.toDomain() }
+        .map { requireNotNull(it?.toDomain()) }
         .flowOn(Dispatchers.IO)
 
     override fun getSongsByIdFlow(ids: List<String>) = songDao.getSongsByIdFlow(ids)
-        .map { it.map(SongEntity::toDomain).toImmutableList() }
+        .map {
+            // Sort the song by the order they were requested
+            it.sortedBy { song -> ids.indexOf(song.id) }
+                .map(SongEntity::toDomain)
+                .toImmutableList()
+        }
         .flowOn(Dispatchers.IO)
 
     override fun searchSongs(query: String): Flow<PagingData<SongSearchResult>> {

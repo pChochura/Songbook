@@ -60,11 +60,12 @@ import com.pointlessapps.songbook.shared.ui.lyrics_section_label
 import com.pointlessapps.songbook.ui.BackTopBarButton
 import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
+import com.pointlessapps.songbook.ui.components.QueueBottomSheet
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
-import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
 import com.pointlessapps.songbook.ui.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
@@ -135,6 +136,7 @@ private fun LyricsScreenContent(
     var isTextScaleDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isKeyOffsetDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isSetlistsDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isQueueBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isBroadcastToTeamDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isConfirmDeleteDialogVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -178,9 +180,9 @@ private fun LyricsScreenContent(
     ) { paddingValues ->
         Box(Modifier.fillMaxSize()) {
             PreviewSongLayout(
-                songId = state.songId,
-                title = state.title,
-                artist = state.artist,
+                songId = state.song.id,
+                title = state.song.title,
+                artist = state.song.artist,
                 sections = state.sections,
                 textScale = state.textScale,
                 keyOffset = state.keyOffset,
@@ -232,7 +234,7 @@ private fun LyricsScreenContent(
                 TextScale -> isTextScaleDialogVisible = true
                 KeyOffset -> isKeyOffsetDialogVisible = true
                 AddToSetlists -> isSetlistsDialogVisible = true
-                ShowQueue -> {}
+                ShowQueue -> isQueueBottomSheetVisible = true
                 Broadcast -> isBroadcastToTeamDialogVisible = true
                 Delete -> isConfirmDeleteDialogVisible = true
             }
@@ -301,6 +303,11 @@ private fun LyricsScreenContent(
         )
     }
 
+    QueueBottomSheet(
+        show = isQueueBottomSheetVisible,
+        onDismissRequest = { isQueueBottomSheetVisible = false },
+    )
+
     if (isBroadcastToTeamDialogVisible) {
         ConfirmBroadcastToTeamDialog(
             onConfirmClicked = {
@@ -312,7 +319,7 @@ private fun LyricsScreenContent(
     }
 
     if (isConfirmDeleteDialogVisible) {
-        ConfirmDeleteDialog(
+        ConfirmationDialog(
             title = Res.string.lyrics_delete_song,
             description = Res.string.lyrics_delete_song_description,
             onConfirmClicked = {

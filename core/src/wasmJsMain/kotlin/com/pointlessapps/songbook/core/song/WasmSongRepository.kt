@@ -16,7 +16,7 @@ internal class WasmSongRepository : SongRepository {
         sortInAscendingOrder: Boolean,
     ): Flow<PagingData<Song>> = emptyFlow()
 
-    override fun getSongByIdFlow(id: String): Flow<Song?> = emptyFlow()
+    override fun getSongByIdFlow(id: String): Flow<Song> = emptyFlow()
     override fun getSongsByIdFlow(ids: List<String>): Flow<ImmutableList<Song>> = emptyFlow()
     override fun searchSongs(query: String): Flow<PagingData<SongSearchResult>> = emptyFlow()
     override fun getSongSetlistsById(id: String): Flow<ImmutableList<Setlist>> = emptyFlow()

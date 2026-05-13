@@ -153,7 +153,7 @@ internal class LibraryViewModel(
 
     fun onLyricsClicked(songId: String) {
         viewModelScope.launch {
-            queueManager.setSong(songId)
+            queueManager.clearQueueAndSetSong(songId)
             eventChannel.send(LibraryEvent.NavigateToLyrics)
         }
     }

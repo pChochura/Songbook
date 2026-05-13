@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +36,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
@@ -45,6 +45,7 @@ import com.pointlessapps.songbook.shared.ui.common_unknown
 import com.pointlessapps.songbook.shared.ui.common_unnamed
 import com.pointlessapps.songbook.shared.ui.setlist_search_songs
 import com.pointlessapps.songbook.shared.ui.setlist_search_songs_placeholder
+import com.pointlessapps.songbook.ui.OptionsBottomSheetTitleHeader
 import com.pointlessapps.songbook.ui.components.SongbookBottomSheet
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText
@@ -71,30 +72,20 @@ internal fun AddSongToSetlistBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
     ) {
-        Column(modifier = Modifier.animateContentSize()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(top = MaterialTheme.spacing.extraLarge),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                SongbookText(
-                    text = stringResource(Res.string.setlist_search_songs),
-                    textStyle = defaultSongbookTextStyle().copy(
-                        textAlign = TextAlign.Center,
-                        textColor = MaterialTheme.colorScheme.onSurface,
-                        typography = MaterialTheme.typography.titleLarge,
-                    ),
-                )
-            }
+        Column(
+            modifier = Modifier
+                .animateContentSize()
+                .statusBarsPadding()
+                .padding(all = MaterialTheme.spacing.extraLarge),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+        ) {
+            OptionsBottomSheetTitleHeader(stringResource(Res.string.setlist_search_songs))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             LazyColumn(
                 modifier = Modifier
                     .weight(1f, fill = false)
-                    .fillMaxWidth()
-                    .padding(vertical = MaterialTheme.spacing.medium)
-                    .padding(horizontal = MaterialTheme.spacing.extraLarge),
+                    .fillMaxWidth(),
             ) {
                 items(
                     count = searchResults.itemCount,
@@ -115,9 +106,7 @@ internal fun AddSongToSetlistBottomSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = MaterialTheme.spacing.extraLarge)
-                    .padding(horizontal = MaterialTheme.spacing.extraLarge),
+                    .navigationBarsPadding(),
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
             ) {
                 SongbookTextField(

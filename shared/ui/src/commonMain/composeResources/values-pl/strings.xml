@@ -53,6 +53,10 @@
     <string name="common_remove_account">Usuń konto</string>
     <string name="common_remove_account_description">Zostaniesz wylogowany, Twoje lokalne dane zostaną usunięte i następnie zostaniesz przekierowany na stronę Songbook, gdzie będziesz mógł usunąć konto.</string>
     <string name="common_no_internet">Brak połączenia z internetem</string>
+    <string name="common_drag_to_reorder">Przeciągnij, aby zmienić kolejność</string>
+    <string name="common_currently_played">Obecnie grane</string>
+    <string name="common_clear_queue_title">Wyczyść kolejkę</string>
+    <string name="common_clear_queue_description">Usuń wszystkie piosenki z kolejki i ukryj belkę z aktualnie graną piosenką.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">Wystąpił błąd podczas inicjalizacji aplikacji. Proszę uruchom aplikację ponownie</string>
@@ -166,6 +170,7 @@
     <string name="lyrics_show_key_offset_fab">Wyświetlaj stały widżet transpozycji na dole ekranu</string>
     <string name="lyrics_no_previous_song">To jest pierwsza piosenka</string>
     <string name="lyrics_no_next_song">To jest ostatnia piosenka</string>
+    <string name="library_queue_bottomsheet_title">Kolejka</string>
 
     <!-- Search Screen -->
     <string name="search_placeholder">Szukaj tytułów, wykonawców i tekstów...</string>

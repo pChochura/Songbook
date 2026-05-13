@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun ConfirmDeleteDialog(
+fun ConfirmationDialog(
     title: StringResource,
     description: StringResource,
     onConfirmClicked: () -> Unit,

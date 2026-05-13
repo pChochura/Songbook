@@ -73,7 +73,7 @@ import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
-import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
 import com.pointlessapps.songbook.ui.theme.IconAscending
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.IconDescending
@@ -228,7 +228,7 @@ internal fun LibraryScreen(
     }
 
     if (isRemoveAccountDialogVisible) {
-        ConfirmDeleteDialog(
+        ConfirmationDialog(
             title = Res.string.common_remove_account,
             description = Res.string.common_remove_account_description,
             onConfirmClicked = {

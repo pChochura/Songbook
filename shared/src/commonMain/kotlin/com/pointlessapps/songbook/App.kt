@@ -14,9 +14,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.add
@@ -38,26 +39,46 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.shared.ui.Res
+import com.pointlessapps.songbook.shared.ui.common_clear_queue_description
+import com.pointlessapps.songbook.shared.ui.common_clear_queue_title
 import com.pointlessapps.songbook.shared.ui.common_dismiss
+import com.pointlessapps.songbook.shared.ui.common_unknown
+import com.pointlessapps.songbook.shared.ui.common_unnamed
+import com.pointlessapps.songbook.shared.ui.lyrics_menu_show_queue
 import com.pointlessapps.songbook.ui.NavigationBottomBar
+import com.pointlessapps.songbook.ui.components.QueueBottomSheet
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookSnackbar
+import com.pointlessapps.songbook.ui.components.SongbookText
+import com.pointlessapps.songbook.ui.components.defaultSongbookIconButtonStyle
+import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
+import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
+import com.pointlessapps.songbook.ui.theme.DEFAULT_BORDER_WIDTH
 import com.pointlessapps.songbook.ui.theme.IconClose
+import com.pointlessapps.songbook.ui.theme.IconQueue
 import com.pointlessapps.songbook.ui.theme.SongbookTheme
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction.AddSongToSetlist
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction.LoadToQueueAndOpen
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import com.pointlessapps.songbook.utils.collectWithLifecycle
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -87,6 +108,12 @@ fun App(
         }
     }
 
+    viewModel.events.collectWithLifecycle {
+        when (it) {
+            is AppEvent.NavigateToLyrics -> navigator.navigateToLyrics()
+        }
+    }
+
     SongbookTheme {
         CompositionLocalProvider(
             LocalNavigator provides navigator,
@@ -105,7 +132,8 @@ fun App(
                         navigator = navigator,
                         snackbarSate = snackbarSate,
                         currentlyPlayedSong = currentlyPlayedSong,
-                        onClearSongClicked = viewModel::clearCurrentlyPlayedSong,
+                        onClearQueueClicked = viewModel::clearQueue,
+                        onOpenSongClicked = viewModel::openCurrentlyPlayedSong,
                     )
                 },
             ) { paddingValues ->
@@ -124,11 +152,15 @@ private fun BottomBarLayout(
     navigator: Navigator,
     snackbarSate: SongbookSnackbarState,
     currentlyPlayedSong: Song?,
-    onClearSongClicked: () -> Unit,
+    onClearQueueClicked: () -> Unit,
+    onOpenSongClicked: () -> Unit,
 ) {
     val shouldShowNavigationBottomBar by remember {
         derivedStateOf { navigator.currentRoute?.hasBottomBar == true }
     }
+
+    var isQueueBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var isClearQueueConfirmationDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -182,7 +214,9 @@ private fun BottomBarLayout(
             if (show && song != null) {
                 CurrentlyPlayingBottomBar(
                     song = song,
-                    onClearSongClicked = onClearSongClicked,
+                    onShowQueueClicked = { isQueueBottomSheetVisible = true },
+                    onClearQueueClicked = { isClearQueueConfirmationDialogVisible = true },
+                    onOpenSongClicked = onOpenSongClicked,
                 )
             } else {
                 Spacer(
@@ -195,25 +229,100 @@ private fun BottomBarLayout(
             }
         }
     }
+
+    QueueBottomSheet(
+        show = isQueueBottomSheetVisible,
+        onDismissRequest = { isQueueBottomSheetVisible = false },
+    )
+
+    if (isClearQueueConfirmationDialogVisible) {
+        ConfirmationDialog(
+            title = Res.string.common_clear_queue_title,
+            description = Res.string.common_clear_queue_description,
+            onConfirmClicked = {
+                isClearQueueConfirmationDialogVisible = false
+                onClearQueueClicked()
+            },
+            onDismissRequest = { isClearQueueConfirmationDialogVisible = false },
+        )
+    }
 }
 
 @Composable
 private fun CurrentlyPlayingBottomBar(
     song: Song,
-    onClearSongClicked: () -> Unit,
+    onShowQueueClicked: () -> Unit,
+    onClearQueueClicked: () -> Unit,
+    onOpenSongClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    val borderColor = MaterialTheme.colorScheme.outlineVariant
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable(
+                onClick = onOpenSongClicked,
+                role = Role.Button,
+            )
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.9f))
+            .drawWithContent {
+                drawContent()
+                drawLine(
+                    color = borderColor,
+                    start = Offset.Zero,
+                    end = Offset(this.size.width, y = 0f),
+                    strokeWidth = DEFAULT_BORDER_WIDTH.toPx(),
+                )
+            }
             .navigationBarsPadding()
             .padding(MaterialTheme.spacing.large),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
+        Column(modifier = Modifier.weight(1f)) {
+            SongbookText(
+                text = song.title.takeIf { it.isNotEmpty() }
+                    ?: stringResource(Res.string.common_unnamed),
+                textStyle = defaultSongbookTextStyle().copy(
+                    typography = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    textOverflow = TextOverflow.Ellipsis,
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            )
+            SongbookText(
+                text = song.artist.takeIf { it.isNotEmpty() }
+                    ?: stringResource(Res.string.common_unknown),
+                textStyle = defaultSongbookTextStyle().copy(
+                    typography = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    textOverflow = TextOverflow.Ellipsis,
+                    textColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
+        }
+
         SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
+            icon = IconQueue,
+            tooltipLabel = Res.string.lyrics_menu_show_queue,
+            onClick = onShowQueueClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                containerColor = Color.Transparent,
+                outlineColor = Color.Transparent,
+            ),
+        )
+        SongbookIconButton(
+            modifier = Modifier.padding(MaterialTheme.spacing.small),
             icon = IconClose,
             tooltipLabel = Res.string.common_dismiss,
-            onClick = onClearSongClicked,
+            onClick = onClearQueueClicked,
+            iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                containerColor = Color.Transparent,
+                outlineColor = Color.Transparent,
+            ),
         )
     }
 }

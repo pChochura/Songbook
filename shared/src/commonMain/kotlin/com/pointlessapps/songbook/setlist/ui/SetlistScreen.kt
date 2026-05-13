@@ -43,7 +43,7 @@ import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
-import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
 import com.pointlessapps.songbook.ui.theme.spacing
 import com.pointlessapps.songbook.utils.SyncingTopBarButton
 import com.pointlessapps.songbook.utils.add
@@ -202,7 +202,7 @@ private fun SetlistScreenContent(
     }
 
     if (isConfirmDeleteDialogVisible) {
-        ConfirmDeleteDialog(
+        ConfirmationDialog(
             title = Res.string.setlist_delete_setlist,
             description = Res.string.setlist_delete_setlist_description,
             onConfirmClicked = {

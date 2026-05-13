@@ -15,6 +15,7 @@ import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -22,11 +23,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.getString
+
+internal sealed interface AppEvent {
+    data object NavigateToLyrics : AppEvent
+}
 
 internal class AppViewModel(
     openSearch: Boolean,
@@ -38,6 +44,9 @@ internal class AppViewModel(
     private val setlistRepository: SetlistRepository,
     private val snackbarState: SongbookSnackbarState,
 ) : BaseViewModel(snackbarState) {
+
+    private val eventChannel = Channel<AppEvent>()
+    val events = eventChannel.receiveAsFlow()
 
     val startingRoutes: Array<Route> = when {
         !authRepository.isLoggedIn() -> arrayOf(Route.Introduction)
@@ -84,15 +93,20 @@ internal class AppViewModel(
         initialValue = null,
     )
 
-    fun clearCurrentlyPlayedSong() {
+    fun clearQueue() {
         viewModelScope.launch {
             queueManager.clearQueue()
         }
     }
 
+    fun openCurrentlyPlayedSong() {
+        eventChannel.trySend(AppEvent.NavigateToLyrics)
+    }
+
     fun openSong(songId: String) {
         viewModelScope.launch {
-            queueManager.setSong(songId)
+            queueManager.clearQueueAndSetSong(songId)
+            eventChannel.send(AppEvent.NavigateToLyrics)
         }
     }
 

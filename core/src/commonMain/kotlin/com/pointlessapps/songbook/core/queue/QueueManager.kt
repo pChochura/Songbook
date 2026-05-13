@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -21,16 +20,18 @@ import kotlinx.coroutines.flow.stateIn
 interface QueueManager {
     val queueFlow: StateFlow<ImmutableList<Song>>
     val currentSongFlow: StateFlow<Song?>
+    val previousSongFlow: StateFlow<Song?>
+    val nextSongFlow: StateFlow<Song?>
 
-    suspend fun setSong(songId: String)
-    suspend fun setQueue(songsIds: List<String>, currentSongId: String)
-    suspend fun clearQueue()
+    fun setSong(songId: String)
+    fun clearQueueAndSetSong(songId: String)
+    fun setQueue(songsIds: List<String>, currentSongId: String)
+    fun clearQueue()
+    fun removeFromQueue(songId: String)
+    fun updateOrder(songsIds: List<String>)
 
     fun goToNextSong(): Boolean
     fun goToPreviousSong(): Boolean
-
-    suspend fun peekPreviousSong(): Song?
-    suspend fun peekNextSong(): Song?
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,32 +49,80 @@ internal class QueueManagerImpl(
             initialValue = emptyImmutableList(),
         )
 
-    private val _currentSongIndexFlow = MutableStateFlow(-1)
-    override val currentSongFlow: StateFlow<Song?> = combine(
+    private val _currentSongIdFlow = MutableStateFlow<String?>(null)
+    override val currentSongFlow: StateFlow<Song?> = _currentSongIdFlow
+        .flatMapLatest {
+            it?.let(songRepository::getSongByIdFlow) ?: flowOf(null)
+        }.stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = null,
+        )
+
+    override val previousSongFlow: StateFlow<Song?> = combine(
+        _currentSongIdFlow,
         _queueFlow,
-        _currentSongIndexFlow,
-    ) { queue, index -> queue.getOrNull(index) }.flatMapLatest {
-        it?.let(songRepository::getSongByIdFlow) ?: flowOf(null)
+    ) { currentSongId, queue ->
+        currentSongId to queue
+    }.flatMapLatest { (currentSongId, queue) ->
+        val songIndex = indexOf(currentSongId ?: return@flatMapLatest flowOf(null))
+        val songId = queue.getOrNull(songIndex - 1)
+        songId?.let(songRepository::getSongByIdFlow) ?: flowOf(null)
     }.stateIn(
         scope = scope,
-        started = SharingStarted.Eagerly,
+        started = SharingStarted.WhileSubscribed(5_000),
         initialValue = null,
     )
 
-    override suspend fun setSong(songId: String) = setQueue(listOf(songId), songId)
-    override suspend fun setQueue(songsIds: List<String>, currentSongId: String) {
-        _queueFlow.value = songsIds.toImmutableList()
-        _currentSongIndexFlow.value = songsIds.indexOf(currentSongId)
+    override val nextSongFlow: StateFlow<Song?> = combine(
+        _currentSongIdFlow,
+        _queueFlow,
+    ) { currentSongId, queue ->
+        currentSongId to queue
+    }.flatMapLatest { (currentSongId, queue) ->
+        val songIndex = indexOf(currentSongId ?: return@flatMapLatest flowOf(null))
+        val songId = queue.getOrNull(songIndex + 1)
+        songId?.let(songRepository::getSongByIdFlow) ?: flowOf(null)
+    }.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null,
+    )
+
+    override fun setSong(songId: String) {
+        _currentSongIdFlow.value = songId
     }
 
-    override suspend fun clearQueue() {
+    override fun clearQueueAndSetSong(songId: String) = setQueue(listOf(songId), songId)
+
+    override fun setQueue(songsIds: List<String>, currentSongId: String) {
+        _queueFlow.value = songsIds.toImmutableList()
+        _currentSongIdFlow.value = currentSongId
+    }
+
+    override fun clearQueue() {
         _queueFlow.value = emptyImmutableList()
-        _currentSongIndexFlow.value = -1
+        _currentSongIdFlow.value = null
+    }
+
+    override fun removeFromQueue(songId: String) {
+        if (_currentSongIdFlow.value == songId && !goToNextSong()) {
+            _currentSongIdFlow.value = null
+        }
+
+        _queueFlow.value = _queueFlow.value.filterNot { it == songId }.toImmutableList()
+    }
+
+    override fun updateOrder(songsIds: List<String>) {
+        _queueFlow.value = songsIds.toImmutableList()
     }
 
     override fun goToNextSong(): Boolean {
-        if (_currentSongIndexFlow.value < _queueFlow.value.size - 1) {
-            _currentSongIndexFlow.value++
+        val songId = _currentSongIdFlow.value ?: return false
+        val songIndex = indexOf(songId)
+
+        if (songIndex < _queueFlow.value.size - 1) {
+            _currentSongIdFlow.value = _queueFlow.value[songIndex + 1]
 
             return true
         }
@@ -82,8 +131,11 @@ internal class QueueManagerImpl(
     }
 
     override fun goToPreviousSong(): Boolean {
-        if (_currentSongIndexFlow.value > 0) {
-            _currentSongIndexFlow.value--
+        val songId = _currentSongIdFlow.value ?: return false
+        val songIndex = indexOf(songId)
+
+        if (songIndex > 0) {
+            _currentSongIdFlow.value = _queueFlow.value[songIndex - 1]
 
             return true
         }
@@ -91,13 +143,5 @@ internal class QueueManagerImpl(
         return false
     }
 
-    override suspend fun peekPreviousSong(): Song? =
-        _queueFlow.value.getOrNull(_currentSongIndexFlow.value - 1)
-            ?.let(songRepository::getSongByIdFlow)
-            ?.firstOrNull()
-
-    override suspend fun peekNextSong(): Song? =
-        _queueFlow.value.getOrNull(_currentSongIndexFlow.value + 1)
-            ?.let(songRepository::getSongByIdFlow)
-            ?.firstOrNull()
+    private fun indexOf(songId: String) = _queueFlow.value.indexOf(songId)
 }

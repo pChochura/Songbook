@@ -15,7 +15,7 @@ interface SongRepository {
         sortInAscendingOrder: Boolean,
     ): Flow<PagingData<Song>>
 
-    fun getSongByIdFlow(id: String): Flow<Song?>
+    fun getSongByIdFlow(id: String): Flow<Song>
     fun getSongsByIdFlow(ids: List<String>): Flow<ImmutableList<Song>>
     fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>
     fun getSongSetlistsById(id: String): Flow<ImmutableList<Setlist>>

@@ -41,7 +41,7 @@ import com.pointlessapps.songbook.ui.components.defaultSongbookButtonStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookButtonTextStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookIconStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
-import com.pointlessapps.songbook.ui.dialogs.ConfirmDeleteDialog
+import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
 import com.pointlessapps.songbook.ui.theme.IconDelete
 import com.pointlessapps.songbook.ui.theme.IconNote
 import com.pointlessapps.songbook.ui.theme.spacing
@@ -135,7 +135,7 @@ internal fun RemoveAccountScreen(
     SongbookLoader(state.isLoading)
 
     if (showConfirmationDialog) {
-        ConfirmDeleteDialog(
+        ConfirmationDialog(
             title = Res.string.remove_account_confirmation_title,
             description = Res.string.remove_account_confirmation_description,
             onConfirmClicked = {
