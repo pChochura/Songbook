@@ -44,7 +44,7 @@ internal fun PublicLyricsCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 SongbookText(
-                    text = lyrics.trackName.takeIf { it.isNotEmpty() }
+                    text = lyrics.trackName.takeIf(String::isNotEmpty)
                         ?: stringResource(Res.string.common_unnamed),
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurface,
@@ -52,7 +52,7 @@ internal fun PublicLyricsCard(
                     ),
                 )
                 SongbookText(
-                    text = lyrics.artistName.takeIf { it.isNotEmpty() }
+                    text = lyrics.artistName.takeIf(String::isNotEmpty)
                         ?: stringResource(Res.string.common_unknown),
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurfaceVariant,

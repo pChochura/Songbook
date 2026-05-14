@@ -4,22 +4,21 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.queue.QueueManager
-import com.pointlessapps.songbook.core.setlist.SetlistRepository
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.LyricsParser
 import com.pointlessapps.songbook.core.song.SongRepository
 import com.pointlessapps.songbook.core.song.model.Section
-import com.pointlessapps.songbook.core.song.model.Section.Companion.toLyrics
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.Keep
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.utils.BaseViewModel
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,12 +34,6 @@ import kotlinx.coroutines.launch
 
 internal sealed interface LyricsEvent {
     data object NavigateBack : LyricsEvent
-    data class NavigateToImportSong(
-        val songId: String,
-        val title: String,
-        val artist: String,
-        val lyrics: String,
-    ) : LyricsEvent
 }
 
 @Keep
@@ -70,14 +63,9 @@ internal sealed interface LyricsState {
         val previousSongTitle: String? = null,
         val nextSongTitle: String? = null,
         val showKeyOffsetFab: Boolean = true,
-        val allSetlists: ImmutableList<Setlist> = emptyImmutableList(),
-        val selectedSetlists: ImmutableList<Setlist> = emptyImmutableList(),
+        val selectedSetlists: ImmutableMap<Setlist, Boolean> = persistentMapOf(),
         val syncStatus: SyncStatus = SyncStatus.LOCAL,
-    ) : LyricsState {
-        val setlistsSelection: ImmutableMap<Setlist, Boolean> =
-            allSetlists.associateWith { it.id in selectedSetlists.map(Setlist::id) }
-                .toImmutableMap()
-    }
+    ) : LyricsState
 
     data object Loading : LyricsState
 
@@ -89,14 +77,13 @@ internal class LyricsViewModel(
     private val queueManager: QueueManager,
     private val prefsRepository: PrefsRepository,
     private val songRepository: SongRepository,
-    private val setlistRepository: SetlistRepository,
-    private val snackbarState: SongbookSnackbarState,
-) : BaseViewModel(snackbarState) {
+    snackbarState: SongbookSnackbarState,
+    private val songOptionsBottomSheetDelegate: SongOptionsBottomSheetDelegate,
+) : BaseViewModel(snackbarState), SongOptionsBottomSheetDelegate by songOptionsBottomSheetDelegate {
 
     @Stable
     private data class LyricsTransientState(
         val keyOffset: Int = 0,
-        val isLoading: Boolean = false,
     )
 
     private val _transientState = MutableStateFlow(LyricsTransientState())
@@ -110,24 +97,20 @@ internal class LyricsViewModel(
         Triple(currentSong, previousSong, nextSong)
     }.flatMapLatest { (currentSong, previousSong, nextSong) ->
         if (currentSong == null) {
-            // The queue has been cleared or is empty.
+            eventChannel.send(LyricsEvent.NavigateBack)
+
             return@flatMapLatest flowOf(LyricsState.Loading)
         }
 
         combine(
             syncRepository.currentSyncStatusFlow,
-            setlistRepository.getAllSetlistsFlow(),
             songRepository.getSongSetlistsById(currentSong.id),
             prefsRepository.getLyricsTextScaleFlow(),
             prefsRepository.getLyricsDisplayModeFlow(),
             prefsRepository.getLyricsWrapModeFlow(),
             prefsRepository.getShowKeyOffsetFabFlow(),
             _transientState,
-        ) { syncStatus, allSetlists, selectedSetlists, textScale, displayMode, wrapMode, showKeyOffsetFab, transient ->
-            if (transient.isLoading) {
-                return@combine LyricsState.Loading
-            }
-
+        ) { syncStatus, selectedSetlists, textScale, displayMode, wrapMode, showKeyOffsetFab, transient ->
             LyricsState.Loaded(
                 song = currentSong,
                 sections = LyricsParser.parseLyrics(currentSong.lyrics),
@@ -138,7 +121,6 @@ internal class LyricsViewModel(
                 previousSongTitle = previousSong?.title,
                 nextSongTitle = nextSong?.title,
                 showKeyOffsetFab = showKeyOffsetFab,
-                allSetlists = allSetlists,
                 selectedSetlists = selectedSetlists,
                 syncStatus = syncStatus,
             )
@@ -152,25 +134,16 @@ internal class LyricsViewModel(
     private val eventChannel = Channel<LyricsEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    init {
+        songOptionsBottomSheetDelegate.init(viewModelScope)
+    }
+
     fun onPreviousSongRequested(): Boolean {
         return queueManager.goToPreviousSong()
     }
 
     fun onNextSongRequested(): Boolean {
         return queueManager.goToNextSong()
-    }
-
-    fun onEditSongClicked() {
-        val state = state.value.loaded
-
-        eventChannel.trySend(
-            LyricsEvent.NavigateToImportSong(
-                songId = state.song.id,
-                title = state.song.title,
-                artist = state.song.artist,
-                lyrics = state.sections.toLyrics(),
-            ),
-        )
     }
 
     fun onTextScaleChanged(textScale: Int) {
@@ -201,27 +174,14 @@ internal class LyricsViewModel(
         }
     }
 
-    fun onSetlistsSelected(setlists: List<Setlist>) {
-        viewModelScope.launch {
-            songRepository.updateSongSetlists(
-                id = state.value.loaded.song.id,
-                setlistsIds = setlists.map { it.id },
-            )
-        }
-    }
-
     fun onBroadcastToTeamConfirmClicked() {
         // TODO
     }
 
-    fun onDeleteSongConfirmClicked() {
-        val state = state.value.loaded
-
+    override fun onSongDeleteClicked() {
         viewModelScope.launch {
-            _transientState.update { it.copy(isLoading = true) }
-            queueManager.removeFromQueue(state.song.id)
-            songRepository.deleteSong(state.song.id)
-            eventChannel.send(LyricsEvent.NavigateBack)
+            queueManager.removeFromQueue(state.value.loaded.song.id)
+            songRepository.deleteSong(state.value.loaded.song.id)
         }
     }
 

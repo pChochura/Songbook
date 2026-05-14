@@ -7,6 +7,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
+import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithInclusion
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
 import com.pointlessapps.songbook.core.song.database.entity.SongSearchEntity
 import com.pointlessapps.songbook.core.song.database.mapper.toSearchEntity
@@ -105,17 +106,13 @@ internal interface SongDao {
     )
     fun searchSongs(query: String): PagingSource<Int, SongSearchResult>
 
-    @Transaction
     @Query(
         """
-        SELECT s.*
-        FROM setlists s
-        INNER JOIN setlist_songs sj ON s.id = sj.setlist_id
-        WHERE sj.song_id = :id
-        ORDER BY sj.`order` ASC
+        SELECT *, EXISTS(SELECT 1 FROM setlist_songs WHERE setlist_id = setlists.id AND song_id = :id) AS isInSetlist
+        FROM setlists
     """,
     )
-    fun getSongSetlistsById(id: String): Flow<List<SetlistEntity>>
+    fun getSongSetlistsById(id: String): Flow<List<SetlistWithInclusion>>
 
     @Query("DELETE FROM setlist_songs WHERE song_id = :songId")
     suspend fun deleteSongSetlist(songId: String)

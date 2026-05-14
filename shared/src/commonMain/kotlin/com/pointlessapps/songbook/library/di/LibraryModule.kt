@@ -23,6 +23,7 @@ internal val libraryModule = module {
             prefsRepository = get(),
             authRepository = get(),
             snackbarState = get(),
+            songOptionsDelegate = get(),
         )
     }
 

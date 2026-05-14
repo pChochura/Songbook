@@ -41,10 +41,13 @@ import com.pointlessapps.songbook.shared.ui.setlist_delete_setlist
 import com.pointlessapps.songbook.shared.ui.setlist_delete_setlist_description
 import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
+import com.pointlessapps.songbook.ui.components.SongOptionsBottomSheetHandler
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetEvent.NavigateToImportSong
 import com.pointlessapps.songbook.utils.SyncingTopBarButton
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -66,6 +69,16 @@ internal fun SetlistScreen(
             is SetlistEvent.NavigateToLyrics -> navigator.navigateToLyrics()
         }
     }
+    viewModel.songEvents.collectWithLifecycle {
+        when (it) {
+            is NavigateToImportSong -> navigator.navigateToImportSong(
+                id = it.songId,
+                title = it.title,
+                artist = it.artist,
+                lyrics = it.lyrics,
+            )
+        }
+    }
 
     when (val state = state) {
         SetlistState.Loading -> SongbookLoader(true)
@@ -80,6 +93,7 @@ internal fun SetlistScreen(
             onRemoveSongFromSetlistClicked = viewModel::onRemoveSongFromSetlistClicked,
             onMove = viewModel::onMove,
             onReorderDone = viewModel::onReorderDone,
+            songOptionsBottomSheetDelegate = viewModel,
         )
     }
 }
@@ -96,8 +110,10 @@ private fun SetlistScreenContent(
     onRemoveSongFromSetlistClicked: (String) -> Unit,
     onMove: (Int, Int) -> Unit,
     onReorderDone: () -> Unit,
+    songOptionsBottomSheetDelegate: SongOptionsBottomSheetDelegate,
 ) {
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var isSongOptionsBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     var isAddSongToSetlistBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     val hapticFeedback = LocalHapticFeedback.current
@@ -137,7 +153,11 @@ private fun SetlistScreenContent(
                             },
                         ),
                         song = song,
-                        onLyricsClicked = onLyricsClicked,
+                        onClicked = { onLyricsClicked(song.id) },
+                        onLongClicked = {
+                            songOptionsBottomSheetDelegate.onSongLongClicked(song)
+                            isSongOptionsBottomSheetVisible = true
+                        },
                         onRemoveSongFromSetlistClicked = onRemoveSongFromSetlistClicked,
                     )
                 }
@@ -153,6 +173,12 @@ private fun SetlistScreenContent(
             item { Spacer(Modifier.bottomBarHeight()) }
         }
     }
+
+    SongOptionsBottomSheetHandler(
+        show = isSongOptionsBottomSheetVisible,
+        delegate = songOptionsBottomSheetDelegate,
+        onDismissRequest = { isSongOptionsBottomSheetVisible = false },
+    )
 
     val setlistsSongIds = remember(state.songs) { state.songs.map(Song::id).toImmutableSet() }
     AddSongToSetlistBottomSheet(

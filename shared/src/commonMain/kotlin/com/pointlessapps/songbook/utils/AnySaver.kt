@@ -12,7 +12,7 @@ import kotlinx.serialization.serializer
 import kotlin.reflect.typeOf
 
 @Composable
-internal inline fun <reified T : Any> rememberAnySaver(): Saver<T, String> = remember {
+internal inline fun <reified T> rememberAnySaver(): Saver<T, String> = remember {
     object : Saver<T, String> {
         override fun SaverScope.save(value: T): String = Json.encodeToString(value)
         override fun restore(value: String): T? = Json.decodeFromString(value)

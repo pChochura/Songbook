@@ -8,7 +8,11 @@ import com.pointlessapps.songbook.lyrics.di.lyricsModule
 import com.pointlessapps.songbook.preview.di.previewModule
 import com.pointlessapps.songbook.search.di.searchModule
 import com.pointlessapps.songbook.setlist.di.setlistModule
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegateImpl
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal val sharedModule = module {
@@ -24,6 +28,8 @@ internal val sharedModule = module {
             snackbarState = get(),
         )
     }
+
+    factoryOf(::SongOptionsBottomSheetDelegateImpl).bind<SongOptionsBottomSheetDelegate>()
 
     includes(
         introductionModule,

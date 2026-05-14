@@ -122,8 +122,10 @@ internal fun LyricsOptionsBottomSheet(
             OptionsBottomSheetItem.new(
                 icon = IconAddFolder,
                 label = Res.string.lyrics_menu_add_to_setlists,
-                description = state.selectedSetlists.joinToString { it.name }
-                    .takeIf { state.selectedSetlists.isNotEmpty() },
+                description = state.selectedSetlists.filterValues { it }.let { selectedSetlists ->
+                    selectedSetlists.keys.joinToString { it.name }
+                        .takeIf { selectedSetlists.isNotEmpty() }
+                },
                 onClick = { onAction(LyricsOptionsBottomSheetAction.AddToSetlists) },
             ),
             OptionsBottomSheetItem.new(
@@ -159,7 +161,7 @@ private fun LyricsOptionsBottomSheetHeader(title: String, artist: String) {
     ) {
         SongbookText(
             modifier = Modifier.fillMaxWidth(),
-            text = title.takeIf { it.isNotEmpty() }
+            text = title.takeIf(String::isNotEmpty)
                 ?: stringResource(Res.string.common_unnamed),
             textStyle = defaultSongbookTextStyle().copy(
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -170,7 +172,7 @@ private fun LyricsOptionsBottomSheetHeader(title: String, artist: String) {
 
         SongbookText(
             modifier = Modifier.fillMaxWidth(),
-            text = artist.takeIf { it.isNotEmpty() }
+            text = artist.takeIf(String::isNotEmpty)
                 ?: stringResource(Res.string.common_unknown),
             textStyle = defaultSongbookTextStyle().copy(
                 textColor = MaterialTheme.colorScheme.onSurfaceVariant,

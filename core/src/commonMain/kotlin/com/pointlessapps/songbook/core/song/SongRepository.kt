@@ -6,6 +6,7 @@ import com.pointlessapps.songbook.core.song.model.NewSong
 import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.core.song.model.SongSearchResult
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.Flow
 
 interface SongRepository {
@@ -18,7 +19,7 @@ interface SongRepository {
     fun getSongByIdFlow(id: String): Flow<Song>
     fun getSongsByIdFlow(ids: List<String>): Flow<ImmutableList<Song>>
     fun searchSongs(query: String): Flow<PagingData<SongSearchResult>>
-    fun getSongSetlistsById(id: String): Flow<ImmutableList<Setlist>>
+    fun getSongSetlistsById(id: String): Flow<ImmutableMap<Setlist, Boolean>>
 
     suspend fun updateSongSetlists(id: String, setlistsIds: List<String>)
     suspend fun saveSong(newSong: NewSong, setlistsIds: List<String>): String

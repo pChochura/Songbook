@@ -28,7 +28,7 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import com.pointlessapps.songbook.LocalNavigator
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.lyrics.DisplayMode
-import com.pointlessapps.songbook.lyrics.LyricsEvent
+import com.pointlessapps.songbook.lyrics.LyricsEvent.NavigateBack
 import com.pointlessapps.songbook.lyrics.LyricsState
 import com.pointlessapps.songbook.lyrics.LyricsViewModel
 import com.pointlessapps.songbook.lyrics.LyricsViewModel.Companion.MAX_ZOOM
@@ -54,8 +54,8 @@ import com.pointlessapps.songbook.lyrics.ui.dialogs.WrapModeDialog
 import com.pointlessapps.songbook.preview.ui.PreviewSongLayout
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_close_fullscreen
-import com.pointlessapps.songbook.shared.ui.lyrics_delete_song
-import com.pointlessapps.songbook.shared.ui.lyrics_delete_song_description
+import com.pointlessapps.songbook.shared.ui.common_delete_song
+import com.pointlessapps.songbook.shared.ui.common_delete_song_description
 import com.pointlessapps.songbook.shared.ui.lyrics_section_label
 import com.pointlessapps.songbook.ui.BackTopBarButton
 import com.pointlessapps.songbook.ui.MenuTopBarButton
@@ -69,6 +69,7 @@ import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
 import com.pointlessapps.songbook.ui.dialogs.SetlistsDialog
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetEvent.NavigateToImportSong
 import com.pointlessapps.songbook.utils.collectWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 
@@ -82,8 +83,12 @@ internal fun LyricsScreen(
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
-            is LyricsEvent.NavigateBack -> navigator.navigateBack()
-            is LyricsEvent.NavigateToImportSong -> navigator.navigateToImportSong(
+            is NavigateBack -> navigator.navigateBack()
+        }
+    }
+    viewModel.songEvents.collectWithLifecycle { event ->
+        when (event) {
+            is NavigateToImportSong -> navigator.navigateToImportSong(
                 id = event.songId,
                 title = event.title,
                 artist = event.artist,
@@ -99,15 +104,15 @@ internal fun LyricsScreen(
             onPreviousSongRequested = viewModel::onPreviousSongRequested,
             onNextSongRequested = viewModel::onNextSongRequested,
             onNavigateBack = navigator::navigateBack,
-            onEditSongClicked = viewModel::onEditSongClicked,
+            onEditSongClicked = viewModel::onSongEditClicked,
             onTextScaleChanged = viewModel::onTextScaleChanged,
             onKeyOffsetChanged = viewModel::onKeyOffsetChanged,
             onShowKeyOffsetFabChanged = viewModel::onShowKeyOffsetFabChanged,
             onDisplayModeChanged = viewModel::onDisplayModeChanged,
             onWrapModeChanged = viewModel::onWrapModeChanged,
-            onSetlistsSelected = viewModel::onSetlistsSelected,
+            onSetlistsSelected = viewModel::onSongSetlistsSelected,
             onBroadcastToTeamConfirmClicked = viewModel::onBroadcastToTeamConfirmClicked,
-            onDeleteSongConfirmClicked = viewModel::onDeleteSongConfirmClicked,
+            onDeleteSongConfirmClicked = viewModel::onSongDeleteClicked,
         )
     }
 }
@@ -294,7 +299,7 @@ private fun LyricsScreenContent(
 
     if (isSetlistsDialogVisible) {
         SetlistsDialog(
-            setlists = state.setlistsSelection,
+            setlists = state.selectedSetlists,
             onSetlistsSelected = {
                 onSetlistsSelected(it)
                 isSetlistsDialogVisible = false
@@ -320,8 +325,8 @@ private fun LyricsScreenContent(
 
     if (isConfirmDeleteDialogVisible) {
         ConfirmationDialog(
-            title = Res.string.lyrics_delete_song,
-            description = Res.string.lyrics_delete_song_description,
+            title = Res.string.common_delete_song,
+            description = Res.string.common_delete_song_description,
             onConfirmClicked = {
                 onDeleteSongConfirmClicked()
                 isConfirmDeleteDialogVisible = false

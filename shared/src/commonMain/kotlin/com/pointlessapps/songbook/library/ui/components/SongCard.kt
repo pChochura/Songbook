@@ -41,7 +41,8 @@ import org.jetbrains.compose.resources.stringResource
 internal fun SongCard(
     song: Song,
     displayMode: DisplayMode,
-    onClick: () -> Unit,
+    onClicked: () -> Unit,
+    onLongClicked: () -> Unit = {},
     enableSharedElementTransitions: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -100,7 +101,8 @@ internal fun SongCard(
 
     SongbookCard(
         modifier = modifier,
-        onClick = onClick,
+        onClick = onClicked,
+        onLongClick = onLongClicked,
     ) {
         AnimatedContent(displayMode) { displayMode ->
             Column(

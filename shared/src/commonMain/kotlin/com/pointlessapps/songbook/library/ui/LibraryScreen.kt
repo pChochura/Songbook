@@ -67,6 +67,7 @@ import com.pointlessapps.songbook.shared.ui.library_sort_by_title
 import com.pointlessapps.songbook.shared.ui.library_starting_with
 import com.pointlessapps.songbook.ui.MenuTopBarButton
 import com.pointlessapps.songbook.ui.TopBar
+import com.pointlessapps.songbook.ui.components.SongOptionsBottomSheetHandler
 import com.pointlessapps.songbook.ui.components.SongbookChip
 import com.pointlessapps.songbook.ui.components.SongbookLoader
 import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
@@ -78,6 +79,7 @@ import com.pointlessapps.songbook.ui.theme.IconAscending
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.IconDescending
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetEvent.NavigateToImportSong
 import com.pointlessapps.songbook.utils.SyncingTopBarButton
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
@@ -92,6 +94,7 @@ internal fun LibraryScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val songs = viewModel.songs.collectAsLazyPagingItems()
     var isBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var isSongOptionsBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
@@ -99,6 +102,17 @@ internal fun LibraryScreen(
             is LibraryEvent.NavigateToImportSong -> navigator.navigateToImportSong()
             is LibraryEvent.NavigateToLyrics -> navigator.navigateToLyrics()
             is LibraryEvent.NavigateToSetlist -> navigator.navigateToSetlist(event.id)
+        }
+    }
+
+    viewModel.songEvents.collectWithLifecycle {
+        when (it) {
+            is NavigateToImportSong -> navigator.navigateToImportSong(
+                id = it.songId,
+                title = it.title,
+                artist = it.artist,
+                lyrics = it.lyrics,
+            )
         }
     }
 
@@ -166,7 +180,11 @@ internal fun LibraryScreen(
                         song = result,
                         displayMode = state.displayMode,
                         enableSharedElementTransitions = true,
-                        onClick = { viewModel.onLyricsClicked(result.id) },
+                        onClicked = { viewModel.onLyricsClicked(result.id) },
+                        onLongClicked = {
+                            viewModel.onSongLongClicked(result)
+                            isSongOptionsBottomSheetVisible = true
+                        },
                     )
                 }
             }
@@ -184,6 +202,12 @@ internal fun LibraryScreen(
             item { Spacer(Modifier.bottomBarHeight()) }
         }
     }
+
+    SongOptionsBottomSheetHandler(
+        show = isSongOptionsBottomSheetVisible,
+        delegate = viewModel,
+        onDismissRequest = { isSongOptionsBottomSheetVisible = false },
+    )
 
     var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
     var isLogoutDialogVisible by rememberSaveable { mutableStateOf(false) }

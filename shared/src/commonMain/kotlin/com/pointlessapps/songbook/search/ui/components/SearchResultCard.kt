@@ -38,7 +38,7 @@ internal fun SearchResultCard(
         ) {
             Column {
                 SongbookText(
-                    text = result.title.takeIf { it.isNotEmpty() }
+                    text = result.title.takeIf(String::isNotEmpty)
                         ?: stringResource(Res.string.common_unnamed),
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurface,
@@ -46,7 +46,7 @@ internal fun SearchResultCard(
                     ),
                 )
                 SongbookText(
-                    text = result.artist.takeIf { it.isNotEmpty() }
+                    text = result.artist.takeIf(String::isNotEmpty)
                         ?: stringResource(Res.string.common_unknown),
                     textStyle = defaultSongbookTextStyle().copy(
                         textColor = MaterialTheme.colorScheme.onSurfaceVariant,

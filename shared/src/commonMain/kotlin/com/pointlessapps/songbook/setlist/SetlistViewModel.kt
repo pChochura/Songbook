@@ -22,6 +22,7 @@ import com.pointlessapps.songbook.shared.ui.setlist_song_removed_from_setlist
 import com.pointlessapps.songbook.ui.theme.IconInfo
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
 import com.pointlessapps.songbook.utils.SongbookSnackbarCallbackAction
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.collections.immutable.ImmutableList
@@ -74,7 +75,8 @@ internal class SetlistViewModel(
     private val setlistRepository: SetlistRepository,
     private val songRepository: SongRepository,
     private val snackbarState: SongbookSnackbarState,
-) : BaseViewModel(snackbarState) {
+    songOptionsBottomSheetDelegate: SongOptionsBottomSheetDelegate,
+) : BaseViewModel(snackbarState), SongOptionsBottomSheetDelegate by songOptionsBottomSheetDelegate {
 
     @Stable
     private data class SetlistTransientState(
@@ -127,6 +129,10 @@ internal class SetlistViewModel(
 
     private val eventChannel = Channel<SetlistEvent>()
     val events = eventChannel.receiveAsFlow()
+
+    init {
+        songOptionsBottomSheetDelegate.init(viewModelScope)
+    }
 
     fun onLyricsClicked(songId: String) {
         viewModelScope.launch {

@@ -22,6 +22,7 @@ import com.pointlessapps.songbook.shared.ui.error_account_already_linked_error
 import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.Keep
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -81,7 +82,8 @@ internal class LibraryViewModel(
     private val prefsRepository: PrefsRepository,
     private val authRepository: AuthRepository,
     private val snackbarState: SongbookSnackbarState,
-) : BaseViewModel(snackbarState) {
+    songOptionsDelegate: SongOptionsBottomSheetDelegate,
+) : BaseViewModel(snackbarState), SongOptionsBottomSheetDelegate by songOptionsDelegate {
 
     @Stable
     private data class LibraryTransientState(
@@ -136,6 +138,10 @@ internal class LibraryViewModel(
 
     private val eventChannel = Channel<LibraryEvent>(BUFFERED)
     val events = eventChannel.receiveAsFlow()
+
+    init {
+        songOptionsDelegate.init(viewModelScope)
+    }
 
     fun onSortBySelected(sortBy: SortBy) {
         viewModelScope.launch {

@@ -5,7 +5,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.pointlessapps.songbook.core.database.dao.SongDao
-import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.setlist.database.mapper.toDomain
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
@@ -18,6 +17,7 @@ import com.pointlessapps.songbook.core.sync.database.dao.SyncActionDao
 import com.pointlessapps.songbook.core.sync.database.entity.SyncAction
 import com.pointlessapps.songbook.core.sync.database.entity.SyncActionEntity
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -75,7 +75,11 @@ internal class SongRepositoryImpl(
     }
 
     override fun getSongSetlistsById(id: String) = songDao.getSongSetlistsById(id)
-        .map { it.map(SetlistEntity::toDomain).toImmutableList() }
+        .map { list ->
+            list.associate {
+                it.setlist.toDomain() to it.isInSetlist
+            }.toImmutableMap()
+        }
         .flowOn(Dispatchers.IO)
 
     override suspend fun updateSongSetlists(id: String, setlistsIds: List<String>) {

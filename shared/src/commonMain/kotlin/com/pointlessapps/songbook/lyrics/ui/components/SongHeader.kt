@@ -41,7 +41,7 @@ internal fun SongHeader(
                     animatedVisibilityScope = animatedContentScope,
                     resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
                 ),
-                text = title.takeIf { it.isNotEmpty() }
+                text = title.takeIf(String::isNotEmpty)
                     ?: stringResource(Res.string.common_unnamed),
                 textStyle = defaultSongbookTextStyle().copy(
                     textColor = MaterialTheme.colorScheme.onSurface,
@@ -56,7 +56,7 @@ internal fun SongHeader(
                     animatedVisibilityScope = animatedContentScope,
                     resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
                 ),
-                text = artist.takeIf { it.isNotEmpty() }
+                text = artist.takeIf(String::isNotEmpty)
                     ?: stringResource(Res.string.common_unknown),
                 textStyle = defaultSongbookTextStyle().copy(
                     textColor = MaterialTheme.colorScheme.onSurfaceVariant,

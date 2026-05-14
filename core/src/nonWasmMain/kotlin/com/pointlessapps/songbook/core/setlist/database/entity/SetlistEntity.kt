@@ -57,3 +57,10 @@ data class SetlistWithCount(
     val setlist: SetlistEntity,
     val songCount: Int,
 )
+
+@Keep
+data class SetlistWithInclusion(
+    @Embedded
+    val setlist: SetlistEntity,
+    val isInSetlist: Boolean,
+)

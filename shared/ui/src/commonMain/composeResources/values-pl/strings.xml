@@ -59,6 +59,8 @@
     <string name="common_clear_queue_description">Usuń wszystkie piosenki z kolejki i ukryj belkę z aktualnie graną piosenką.</string>
     <string name="common_edit">Edytuj</string>
     <string name="common_done">Zapisz</string>
+    <string name="common_delete_song">Usunąć piosenkę?</string>
+    <string name="common_delete_song_description">Piosenka zostanie przeniesiona do kosza, skąd będzie można ją później przywrócić.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">Wystąpił błąd podczas inicjalizacji aplikacji. Proszę uruchom aplikację ponownie</string>
@@ -69,6 +71,14 @@
     <string name="error_unknown_error">Wystąpił nieznany błąd</string>
     <string name="error_account_already_linked_error">To konto jest już powiązane z innym urządzeniem</string>
     <string name="error_login_failed">Logowanie nie powiodło się. Spróbuj ponownie.</string>
+
+    <!-- Song options -->
+    <string name="song_menu_edit">Edytuj</string>
+    <string name="song_menu_add_to_queue">Dodaj do kolejki</string>
+    <string name="song_menu_add_to_setlists">Dodaj do setlist</string>
+    <string name="song_menu_add_to_favourites">Dodaj do ulubionych</string>
+    <string name="song_menu_delete">Usuń piosenkę</string>
+    <string name="song_menu_delete_description">Piosenka zostanie przeniesiona do kosza</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Biblioteka</string>
@@ -166,8 +176,6 @@
     <string name="lyrics_display_mode_both_description">Akordy będą wyświetlane obok tekstu oraz nad każdą linią</string>
     <string name="lyrics_display_mode_text_only">Tylko tekst</string>
     <string name="lyrics_display_mode_text_only_description">Wyświetlany będzie tylko tekst</string>
-    <string name="lyrics_delete_song">Usunąć piosenkę?</string>
-    <string name="lyrics_delete_song_description">Zostanie przeniesiona do kosza, będziesz mógł ją później przywrócić.</string>
     <string name="lyrics_transpose">Transponuj</string>
     <string name="lyrics_show_key_offset_fab">Wyświetlaj stały widżet transpozycji na dole ekranu</string>
     <string name="lyrics_no_previous_song">To jest pierwsza piosenka</string>

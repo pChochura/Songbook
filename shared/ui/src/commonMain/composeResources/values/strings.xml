@@ -59,6 +59,8 @@
     <string name="common_clear_queue_description">Remove all the songs from the queue and hide the currently played song bottom bar.</string>
     <string name="common_edit">Edit</string>
     <string name="common_done">Done</string>
+    <string name="common_delete_song">Delete the song?</string>
+    <string name="common_delete_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
 
     <!-- Errors -->
     <string name="error_initilizing_error">An error occurred while initializing the app. Please restart the app</string>
@@ -69,6 +71,14 @@
     <string name="error_unknown_error">An unknown error occurred</string>
     <string name="error_account_already_linked_error">That account is already linked to another device</string>
     <string name="error_login_failed">The login failed. Please try again.</string>
+
+    <!-- Song options -->
+    <string name="song_menu_edit">Edit</string>
+    <string name="song_menu_add_to_queue">Add to queue</string>
+    <string name="song_menu_add_to_setlists">Add to setlists</string>
+    <string name="song_menu_add_to_favourites">Add to favourites</string>
+    <string name="song_menu_delete">Delete the song</string>
+    <string name="song_menu_delete_description">The song will be moved to the trash</string>
 
     <!-- Bottom navigation -->
     <string name="navigation_library">Library</string>
@@ -166,8 +176,6 @@
     <string name="lyrics_display_mode_both_description">The chords will be displayed to the side of the lyrics and above each line</string>
     <string name="lyrics_display_mode_text_only">Text only</string>
     <string name="lyrics_display_mode_text_only_description">Only the text will be displayed</string>
-    <string name="lyrics_delete_song">Delete the song?</string>
-    <string name="lyrics_delete_song_description">It will be moved to the trash, and you'll be able to restore it later.</string>
     <string name="lyrics_transpose">Transpose</string>
     <string name="lyrics_show_key_offset_fab">Display the permanent transpose widget on the bottom of the screen</string>
     <string name="lyrics_no_previous_song">It's the first song</string>
