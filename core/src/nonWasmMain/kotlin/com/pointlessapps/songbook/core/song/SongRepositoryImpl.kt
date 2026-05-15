@@ -84,10 +84,16 @@ internal class SongRepositoryImpl(
 
     override suspend fun updateSongSetlists(id: String, setlistsIds: List<String>) {
         withContext(Dispatchers.IO) {
+            val maxOrders = songDao.getSetlistsLastOrders(setlistsIds)
+
             songDao.updateSongSetlists(
                 songId = id,
                 setlistSongs = setlistsIds.mapIndexed { index, setlistId ->
-                    SetlistSongEntity(setlistId, id, index)
+                    SetlistSongEntity(
+                        setlistId = setlistId,
+                        songId = id,
+                        order = index + (maxOrders[setlistId] ?: 0),
+                    )
                 },
             )
 
@@ -109,10 +115,16 @@ internal class SongRepositoryImpl(
                 lyrics = newSong.lyrics,
             )
 
+            val maxOrders = songDao.getSetlistsLastOrders(setlistsIds)
+
             songDao.insertSongWithSetlists(
                 song = song.toEntity(),
                 setlistsSongs = setlistsIds.mapIndexed { index, setlistId ->
-                    SetlistSongEntity(setlistId, song.id, index)
+                    SetlistSongEntity(
+                        setlistId = setlistId,
+                        songId = song.id,
+                        order = index + (maxOrders[setlistId] ?: 0),
+                    )
                 },
             )
 

@@ -52,7 +52,6 @@ import com.pointlessapps.songbook.utils.SyncingTopBarButton
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
 import kotlinx.collections.immutable.toImmutableSet
-import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
@@ -141,26 +140,17 @@ private fun SetlistScreenContent(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large),
         ) {
             items(state.songs, key = { it.id }) { song ->
-                ReorderableItem(
-                    state = reorderableLazyListState,
-                    key = song.id,
-                ) {
-                    SetlistSongItem(
-                        modifier = Modifier.longPressDraggableHandle(
-                            onDragStopped = {
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onReorderDone()
-                            },
-                        ),
-                        song = song,
-                        onClicked = { onLyricsClicked(song.id) },
-                        onLongClicked = {
-                            songOptionsBottomSheetDelegate.onSongLongClicked(song)
-                            isSongOptionsBottomSheetVisible = true
-                        },
-                        onRemoveSongFromSetlistClicked = onRemoveSongFromSetlistClicked,
-                    )
-                }
+                SetlistSongItem(
+                    song = song,
+                    onClicked = { onLyricsClicked(song.id) },
+                    onLongClicked = {
+                        songOptionsBottomSheetDelegate.onSongLongClicked(song)
+                        isSongOptionsBottomSheetVisible = true
+                    },
+                    onRemoveSongFromSetlistClicked = onRemoveSongFromSetlistClicked,
+                    onReorderDone = onReorderDone,
+                    reorderableLazyListState = reorderableLazyListState,
+                )
             }
 
             item(key = "add_to_setlist_button") {

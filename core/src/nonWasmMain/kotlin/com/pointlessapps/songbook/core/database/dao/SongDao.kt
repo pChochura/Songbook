@@ -2,10 +2,10 @@ package com.pointlessapps.songbook.core.database.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
+import androidx.room.MapColumn
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.pointlessapps.songbook.core.setlist.database.entity.SetlistEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistSongEntity
 import com.pointlessapps.songbook.core.setlist.database.entity.SetlistWithInclusion
 import com.pointlessapps.songbook.core.song.database.entity.SongEntity
@@ -116,6 +116,11 @@ internal interface SongDao {
 
     @Query("DELETE FROM setlist_songs WHERE song_id = :songId")
     suspend fun deleteSongSetlist(songId: String)
+
+    @Query("SELECT setlist_id, MAX(`order`) as max FROM setlist_songs WHERE setlist_id IN (:setlistsIds)")
+    suspend fun getSetlistsLastOrders(
+        setlistsIds: List<String>,
+    ): Map<@MapColumn("setlist_id") String, @MapColumn("max") Int?>
 
     @Upsert
     suspend fun insertSetlistSongs(setlistSongs: List<SetlistSongEntity>)

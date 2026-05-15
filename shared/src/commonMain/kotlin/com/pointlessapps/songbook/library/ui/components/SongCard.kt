@@ -44,6 +44,7 @@ internal fun SongCard(
     onClicked: () -> Unit,
     onLongClicked: () -> Unit = {},
     enableSharedElementTransitions: Boolean = false,
+    supportingButtonContent: @Composable () -> Unit = { DefaultSongCardSupportingButton() },
     modifier: Modifier = Modifier,
 ) {
     val sharedContentConfig = object : SharedContentConfig {
@@ -131,16 +132,7 @@ internal fun SongCard(
                         Spacer(Modifier.weight(1f))
                     }
 
-                    SongbookIconButton(
-                        icon = IconFavouriteEmpty,
-                        tooltipLabel = Res.string.library_add_to_favourites,
-                        onClick = {},
-                        iconButtonStyle = defaultSongbookIconButtonStyle().copy(
-                            outlineColor = Color.Transparent,
-                            containerColor = Color.Transparent,
-                            contentColor = MaterialTheme.colorScheme.primary,
-                        ),
-                    )
+                    supportingButtonContent()
                 }
 
                 if (displayMode == DisplayMode.Grid) {
@@ -149,4 +141,18 @@ internal fun SongCard(
             }
         }
     }
+}
+
+@Composable
+internal fun DefaultSongCardSupportingButton() {
+    SongbookIconButton(
+        icon = IconFavouriteEmpty,
+        tooltipLabel = Res.string.library_add_to_favourites,
+        onClick = {},
+        iconButtonStyle = defaultSongbookIconButtonStyle().copy(
+            outlineColor = Color.Transparent,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.primary,
+        ),
+    )
 }

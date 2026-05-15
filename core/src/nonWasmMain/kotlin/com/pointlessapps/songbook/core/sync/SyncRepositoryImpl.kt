@@ -34,6 +34,8 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
 internal class SyncRepositoryImpl(
@@ -46,6 +48,7 @@ internal class SyncRepositoryImpl(
     private val songsTable = supabase.from(SONGS_TABLE)
     private val setlistsTable = supabase.from(SETLISTS_TABLE)
     private val setlistSongsTable = supabase.from(SETLIST_SONGS_TABLE)
+    private val setlistSongsMaxOrdersView = supabase.from(SETLIST_SONGS_MAX_ORDERS_VIEW)
 
     private val _syncStatus = MutableStateFlow(SyncStatus.LOCAL)
     override val currentSyncStatusFlow: StateFlow<SyncStatus> = _syncStatus.asStateFlow()
@@ -110,9 +113,16 @@ internal class SyncRepositoryImpl(
                 when (val payload = action.syncAction) {
                     is SyncAction.SaveSong -> {
                         songsTable.upsert(payload.song)
+                        val maxOrders = setlistSongsMaxOrdersView.select {
+                            filter { SetlistSongEntity::setlistId isIn payload.setlistsIds }
+                        }.decodeList<MaxOrderResponse>().associate { it.setlistId to it.maxOrder }
                         setlistSongsTable.upsert(
                             payload.setlistsIds.mapIndexed { index, setlistId ->
-                                SetlistSongEntity(setlistId, payload.song.id, index)
+                                SetlistSongEntity(
+                                    setlistId = setlistId,
+                                    songId = payload.song.id,
+                                    order = index + (maxOrders[setlistId] ?: 0),
+                                )
                             },
                         )
                     }
@@ -140,9 +150,16 @@ internal class SyncRepositoryImpl(
                                 }
                             }
                         }
+                        val maxOrders = setlistSongsMaxOrdersView.select {
+                            filter { SetlistSongEntity::setlistId isIn payload.setlistsIds }
+                        }.decodeList<MaxOrderResponse>().associate { it.setlistId to it.maxOrder }
                         setlistSongsTable.upsert(
                             payload.setlistsIds.mapIndexed { index, setlistId ->
-                                SetlistSongEntity(setlistId, payload.id, index)
+                                SetlistSongEntity(
+                                    setlistId = setlistId,
+                                    songId = payload.id,
+                                    order = index + (maxOrders[setlistId] ?: 0),
+                                )
                             },
                         )
                     }
@@ -206,7 +223,14 @@ internal class SyncRepositoryImpl(
         const val SONGS_TABLE = "songs"
         const val SETLISTS_TABLE = "setlists"
         const val SETLIST_SONGS_TABLE = "setlist_songs"
+        const val SETLIST_SONGS_MAX_ORDERS_VIEW = "setlist_song_max_orders"
 
         val SYNC_DEBOUNCE = 2.seconds
     }
+
+    @Serializable
+    private data class MaxOrderResponse(
+        @SerialName("setlist_id") val setlistId: String,
+        @SerialName("max_order") val maxOrder: Int?,
+    )
 }
