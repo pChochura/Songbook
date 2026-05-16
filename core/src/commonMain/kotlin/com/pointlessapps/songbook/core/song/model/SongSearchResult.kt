@@ -8,5 +8,6 @@ data class SongSearchResult(
     val songId: String,
     val title: String,
     val artist: String,
+    val plainLyrics: String,
     val snippet: String,
 )

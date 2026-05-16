@@ -144,7 +144,12 @@ private fun SetlistScreenContent(
                     song = song,
                     onClicked = { onLyricsClicked(song.id) },
                     onLongClicked = {
-                        songOptionsBottomSheetDelegate.onSongLongClicked(song)
+                        songOptionsBottomSheetDelegate.onSongLongClicked(
+                            songId = song.id,
+                            title = song.title,
+                            artist = song.artist,
+                            lyrics = song.lyrics,
+                        )
                         isSongOptionsBottomSheetVisible = true
                     },
                     onRemoveSongFromSetlistClicked = onRemoveSongFromSetlistClicked,

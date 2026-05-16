@@ -20,6 +20,7 @@ import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.utils.BaseViewModel
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
 import com.pointlessapps.songbook.utils.SongbookSnackbarState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -78,7 +79,8 @@ internal class SearchViewModel(
     private val songRepository: SongRepository,
     private val publicLyricsRepository: PublicLyricsRepository,
     snackbarState: SongbookSnackbarState,
-) : BaseViewModel(snackbarState) {
+    songOptionBottomSheetDelegate: SongOptionsBottomSheetDelegate,
+) : BaseViewModel(snackbarState), SongOptionsBottomSheetDelegate by songOptionBottomSheetDelegate {
 
     private val eventChannel = Channel<SearchEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -150,6 +152,7 @@ internal class SearchViewModel(
     )
 
     init {
+        songOptionBottomSheetDelegate.init(viewModelScope)
         viewModelScope.launch {
             _transientState.update {
                 it.copy(showPublicLyrics = prefsRepository.getShowPublicLyrics())

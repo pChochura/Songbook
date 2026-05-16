@@ -99,6 +99,7 @@ internal interface SongDao {
             songId,
             title, 
             artist, 
+            plainLyrics,
             snippet(songs_search, '<b>', '</b>', '...', -1, 10) as snippet
         FROM songs_search
         WHERE songs_search MATCH :query

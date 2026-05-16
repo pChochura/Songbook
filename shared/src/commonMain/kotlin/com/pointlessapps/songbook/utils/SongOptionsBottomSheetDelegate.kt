@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import com.pointlessapps.songbook.core.queue.QueueManager
 import com.pointlessapps.songbook.core.setlist.model.Setlist
 import com.pointlessapps.songbook.core.song.SongRepository
-import com.pointlessapps.songbook.core.song.model.Song
 import com.pointlessapps.songbook.utils.SongOptionsBottomSheetState.Loaded
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
@@ -26,7 +25,13 @@ internal interface SongOptionsBottomSheetDelegate {
 
     fun init(coroutineScope: CoroutineScope)
 
-    fun onSongLongClicked(song: Song)
+    fun onSongLongClicked(
+        songId: String,
+        title: String,
+        artist: String,
+        lyrics: String,
+    )
+
     fun onSongEditClicked()
     fun onSongSetlistsSelected(setlists: List<Setlist>)
     fun onSongAddToQueueClicked()
@@ -53,11 +58,32 @@ internal class SongOptionsBottomSheetDelegateImpl(
         this.coroutineScope = coroutineScope
     }
 
-    override fun onSongLongClicked(song: Song) {
-        _songState.update { Loaded(song, persistentMapOf()) }
+    override fun onSongLongClicked(
+        songId: String,
+        title: String,
+        artist: String,
+        lyrics: String,
+    ) {
+        _songState.update {
+            Loaded(
+                songId = songId,
+                title = title,
+                artist = artist,
+                lyrics = lyrics,
+                setlists = persistentMapOf(),
+            )
+        }
         coroutineScope.launch {
-            songRepository.getSongSetlistsById(song.id).firstOrNull()?.let { setlists ->
-                _songState.update { Loaded(song, setlists) }
+            songRepository.getSongSetlistsById(songId).firstOrNull()?.let { setlists ->
+                _songState.update {
+                    Loaded(
+                        songId = songId,
+                        title = title,
+                        artist = artist,
+                        lyrics = lyrics,
+                        setlists = setlists,
+                    )
+                }
             }
         }
     }
@@ -67,10 +93,10 @@ internal class SongOptionsBottomSheetDelegateImpl(
 
         _songEvents.trySend(
             SongOptionsBottomSheetEvent.NavigateToImportSong(
-                songId = state.song.id,
-                title = state.song.title,
-                artist = state.song.artist,
-                lyrics = state.song.lyrics,
+                songId = state.songId,
+                title = state.title,
+                artist = state.artist,
+                lyrics = state.lyrics,
             ),
         )
     }
@@ -80,7 +106,7 @@ internal class SongOptionsBottomSheetDelegateImpl(
 
         coroutineScope.launch {
             songRepository.updateSongSetlists(
-                id = state.song.id,
+                id = state.songId,
                 setlistsIds = setlists.map(Setlist::id),
             )
         }
@@ -90,7 +116,7 @@ internal class SongOptionsBottomSheetDelegateImpl(
         val state = songState.value as? Loaded ?: return
 
         coroutineScope.launch {
-            queueManager.addToQueue(state.song.id)
+            queueManager.addToQueue(state.songId)
         }
     }
 
@@ -102,8 +128,8 @@ internal class SongOptionsBottomSheetDelegateImpl(
         val state = songState.value as? Loaded ?: return
 
         coroutineScope.launch {
-            queueManager.removeFromQueue(state.song.id)
-            songRepository.deleteSong(state.song.id)
+            queueManager.removeFromQueue(state.songId)
+            songRepository.deleteSong(state.songId)
         }
     }
 }
@@ -112,7 +138,10 @@ internal class SongOptionsBottomSheetDelegateImpl(
 internal sealed interface SongOptionsBottomSheetState {
     data object Empty : SongOptionsBottomSheetState
     data class Loaded(
-        val song: Song,
+        val songId: String,
+        val title: String,
+        val artist: String,
+        val lyrics: String,
         val setlists: ImmutableMap<Setlist, Boolean>,
     ) : SongOptionsBottomSheetState
 }

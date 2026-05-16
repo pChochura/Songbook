@@ -60,8 +60,8 @@ internal fun SongOptionsBottomSheet(
             onDismissRequest = onDismissRequest,
             headerContent = {
                 SongOptionsBottomSheetHeader(
-                    title = state.song.title,
-                    artist = state.song.artist,
+                    title = state.title,
+                    artist = state.artist,
                 )
             },
             items = persistentListOf(

@@ -24,11 +24,13 @@ import org.jetbrains.compose.resources.stringResource
 internal fun SearchResultCard(
     result: SongSearchResult,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SongbookCard(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
+        onLongClick = onLongClick,
     ) {
         Column(
             modifier = Modifier

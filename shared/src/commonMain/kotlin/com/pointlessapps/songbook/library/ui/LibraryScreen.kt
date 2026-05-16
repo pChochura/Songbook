@@ -177,7 +177,12 @@ internal fun LibraryScreen(
                         enableSharedElementTransitions = true,
                         onClicked = { viewModel.onLyricsClicked(result.id) },
                         onLongClicked = {
-                            viewModel.onSongLongClicked(result)
+                            viewModel.onSongLongClicked(
+                                songId = result.id,
+                                title = result.title,
+                                artist = result.artist,
+                                lyrics = result.lyrics,
+                            )
                             isSongOptionsBottomSheetVisible = true
                         },
                     )

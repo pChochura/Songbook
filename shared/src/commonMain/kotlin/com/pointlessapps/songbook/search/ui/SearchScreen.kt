@@ -32,6 +32,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,6 +76,7 @@ import com.pointlessapps.songbook.shared.ui.search_public_lyrics
 import com.pointlessapps.songbook.shared.ui.search_what_is_public_lyrics
 import com.pointlessapps.songbook.shared.ui.search_your_library
 import com.pointlessapps.songbook.ui.components.Position
+import com.pointlessapps.songbook.ui.components.SongOptionsBottomSheetHandler
 import com.pointlessapps.songbook.ui.components.SongbookButton
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookIconButton
@@ -93,6 +95,7 @@ import com.pointlessapps.songbook.ui.theme.IconHelp
 import com.pointlessapps.songbook.ui.theme.IconHistory
 import com.pointlessapps.songbook.ui.theme.IconNote
 import com.pointlessapps.songbook.ui.theme.spacing
+import com.pointlessapps.songbook.utils.SongOptionsBottomSheetEvent.NavigateToImportSong
 import com.pointlessapps.songbook.utils.add
 import com.pointlessapps.songbook.utils.collectWithLifecycle
 import org.jetbrains.compose.resources.stringResource
@@ -107,6 +110,7 @@ internal fun SearchScreen(
     var confirmRemoveLastSearchDialogData by remember { mutableStateOf<String?>(null) }
     var isPublicLyricsHelpDialogVisible by remember { mutableStateOf(false) }
     var importPublicLyricsDialogData by remember { mutableStateOf<PublicLyrics?>(null) }
+    var isSongOptionsBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
@@ -122,6 +126,16 @@ internal fun SearchScreen(
                 title = event.title,
                 artist = event.artist,
                 sections = event.sections,
+            )
+        }
+    }
+    viewModel.songEvents.collectWithLifecycle {
+        when (it) {
+            is NavigateToImportSong -> navigator.navigateToImportSong(
+                id = it.songId,
+                title = it.title,
+                artist = it.artist,
+                lyrics = it.lyrics,
             )
         }
     }
@@ -200,6 +214,15 @@ internal fun SearchScreen(
                             modifier = Modifier.animateItem(),
                             result = result,
                             onClick = { viewModel.onLyricsClicked(result.songId) },
+                            onLongClick = {
+                                viewModel.onSongLongClicked(
+                                    songId = result.songId,
+                                    title = result.title,
+                                    artist = result.artist,
+                                    lyrics = result.plainLyrics,
+                                )
+                                isSongOptionsBottomSheetVisible = true
+                            },
                         )
                     }
                 }
@@ -266,6 +289,12 @@ internal fun SearchScreen(
             item { Spacer(Modifier.bottomBarHeight()) }
         }
     }
+
+    SongOptionsBottomSheetHandler(
+        show = isSongOptionsBottomSheetVisible,
+        delegate = viewModel,
+        onDismissRequest = { isSongOptionsBottomSheetVisible = false },
+    )
 
     confirmRemoveLastSearchDialogData?.let {
         ConfirmRemoveLastSearchDialog(

@@ -17,6 +17,7 @@ internal fun SongEntity.toSearchEntity() = SongSearchEntity(
     songId = id,
     title = title,
     artist = artist,
+    plainLyrics = lyrics,
     content = lyrics.replace(Regex("\\[.*?]"), ""),
 )
 

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
 
-@Fts4
+@Fts4(notIndexed = ["plainLyrics"])
 @Entity(tableName = "songs_search")
 data class SongSearchEntity(
     @PrimaryKey @ColumnInfo(name = "rowid") val id: Int? = null,
@@ -13,4 +13,5 @@ data class SongSearchEntity(
     val title: String,
     val artist: String,
     val content: String,
+    val plainLyrics: String,
 )
