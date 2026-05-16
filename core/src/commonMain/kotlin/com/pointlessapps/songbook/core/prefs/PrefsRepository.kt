@@ -28,4 +28,6 @@ interface PrefsRepository {
 
     fun getLibrarySortByFlow(): Flow<Pair<String, Boolean>?>
     suspend fun setLibrarySortBy(field: String, ascending: Boolean)
+
+    suspend fun clearData()
 }

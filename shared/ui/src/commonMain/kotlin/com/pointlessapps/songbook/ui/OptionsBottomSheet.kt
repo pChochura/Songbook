@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +24,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import com.pointlessapps.songbook.ui.OptionsBottomSheetItem.Button
+import com.pointlessapps.songbook.ui.OptionsBottomSheetItem.Divider
 import com.pointlessapps.songbook.ui.components.SongbookBottomSheet
 import com.pointlessapps.songbook.ui.components.SongbookIcon
 import com.pointlessapps.songbook.ui.components.SongbookText
@@ -40,28 +43,39 @@ fun OptionsBottomSheet(
     show: Boolean,
     onDismissRequest: () -> Unit,
     items: ImmutableList<OptionsBottomSheetItem>,
-    header: @Composable () -> Unit = { },
+    headerContent: @Composable () -> Unit = {},
+    footerContent: @Composable () -> Unit = { OptionsBottomSheetFooter() },
 ) {
     SongbookBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
     ) {
-        LazyColumn(
-            contentPadding = PaddingValues(all = MaterialTheme.spacing.extraLarge),
-            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-        ) {
-            item { Spacer(Modifier.statusBarsPadding()) }
-            item { header() }
-            items(items) {
-                when (it) {
-                    is OptionsBottomSheetItem.Button -> OptionsBottomSheetItemButton(it)
-                    OptionsBottomSheetItem.Divider -> HorizontalDivider(
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                    )
-                }
+        OptionsBottomSheetContent(
+            headerContent = headerContent,
+            footerContent = footerContent,
+            items = items,
+        )
+    }
+}
+
+@Composable
+fun OptionsBottomSheetContent(
+    headerContent: @Composable () -> Unit,
+    footerContent: @Composable () -> Unit,
+    items: ImmutableList<OptionsBottomSheetItem>,
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(all = MaterialTheme.spacing.extraLarge),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
+    ) {
+        item { headerContent() }
+        items(items) {
+            when (it) {
+                is Button -> OptionsBottomSheetItemButton(it)
+                is Divider -> OptionsBottomSheetDivider()
             }
-            item { Spacer(Modifier.navigationBarsPadding()) }
         }
+        item { footerContent() }
     }
 }
 
@@ -70,6 +84,7 @@ fun OptionsBottomSheetTitleHeader(title: String) {
     SongbookText(
         modifier = Modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(bottom = MaterialTheme.spacing.small),
         text = title,
         textStyle = defaultSongbookTextStyle().copy(
@@ -81,7 +96,12 @@ fun OptionsBottomSheetTitleHeader(title: String) {
 }
 
 @Composable
-fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem.Button) {
+fun OptionsBottomSheetFooter() {
+    Spacer(Modifier.navigationBarsPadding())
+}
+
+@Composable
+fun OptionsBottomSheetItemButton(item: Button) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -123,6 +143,11 @@ fun OptionsBottomSheetItemButton(item: OptionsBottomSheetItem.Button) {
     }
 }
 
+@Composable
+fun OptionsBottomSheetDivider() {
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+}
+
 @Stable
 sealed interface OptionsBottomSheetItem {
     @Stable
@@ -138,6 +163,7 @@ sealed interface OptionsBottomSheetItem {
 
     companion object {
         @Composable
+        @ReadOnlyComposable
         fun new(
             label: StringResource,
             onClick: () -> Unit,

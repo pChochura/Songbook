@@ -8,6 +8,7 @@ import com.pointlessapps.songbook.lyrics.di.lyricsModule
 import com.pointlessapps.songbook.preview.di.previewModule
 import com.pointlessapps.songbook.search.di.searchModule
 import com.pointlessapps.songbook.setlist.di.setlistModule
+import com.pointlessapps.songbook.settings.di.settingsModule
 import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
 import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegateImpl
 import org.koin.core.module.dsl.factoryOf
@@ -34,6 +35,7 @@ internal val sharedModule = module {
     includes(
         introductionModule,
         libraryModule,
+        settingsModule,
         lyricsModule,
         searchModule,
         setlistModule,

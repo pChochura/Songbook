@@ -1,12 +1,10 @@
 package com.pointlessapps.songbook.library
 
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.pointlessapps.songbook.core.app.AppRepository
 import com.pointlessapps.songbook.core.auth.AuthRepository
-import com.pointlessapps.songbook.core.auth.exceptions.AccountAlreadyLinkedException
 import com.pointlessapps.songbook.core.auth.model.LoginStatus
 import com.pointlessapps.songbook.core.prefs.PrefsRepository
 import com.pointlessapps.songbook.core.queue.QueueManager
@@ -17,9 +15,6 @@ import com.pointlessapps.songbook.core.sync.SyncRepository
 import com.pointlessapps.songbook.core.sync.model.SyncStatus
 import com.pointlessapps.songbook.core.utils.emptyImmutableList
 import com.pointlessapps.songbook.library.ui.mapper.toDomain
-import com.pointlessapps.songbook.shared.ui.Res
-import com.pointlessapps.songbook.shared.ui.error_account_already_linked_error
-import com.pointlessapps.songbook.ui.theme.IconWarning
 import com.pointlessapps.songbook.utils.BaseViewModel
 import com.pointlessapps.songbook.utils.Keep
 import com.pointlessapps.songbook.utils.SongOptionsBottomSheetDelegate
@@ -42,6 +37,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 internal sealed interface LibraryEvent {
+    data object NavigateToSettings : LibraryEvent
     data object NavigateToIntroduction : LibraryEvent
     data object NavigateToImportSong : LibraryEvent
     data object NavigateToLyrics : LibraryEvent
@@ -175,37 +171,8 @@ internal class LibraryViewModel(
         }
     }
 
-    fun loginClicked() {
-        viewModelScope.launch {
-            try {
-                authRepository.linkWithGoogle()
-            } catch (_: AccountAlreadyLinkedException) {
-                snackbarState.showSnackbar(
-                    message = Res.string.error_account_already_linked_error,
-                    icon = IconWarning,
-                    duration = SnackbarDuration.Long,
-                )
-            }
-        }
-    }
-
-    fun logoutClicked() {
-        viewModelScope.launch {
-            authRepository.logout()
-            syncRepository.clearDatabase()
-            eventChannel.send(LibraryEvent.NavigateToIntroduction)
-        }
-    }
-
-    fun removeAccountClicked() {
-        viewModelScope.launch {
-            authRepository.getTokens()?.let { (accessToken, refreshToken) ->
-                appRepository.openRemoveAccountWebsite(accessToken, refreshToken)
-            }
-            authRepository.clearSession()
-            syncRepository.clearDatabase()
-            eventChannel.send(LibraryEvent.NavigateToIntroduction)
-        }
+    fun onSettingsClicked() {
+        eventChannel.trySend(LibraryEvent.NavigateToSettings)
     }
 
     fun onDisplayModeChanged(mode: DisplayMode) {

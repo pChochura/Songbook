@@ -26,7 +26,7 @@ internal fun SetlistOptionsBottomSheet(
     OptionsBottomSheet(
         show = show,
         onDismissRequest = onDismissRequest,
-        header = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
+        headerContent = { OptionsBottomSheetTitleHeader(stringResource(Res.string.common_menu)) },
         items = persistentListOf(
             OptionsBottomSheetItem.Divider,
             OptionsBottomSheetItem.new(

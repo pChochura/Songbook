@@ -3,6 +3,7 @@ package com.pointlessapps.songbook.core.prefs
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -153,6 +154,12 @@ internal class PrefsRepositoryImpl(
                     set(librarySortByAscendingKey, ascending)
                 }
             }
+        }
+    }
+
+    override suspend fun clearData() {
+        withContext(Dispatchers.IO) {
+            dataStore.edit { it.clear() }
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -57,7 +58,7 @@ internal fun SongOptionsBottomSheet(
         OptionsBottomSheet(
             show = show,
             onDismissRequest = onDismissRequest,
-            header = {
+            headerContent = {
                 SongOptionsBottomSheetHeader(
                     title = state.song.title,
                     artist = state.song.artist,
@@ -107,7 +108,9 @@ internal fun SongOptionsBottomSheet(
 @Composable
 private fun SongOptionsBottomSheetHeader(title: String, artist: String) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .statusBarsPadding()
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

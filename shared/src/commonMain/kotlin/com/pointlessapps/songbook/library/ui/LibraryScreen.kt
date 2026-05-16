@@ -43,20 +43,15 @@ import com.pointlessapps.songbook.library.ui.components.AddSetlistCard
 import com.pointlessapps.songbook.library.ui.components.AddSongCard
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheet
 import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.DisplayMode
-import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Login
-import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Logout
-import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.RemoveAccount
+import com.pointlessapps.songbook.library.ui.components.LibraryOptionsBottomSheetAction.Settings
 import com.pointlessapps.songbook.library.ui.components.SetlistCard
 import com.pointlessapps.songbook.library.ui.components.ShowMoreButton
 import com.pointlessapps.songbook.library.ui.components.SongCard
 import com.pointlessapps.songbook.library.ui.dialogs.AddSetlistDialog
 import com.pointlessapps.songbook.library.ui.dialogs.DisplayModeDialog
-import com.pointlessapps.songbook.library.ui.dialogs.LogoutDialog
 import com.pointlessapps.songbook.library.ui.dialogs.SortByDialog
 import com.pointlessapps.songbook.shared.ui.Res
 import com.pointlessapps.songbook.shared.ui.common_app_name
-import com.pointlessapps.songbook.shared.ui.common_remove_account
-import com.pointlessapps.songbook.shared.ui.common_remove_account_description
 import com.pointlessapps.songbook.shared.ui.library_setlists_section_title
 import com.pointlessapps.songbook.shared.ui.library_songs_found
 import com.pointlessapps.songbook.shared.ui.library_songs_section_title
@@ -74,7 +69,6 @@ import com.pointlessapps.songbook.ui.components.SongbookScaffoldLayout
 import com.pointlessapps.songbook.ui.components.SongbookText
 import com.pointlessapps.songbook.ui.components.defaultSongbookChipStyle
 import com.pointlessapps.songbook.ui.components.defaultSongbookTextStyle
-import com.pointlessapps.songbook.ui.dialogs.ConfirmationDialog
 import com.pointlessapps.songbook.ui.theme.IconAscending
 import com.pointlessapps.songbook.ui.theme.IconClose
 import com.pointlessapps.songbook.ui.theme.IconDescending
@@ -98,6 +92,7 @@ internal fun LibraryScreen(
 
     viewModel.events.collectWithLifecycle { event ->
         when (event) {
+            is LibraryEvent.NavigateToSettings -> navigator.navigateToSettings()
             is LibraryEvent.NavigateToIntroduction -> navigator.navigateToIntroduction()
             is LibraryEvent.NavigateToImportSong -> navigator.navigateToImportSong()
             is LibraryEvent.NavigateToLyrics -> navigator.navigateToLyrics()
@@ -210,8 +205,6 @@ internal fun LibraryScreen(
     )
 
     var isDisplayModeDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isLogoutDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isRemoveAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     LibraryOptionsBottomSheet(
         show = isBottomSheetVisible,
@@ -222,9 +215,7 @@ internal fun LibraryScreen(
 
             when (it) {
                 DisplayMode -> isDisplayModeDialogVisible = true
-                Login -> viewModel.loginClicked()
-                Logout -> isLogoutDialogVisible = true
-                RemoveAccount -> isRemoveAccountDialogVisible = true
+                Settings -> viewModel.onSettingsClicked()
             }
         },
     )
@@ -237,29 +228,6 @@ internal fun LibraryScreen(
                 isDisplayModeDialogVisible = false
             },
             onDismissRequest = { isDisplayModeDialogVisible = false },
-        )
-    }
-
-    if (isLogoutDialogVisible) {
-        LogoutDialog(
-            loginStatus = state.loginStatus,
-            onConfirmClicked = {
-                viewModel.logoutClicked()
-                isLogoutDialogVisible = false
-            },
-            onDismissRequest = { isLogoutDialogVisible = false },
-        )
-    }
-
-    if (isRemoveAccountDialogVisible) {
-        ConfirmationDialog(
-            title = Res.string.common_remove_account,
-            description = Res.string.common_remove_account_description,
-            onConfirmClicked = {
-                viewModel.removeAccountClicked()
-                isRemoveAccountDialogVisible = false
-            },
-            onDismissRequest = { isRemoveAccountDialogVisible = false },
         )
     }
 

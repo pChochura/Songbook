@@ -22,4 +22,6 @@ internal class WasmPrefsRepository : PrefsRepository {
     override suspend fun setShowPublicLyrics(show: Boolean) {}
     override fun getLibrarySortByFlow(): Flow<Pair<String, Boolean>?> = emptyFlow()
     override suspend fun setLibrarySortBy(field: String, ascending: Boolean) {}
+
+    override suspend fun clearData() {}
 }

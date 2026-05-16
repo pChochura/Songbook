@@ -1,5 +1,6 @@
 <resources>
     <string name="common_app_name">Songbook</string>
+    <string name="common_settings">Settings</string>
     <string name="common_unknown">Unknown</string>
     <string name="common_unnamed">Unnamed</string>
     <string name="common_syncing">Syncing</string>
@@ -113,16 +114,19 @@
     <string name="library_add_setlist_description">Create a setlist that will contain a set of songs with a specified order.</string>
     <string name="library_add_setlist_placeholder">Setlist name...</string>
     <string name="library_menu_display_mode">Display mode</string>
+    <string name="library_menu_settings">Settings</string>
     <string name="library_menu_display_mode_list">List</string>
     <string name="library_menu_display_mode_list_description">The songs will be displayed as a compact list</string>
     <string name="library_menu_display_mode_grid">Grid</string>
     <string name="library_menu_display_mode_grid_description">The songs will be displayed in a grid with a dynamic number of columns</string>
-    <string name="library_menu_login">Link with Google</string>
-    <string name="library_menu_login_description">Allows for synchronizing the library with other devices</string>
-    <string name="library_menu_logout">Logout</string>
-    <string name="library_menu_logout_description">Clear the local database and log out of the app</string>
-    <string name="library_menu_remove_account">Remove account</string>
-    <string name="library_menu_remove_account_description">Remove the account from the app and clear the data</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_login">Link with Google</string>
+    <string name="settings_login_description">Allows for synchronizing the library with other devices</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_logout_description">Clear the local database and log out of the app</string>
+    <string name="settings_remove_account">Remove account</string>
+    <string name="settings_remove_account_description">Remove the account from the app and clear the data</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Add new song</string>

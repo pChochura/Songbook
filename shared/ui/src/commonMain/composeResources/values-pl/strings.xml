@@ -1,5 +1,6 @@
 <resources>
     <string name="common_app_name">Songbook</string>
+    <string name="common_settings">Ustawienia</string>
     <string name="common_unknown">Nieznany</string>
     <string name="common_unnamed">Bez nazwy</string>
     <string name="common_syncing">Synchronizowanie</string>
@@ -113,16 +114,19 @@
     <string name="library_add_setlist_description">Utwórz setlistę, która będzie zawierać zestaw piosenek w określonej kolejności.</string>
     <string name="library_add_setlist_placeholder">Nazwa setlisty...</string>
     <string name="library_menu_display_mode">Tryb wyświetlania</string>
+    <string name="library_menu_settings">Ustawienia</string>
     <string name="library_menu_display_mode_list">Lista</string>
     <string name="library_menu_display_mode_list_description">Piosenki będą wyświetlane jako zwarta lista</string>
     <string name="library_menu_display_mode_grid">Siatka</string>
     <string name="library_menu_display_mode_grid_description">Piosenki będą wyświetlane w siatce z dynamiczną liczbą kolumn</string>
-    <string name="library_menu_login">Połącz z kontem Google</string>
-    <string name="library_menu_login_description">Pozwala na synchronizację biblioteki z innymi urządzeniami</string>
-    <string name="library_menu_logout">Wyloguj się</string>
-    <string name="library_menu_logout_description">Wyczyść lokalną bazę danych i wyloguj się z aplikacji</string>
-    <string name="library_menu_remove_account">Usuń konto</string>
-    <string name="library_menu_remove_account_description">Usuń konto z aplikacji i wyczyść dane</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_login">Połącz z kontem Google</string>
+    <string name="settings_login_description">Pozwala na synchronizację biblioteki z innymi urządzeniami</string>
+    <string name="settings_logout">Wyloguj się</string>
+    <string name="settings_logout_description">Wyczyść lokalną bazę danych i wyloguj się z aplikacji</string>
+    <string name="settings_remove_account">Usuń konto</string>
+    <string name="settings_remove_account_description">Usuń konto z aplikacji i wyczyść dane</string>
 
     <!-- Import Song Screen -->
     <string name="import_header_title">Dodaj nową piosenkę</string>
